@@ -22,33 +22,26 @@ namespace WledOrchestrator
             var tasks = new List<Task>();
             var fac = new TaskFactory();
 
+            HttpClient client = new HttpClient();
+            client.Timeout = new TimeSpan(0, 0, 3);
+
             for (int i = 0; i < 256; i++)
                 tasks.Add(fac.StartNew(async (i) =>
                 {
-                    if ((int)i == 33)
-                        localIp.GetHashCode();
-
                     var address = $"http://{localIp[0]}.{localIp[1]}.{localIp[2]}.{i}/json/state";
 
                     try
                     {
-                        HttpClient client = new HttpClient();
-                        client.Timeout = new TimeSpan(0, 0, 1);
-
                         using HttpResponseMessage response = await client.GetAsync(address);
                         using HttpContent content = response.Content;
                         string responseText = await content.ReadAsStringAsync();
 
-                        Debug.WriteLine(responseText);
                         if (!responseText.StartsWith("{\"on\":"))
                             return;
 
                         ledAddresses.Add(address);
-                        Debug.WriteLine("Found LED at: " + address);
                     }
-                    catch (Exception e) 
-                    { 
-                    }
+                    catch (Exception e)  {  }
                 }, i));
 
             Task.WaitAll(tasks.ToArray());
