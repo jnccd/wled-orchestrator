@@ -28,11 +28,11 @@ namespace WledOrchestrator
             for (int i = 0; i < 256; i++)
                 tasks.Add(fac.StartNew(async (i) =>
                 {
-                    var address = $"http://{localIp[0]}.{localIp[1]}.{localIp[2]}.{i}/json/state";
+                    var address = $"http://{localIp[0]}.{localIp[1]}.{localIp[2]}.{i}";
 
                     try
                     {
-                        using HttpResponseMessage response = await client.GetAsync(address);
+                        using HttpResponseMessage response = await client.GetAsync(address + "/json/state");
                         using HttpContent content = response.Content;
                         string responseText = await content.ReadAsStringAsync();
 
