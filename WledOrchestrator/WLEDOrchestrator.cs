@@ -17,7 +17,19 @@ namespace WledOrchestrator
 {
     public static class WLEDOrchestrator
     {
-        static string[] LedAddresses = new string[0];
+        public class Led 
+        { 
+            public string address; public 
+            LedState state;
+
+            public Led(string address, LedState state)
+            {
+                this.address = address;
+                this.state = state;
+            }
+        }
+
+        static Led[] Leds = new Led[0];
 
         public static void FindLEDs()
         {
@@ -25,7 +37,7 @@ namespace WledOrchestrator
             if (localIp == null)
                 return;
 
-            var ledAddresses = new List<string>();
+            var leds = new List<Led>();
             var tasks = new List<Task>();
             var fac = new TaskFactory();
 
@@ -41,14 +53,16 @@ namespace WledOrchestrator
                         if (!responseText.StartsWith("{\"on\":"))
                             return;
 
-                        ledAddresses.Add(address);
+                        var ledState = LedState.FromJson(responseText);
+
+                        leds.Add(new Led(address, ledState));
                     }
                     catch (Exception e) { }
                 }, i));
 
             Task.WaitAll(tasks.ToArray());
-            Debug.WriteLine("Found LEDs at: " + ledAddresses.Combine(", "));
-            LedAddresses = ledAddresses.ToArray();
+            Debug.WriteLine("Found LEDs at: " + leds.Select(x => x.address).Combine(", "));
+            Leds = leds.ToArray();
         }
         public static IPAddress GetLocalIPAddress()
         {
@@ -65,14 +79,33 @@ namespace WledOrchestrator
 
         public static void SetGlobalBrightness(int bri)
         {
-            foreach (var led in LedAddresses)
+            foreach (var led in Leds)
                 new Dictionary<string, string> { { "bri", bri.ToString() } }.
-                        HttpPostAsJson($"{led}/json/state");
+                        HttpPostAsJson($"{led.address}/json/state");
         }
 
         public static void SetLedColors(Color[] colors)
         {
+            foreach (var led in Leds)
+                foreach (var seg in led.state.Seg)
+                {
+                    // TODO: Implement multi segment thingys correctly
 
+                    ColorTranslator.ToHtml(colors[0]);
+
+                    var ledCols = new StringBuilder();
+                    ledCols.Append("{\"i\":[");
+
+                    for (int i = 0; i < seg.Len; i++)
+                    {
+                        var col = colors[i * seg.Len]
+                    }
+
+                    ledCols.Append("]}");
+
+                    new Dictionary<string, string> { { "seg", ledCols.ToString() } }.
+                        HttpPostAsJson($"{led.address}/json/state");
+                }
         }
     }
 }
