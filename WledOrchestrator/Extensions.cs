@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,8 +14,6 @@ namespace WledOrchestrator
 {
     public static class Extensions
     {
-        private static int RunAsConsoleCommandThreadIndex = 0;
-
         public static void InvokeIfRequired(this ISynchronizeInvoke obj, MethodInvoker action)
         {
             if (obj.InvokeRequired)
@@ -56,16 +55,27 @@ namespace WledOrchestrator
         {
             return s.Count() == 0 ? "" : s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
         }
+
         public static async Task<string> GetHttpResponse(this string url, int timeout = 2)
         {
-            HttpClient client = new HttpClient();
+            using var client = new HttpClient();
             client.Timeout = new TimeSpan(0, 0, timeout);
 
             using HttpResponseMessage response = await client.GetAsync(url);
-            using HttpContent content = response.Content;
-            string responseText = await content.ReadAsStringAsync();
+            string responseText = await response.Content.ReadAsStringAsync();
 
             return responseText;
+        }
+        public static async void HttpPostAsJson(this Dictionary<string, string> dic, string address)
+        {
+            using var client = new HttpClient();
+            client.Timeout = new TimeSpan(0, 0, 2);
+
+            var data = dic;
+            var jsonData = JsonConvert.SerializeObject(data);
+            var contentData = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+            var res = await client.PostAsync(address, contentData);
         }
 
         public static void Hide(IntPtr WindowHandle) { ShowWindow(WindowHandle, 0); }

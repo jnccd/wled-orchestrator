@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace WledOrchestrator
 {
     public partial class Form1 : Form
@@ -11,7 +13,10 @@ namespace WledOrchestrator
         {
             Task.Factory.StartNew(() => { this.InvokeIfRequired(() => { this.ForceHide(); }); });
 
-            WLEDOrchestrator.FindLEDs();
+            WLEDOrchestrator.Init();
+            Debug.WriteLine("Done");
+
+            WLEDOrchestrator.SetGlobalBrightness(32);
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
