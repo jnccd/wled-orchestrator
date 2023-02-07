@@ -13,8 +13,7 @@ namespace WledOrchestrator
         {
             Task.Factory.StartNew(() => { this.InvokeIfRequired(() => { this.ForceHide(); }); });
 
-            WLEDOrchestrator.Init();
-            Debug.WriteLine("Done");
+            WLEDOrchestrator.FindLEDs();
 
             WLEDOrchestrator.SetGlobalBrightness(32);
         }

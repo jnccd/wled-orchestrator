@@ -19,27 +19,11 @@ namespace WledOrchestrator
     {
         static string[] LedAddresses = new string[0];
 
-        public static void Init()
-        {
-            LedAddresses = FindLEDs();
-        }
-
-        public static void SetGlobalBrightness(int bri)
-        {
-            Task t = Task.Run(async () =>
-            {
-                foreach (var led in LedAddresses)
-                    await new Dictionary<string, string> { { "bri", bri.ToString() } }.
-                            HttpPostAsJson($"{led}/json/state");
-            });
-            t.Wait();
-        }
-
-        public static string[] FindLEDs()
+        public static void FindLEDs()
         {
             var localIp = GetLocalIPAddress().GetAddressBytes();
             if (localIp == null)
-                return null;
+                return;
 
             var ledAddresses = new List<string>();
             var tasks = new List<Task>();
@@ -59,15 +43,13 @@ namespace WledOrchestrator
 
                         ledAddresses.Add(address);
                     }
-                    catch (Exception e)  {  }
+                    catch (Exception e) { }
                 }, i));
 
             Task.WaitAll(tasks.ToArray());
             Debug.WriteLine("Found LEDs at: " + ledAddresses.Combine(", "));
-            return ledAddresses.ToArray();
+            LedAddresses = ledAddresses.ToArray();
         }
-
-
         public static IPAddress GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -79,6 +61,18 @@ namespace WledOrchestrator
                 }
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+
+        public static void SetGlobalBrightness(int bri)
+        {
+            foreach (var led in LedAddresses)
+                new Dictionary<string, string> { { "bri", bri.ToString() } }.
+                        HttpPostAsJson($"{led}/json/state");
+        }
+
+        public static void SetLedColors(Color[] colors)
+        {
+
         }
     }
 }
