@@ -14,8 +14,10 @@ namespace WledOrchestrator
             Task.Factory.StartNew(() => { this.InvokeIfRequired(() => { this.ForceHide(); }); });
 
             WLEDOrchestrator.FindLEDs();
+            Debug.WriteLine("Done");
 
             WLEDOrchestrator.SetGlobalBrightness(32);
+            WLEDOrchestrator.SetLedColors(new Color[] { Color.Azure,Color.CornflowerBlue,Color.Cyan,Color.Coral,Color.Crimson });
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)

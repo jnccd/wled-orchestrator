@@ -19,8 +19,8 @@ namespace WledOrchestrator
     {
         public class Led 
         { 
-            public string address; public 
-            LedState state;
+            public string address; 
+            public LedState state;
 
             public Led(string address, LedState state)
             {
@@ -40,27 +40,35 @@ namespace WledOrchestrator
             var leds = new List<Led>();
             var tasks = new List<Task>();
             var fac = new TaskFactory();
+            int done = 0;
 
             for (int i = 0; i < 256; i++)
                 tasks.Add(fac.StartNew(async (i) =>
                 {
                     var address = $"http://{localIp[0]}.{localIp[1]}.{localIp[2]}.{i}";
 
+                    string responseText = "";
                     try
                     {
-                        string responseText = await $"{address}/json/state".GetHttpResponse();
+                        responseText = await $"{address}/json/state".GetHttpResponse();
+                    } catch (Exception e) { }
 
-                        if (!responseText.StartsWith("{\"on\":"))
-                            return;
-
-                        var ledState = LedState.FromJson(responseText);
-
-                        leds.Add(new Led(address, ledState));
+                    if (string.IsNullOrWhiteSpace(responseText) || !responseText.StartsWith("{\"on\":"))
+                    {
+                        done++;
+                        return;
                     }
-                    catch (Exception e) { }
+
+                    var ledState = JsonConvert.DeserializeObject<LedState>(responseText);
+
+                    leds.Add(new Led(address, ledState));
+                    done++;
                 }, i));
 
             Task.WaitAll(tasks.ToArray());
+            while (done < 250)
+                Thread.Sleep(200);
+
             Debug.WriteLine("Found LEDs at: " + leds.Select(x => x.address).Combine(", "));
             Leds = leds.ToArray();
         }
@@ -80,8 +88,7 @@ namespace WledOrchestrator
         public static void SetGlobalBrightness(int bri)
         {
             foreach (var led in Leds)
-                new Dictionary<string, string> { { "bri", bri.ToString() } }.
-                        HttpPostAsJson($"{led.address}/json/state");
+                $"{{\"bri\":{bri}}}".HttpPostAsJson($"{led.address}/json/state");
         }
 
         public static void SetLedColors(Color[] colors)
@@ -91,20 +98,18 @@ namespace WledOrchestrator
                 {
                     // TODO: Implement multi segment thingys correctly
 
-                    ColorTranslator.ToHtml(colors[0]);
-
                     var ledCols = new StringBuilder();
                     ledCols.Append("{\"i\":[");
-
                     for (int i = 0; i < seg.Len; i++)
                     {
-                        var col = colors[i * seg.Len]
+                        var col = colors[(int)(i * (float)colors.Length / seg.Len)];
+                        if (i > 0)
+                            ledCols.Append(',');
+                        ledCols.Append($"'{col.ToHex()}'");
                     }
-
                     ledCols.Append("]}");
 
-                    new Dictionary<string, string> { { "seg", ledCols.ToString() } }.
-                        HttpPostAsJson($"{led.address}/json/state");
+                    $"{{\"seg\":{ledCols}}}".HttpPostAsJson($"{led.address}/json/state");
                 }
         }
     }
