@@ -7,6 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Security.Policy;
+using System.Threading;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace WledOrchestrator
 {
@@ -17,16 +22,17 @@ namespace WledOrchestrator
         public static void Init()
         {
             LedAddresses = FindLEDs();
-
-
         }
 
         public static void SetGlobalBrightness(int bri)
         {
-            foreach (var led in LedAddresses)
+            Task t = Task.Run(async () =>
             {
-
-            }
+                foreach (var led in LedAddresses)
+                    await new Dictionary<string, string> { { "bri", bri.ToString() } }.
+                            HttpPostAsJson($"{led}/json/state");
+            });
+            t.Wait();
         }
 
         public static string[] FindLEDs()
