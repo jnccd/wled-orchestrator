@@ -56,135 +56,16 @@ namespace WledOrchestrator
         {
             return s.Count() == 0 ? "" : s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
         }
-        public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent,
-            Action<StreamWriter> RunEvent = null, string WorkingDir = "", Process compiler = null)
+        public static async Task<string> GetHttpResponse(this string url, int timeout = 2)
         {
-            bool exited = false;
-            string[] split = command.Split(' ');
+            HttpClient client = new HttpClient();
+            client.Timeout = new TimeSpan(0, 0, timeout);
 
-            if (split.Length == 0)
-                return;
+            using HttpResponseMessage response = await client.GetAsync(url);
+            using HttpContent content = response.Content;
+            string responseText = await content.ReadAsStringAsync();
 
-            if (compiler == null)
-                compiler = new Process();
-
-            using (compiler)
-            {
-                compiler.StartInfo.FileName = split.First();
-                compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y).Trim(' ');
-                compiler.StartInfo.CreateNoWindow = true;
-                compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                compiler.StartInfo.RedirectStandardInput = true;
-                compiler.StartInfo.RedirectStandardOutput = true;
-                compiler.StartInfo.RedirectStandardError = true;
-                if (!string.IsNullOrWhiteSpace(WorkingDir))
-                    compiler.StartInfo.WorkingDirectory = WorkingDir;
-                compiler.Start();
-
-                Task.Run(() => { RunEvent?.Invoke(compiler.StandardInput); });
-
-                DateTime start = DateTime.Now;
-
-                Task.Run(() =>
-                {
-                    Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
-                    compiler.WaitForExit();
-
-                    string o = "";
-                    string e = "";
-
-                    try { o = compiler.StandardOutput.ReadToEnd(); } catch { }
-                    try { e = compiler.StandardError.ReadToEnd(); } catch { }
-
-                    exited = true;
-                    ExecutedEvent(o, e);
-                });
-
-                while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
-                    Thread.Sleep(100);
-                if (!exited)
-                {
-                    exited = true;
-                    try
-                    {
-                        compiler.Close();
-                    }
-                    catch { }
-                    TimeoutEvent();
-                }
-            }
-        }
-        public static string GetShellOut(this string command, int timeout = 10000)
-        {
-            string[] split = command.Split(' ');
-
-            Process P = Process.Start(new ProcessStartInfo()
-            {
-                FileName = split.First(),
-                Arguments = split.Skip(1).Combine(" "),
-                RedirectStandardOutput = true,
-                RedirectStandardInput = true,
-                RedirectStandardError = true
-            });
-            if (!P.WaitForExit(timeout))
-                P.Kill();
-
-            return P.StandardOutput.ReadToEnd() + P.StandardError.ReadToEnd();
-        }
-        public static string GetHTMLfromURL(this string URL, int timeout = 10000, bool silentError = false)
-        {
-            try
-            {
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
-                req.KeepAlive = false;
-                req.Timeout = timeout;
-                req.AllowAutoRedirect = true;
-                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
-                using (WebResponse w = req.GetResponse())
-                using (Stream s = w.GetResponseStream())
-                using (StreamReader sr = new StreamReader(s))
-                    return sr.ReadToEnd();
-            }
-            catch (Exception e) 
-            {   
-                if (silentError)
-                {
-                    return "";
-                }
-                else
-                {
-                    return $"Exception: {e}";
-                }
-            }
-        }
-        public static WebResponse GetWebResponsefromURL(this string URL)
-        {
-            try
-            {
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
-                req.KeepAlive = false;
-                req.Timeout = 3000;
-                req.AllowAutoRedirect = true;
-                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
-
-                return req.GetResponse();
-            }
-            catch (Exception) { return null; }
-        }
-        public static MemoryStream GetStreamFromUrl(this string url)
-        {
-            byte[] imageData = null;
-            MemoryStream ms = null;
-
-            try
-            {
-                using (var wc = new WebClient())
-                    imageData = wc.DownloadData(url);
-                ms = new MemoryStream(imageData);
-            }
-            catch { }
-
-            return ms;
+            return responseText;
         }
 
         public static void Hide(IntPtr WindowHandle) { ShowWindow(WindowHandle, 0); }
