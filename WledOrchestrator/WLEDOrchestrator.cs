@@ -12,7 +12,24 @@ namespace WledOrchestrator
 {
     public static class WLEDOrchestrator
     {
-        public static List<string> FindLEDs()
+        static string[] LedAddresses = new string[0];
+
+        public static void Init()
+        {
+            LedAddresses = FindLEDs();
+
+
+        }
+
+        public static void SetGlobalBrightness(int bri)
+        {
+            foreach (var led in LedAddresses)
+            {
+
+            }
+        }
+
+        public static string[] FindLEDs()
         {
             var localIp = GetLocalIPAddress().GetAddressBytes();
             if (localIp == null)
@@ -22,9 +39,6 @@ namespace WledOrchestrator
             var tasks = new List<Task>();
             var fac = new TaskFactory();
 
-            HttpClient client = new HttpClient();
-            client.Timeout = new TimeSpan(0, 0, 3);
-
             for (int i = 0; i < 256; i++)
                 tasks.Add(fac.StartNew(async (i) =>
                 {
@@ -32,9 +46,7 @@ namespace WledOrchestrator
 
                     try
                     {
-                        using HttpResponseMessage response = await client.GetAsync(address + "/json/state");
-                        using HttpContent content = response.Content;
-                        string responseText = await content.ReadAsStringAsync();
+                        string responseText = await $"{address}/json/state".GetHttpResponse();
 
                         if (!responseText.StartsWith("{\"on\":"))
                             return;
@@ -46,7 +58,7 @@ namespace WledOrchestrator
 
             Task.WaitAll(tasks.ToArray());
             Debug.WriteLine("Found LEDs at: " + ledAddresses.Combine(", "));
-            return ledAddresses;
+            return ledAddresses.ToArray();
         }
 
 
