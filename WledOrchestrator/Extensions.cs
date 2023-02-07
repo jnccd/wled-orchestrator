@@ -56,7 +56,9 @@ namespace WledOrchestrator
             return s.Count() == 0 ? "" : s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
         }
 
-        public static async Task<string> GetHttpResponse(this string url, int timeout = 2)
+        public static string ToHex(this Color c) => $"{c.R:X2}{c.G:X2}{c.B:X2}";
+
+        public static async Task<string> GetHttpResponse(this string url, int timeout = 5)
         {
             using var client = new HttpClient();
             client.Timeout = new TimeSpan(0, 0, timeout);
@@ -66,14 +68,12 @@ namespace WledOrchestrator
 
             return responseText;
         }
-        public static async void HttpPostAsJson(this Dictionary<string, string> dic, string address)
+        public static async void HttpPostAsJson(this string json, string address, int timeout = 5)
         {
             using var client = new HttpClient();
-            client.Timeout = new TimeSpan(0, 0, 2);
+            client.Timeout = new TimeSpan(0, 0, timeout);
 
-            var data = dic;
-            var jsonData = JsonConvert.SerializeObject(data);
-            var contentData = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            var contentData = new StringContent(json, Encoding.UTF8, "application/json");
 
             var res = await client.PostAsync(address, contentData);
         }
