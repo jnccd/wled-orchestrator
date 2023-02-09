@@ -24,6 +24,9 @@ namespace WledOrchestrator
             WLEDOrchestrator.SetGlobalBrightness(16);
             WLEDOrchestrator.SetLedColors(new Color[] { Color.Orange, Color.OrangeRed, Color.Crimson, Color.MintCream });
 
+            foreach (var led in WLEDOrchestrator.Leds)
+                ledsPanel.Controls.Add(new Button() { Text = led.address.Split(".").Last(), Bounds = ledButtonTemplate.Bounds });
+
             timer.Start();
         }
 

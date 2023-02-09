@@ -58,7 +58,7 @@ namespace WledOrchestrator
 
         public static string ToHex(this Color c) => $"{c.R:X2}{c.G:X2}{c.B:X2}";
 
-        public static async Task<string> GetHttpResponse(this string url, int timeout = 5)
+        public static async Task<string> GetHttpResponseFrom(this string url, int timeout = 5)
         {
             using var client = new HttpClient();
             client.Timeout = new TimeSpan(0, 0, timeout);
@@ -68,7 +68,7 @@ namespace WledOrchestrator
 
             return responseText;
         }
-        public static async void HttpPostAsJson(this string json, string address, int timeout = 5)
+        public static async void HttpPostAsJsonTo(this string json, string address, int timeout = 5)
         {
             using var client = new HttpClient();
             client.Timeout = new TimeSpan(0, 0, timeout);
