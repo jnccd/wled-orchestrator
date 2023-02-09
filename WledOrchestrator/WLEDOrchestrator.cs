@@ -29,7 +29,7 @@ namespace WledOrchestrator
             }
         }
 
-        static Led[] Leds = new Led[0];
+        public static Led[] Leds = new Led[0];
 
         public static void FindLEDs()
         {
@@ -50,7 +50,7 @@ namespace WledOrchestrator
                     string responseText = "";
                     try
                     {
-                        responseText = await $"{address}/json/state".GetHttpResponse();
+                        responseText = await $"{address}/json/state".GetHttpResponseFrom();
                     } catch (Exception e) { }
 
                     if (string.IsNullOrWhiteSpace(responseText) || !responseText.StartsWith("{\"on\":"))
@@ -88,7 +88,7 @@ namespace WledOrchestrator
         public static void SetGlobalBrightness(int bri)
         {
             foreach (var led in Leds)
-                $"{{\"bri\":{bri}}}".HttpPostAsJson($"{led.address}/json/state");
+                $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{led.address}/json/state");
         }
 
         public static void SetLedColors(Color[] colors)
@@ -109,7 +109,7 @@ namespace WledOrchestrator
                     }
                     ledCols.Append("]}");
 
-                    $"{{\"seg\":{ledCols}}}".HttpPostAsJson($"{led.address}/json/state");
+                    $"{{\"seg\":{ledCols}}}".HttpPostAsJsonTo($"{led.address}/json/state");
                 }
         }
     }
