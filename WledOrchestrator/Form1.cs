@@ -4,6 +4,10 @@ namespace WledOrchestrator
 {
     public partial class Form1 : Form
     {
+        int bri;
+        Color[] cols;
+        bool briChangeRequested, colsChangeRequested;
+
         public Form1()
         {
             InitializeComponent();
@@ -19,6 +23,8 @@ namespace WledOrchestrator
 
             WLEDOrchestrator.SetGlobalBrightness(16);
             WLEDOrchestrator.SetLedColors(new Color[] { Color.Orange, Color.OrangeRed, Color.Crimson, Color.MintCream });
+
+            timer.Start();
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -35,6 +41,27 @@ namespace WledOrchestrator
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             WLEDOrchestrator.SetGlobalBrightness(0);
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            if (briChangeRequested)
+            {
+                WLEDOrchestrator.SetGlobalBrightness(bri);
+                briChangeRequested = false;
+            }
+
+            if (colsChangeRequested)
+            {
+                WLEDOrchestrator.SetLedColors(cols);
+                colsChangeRequested = false;
+            }
+        }
+
+        private void brightnessBar_Scroll(object sender, EventArgs e)
+        {
+            bri = brightnessBar.Value;
+            briChangeRequested = true;
         }
     }
 }
