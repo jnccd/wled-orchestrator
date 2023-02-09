@@ -11,13 +11,14 @@ namespace WledOrchestrator
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            this.Enabled = false;
             Task.Factory.StartNew(() => { this.InvokeIfRequired(() => { this.ForceHide(); }); });
-
             WLEDOrchestrator.FindLEDs();
+            this.Enabled = true;
             Debug.WriteLine("Done");
 
-            WLEDOrchestrator.SetGlobalBrightness(32);
-            WLEDOrchestrator.SetLedColors(new Color[] { Color.Azure,Color.CornflowerBlue,Color.Cyan,Color.Coral,Color.Crimson });
+            WLEDOrchestrator.SetGlobalBrightness(16);
+            WLEDOrchestrator.SetLedColors(new Color[] { Color.Orange, Color.OrangeRed, Color.Crimson, Color.MintCream });
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -29,6 +30,11 @@ namespace WledOrchestrator
         {
             if (WindowState == FormWindowState.Minimized)
                 this.ForceHide();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            WLEDOrchestrator.SetGlobalBrightness(0);
         }
     }
 }
