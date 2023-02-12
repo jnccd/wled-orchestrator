@@ -11,11 +11,8 @@ namespace WledOrchestrator
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Enabled = false;
-            Task.Factory.StartNew(() => { this.InvokeIfRequired(() => { this.ForceHide(); }); });
+            Task.Factory.StartNew(() => this.InvokeIfRequired(this.ForceHide));
             WLEDOrchestrator.FindLEDs();
-            this.Enabled = true;
-            Debug.WriteLine("Done");
 
             WLEDOrchestrator.SetGlobalBrightness(16);
             WLEDOrchestrator.SetLedColors(new Color[] { Color.Orange, Color.OrangeRed, Color.Crimson, Color.MintCream });
