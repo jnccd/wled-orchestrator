@@ -18,8 +18,9 @@ namespace WledOrchestrator
     public static class WLEDOrchestrator
     {
         public static Led[] Leds = new Led[0];
-        static DateTime LastHTTPReq = new DateTime(1999,5,4);
         static double HttpReqCooldownTime = 3;
+        static DateTime LastBriHTTPReq = new DateTime(2999, 5, 4);
+        static DateTime LastColHTTPReq = new DateTime(2999, 5, 4);
 
         public class Led
         { 
@@ -89,9 +90,9 @@ namespace WledOrchestrator
 
         public static void SetGlobalBrightness(int bri)
         {
-            if ((LastHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
+            if ((LastBriHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
                 return;
-            LastHTTPReq = DateTime.Now;
+            LastBriHTTPReq = DateTime.Now;
 
             foreach (var led in Leds)
                 $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{led.address}/json/state");
@@ -99,9 +100,9 @@ namespace WledOrchestrator
 
         public static void SetLedColors(Color[] colors)
         {
-            if ((LastHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
+            if ((LastColHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
                 return;
-            LastHTTPReq = DateTime.Now;
+            LastBriHTTPReq = DateTime.Now;
 
             foreach (var led in Leds)
                 foreach (var seg in led.state.Seg)
