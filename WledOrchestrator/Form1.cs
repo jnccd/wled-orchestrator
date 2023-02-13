@@ -8,7 +8,15 @@ namespace WledOrchestrator
         Color SunColor = Color.FromArgb(252, 200, 20);
         int ColorArrayResolution = 300;
         static double sunRise = 0.3;
-        Func<double, double> DayLightFunction = (x) => Math.Sin(2 * (x - sunRise) * Math.PI);
+        static double sunTime = 0.5;
+
+        static double halfSunTime = sunTime / 2;
+        static double sunTop = sunRise + halfSunTime;
+        static double sunSet = sunRise + sunTime;
+
+        static double dayLightFunMult = Math.Log2(0.05) / (halfSunTime * halfSunTime);
+        Func<double, double> DayLightFunction = (x) => Math.Pow(2, -((x-sunTop)*(x-sunTop)) * dayLightFunMult);
+
         double invertedSunSize = 150;
 
         public Form1()
@@ -28,7 +36,7 @@ namespace WledOrchestrator
             {
                 while (true)
                 {
-                    Thread.Sleep(30_000);
+                    Thread.Sleep(15_000);
                     UpdateLEDs();
                 }
             });
@@ -40,10 +48,6 @@ namespace WledOrchestrator
             var curDayTimePercent = DateTime.Now.TimeOfDay.TotalDays;
             {
                 var funOut = DayLightFunction(curDayTimePercent);
-
-                funOut = (funOut + 0.5) / 1.5;
-                funOut = funOut < 0.01 ? 0.01 : funOut;
-
                 WLEDOrchestrator.SetGlobalBrightness((int)(funOut * 255));
             }
 
@@ -52,7 +56,10 @@ namespace WledOrchestrator
             for (int i = 0; i < ColorArrayResolution; i++)
             {
                 var sunRiseDayTime = curDayTimePercent - sunRise;
-                var x = i - sunRiseDayTime;
+                if (sunRiseDayTime < 0)
+                    sunRiseDayTime += 1;
+
+                var x = (i / (double)ColorArrayResolution) - sunRiseDayTime;
                 var gaussianSun = Math.Exp(-(x * x) * invertedSunSize);
                 colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
             }
