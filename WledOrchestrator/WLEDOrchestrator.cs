@@ -102,7 +102,7 @@ namespace WledOrchestrator
         {
             if ((LastColHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
                 return;
-            LastBriHTTPReq = DateTime.Now;
+            LastColHTTPReq = DateTime.Now;
 
             foreach (var led in Leds)
                 foreach (var seg in led.state.Seg)
