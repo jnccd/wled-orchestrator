@@ -14,7 +14,7 @@ namespace WledOrchestrator
         static double sunTop = sunRise + halfSunTime;
         static double sunSet = sunRise + sunTime;
 
-        static double dayLightFunMult = Math.Log2(0.05) / (halfSunTime * halfSunTime);
+        static double dayLightFunMult = -Math.Log2(0.05) / (halfSunTime * halfSunTime);
         Func<double, double> DayLightFunction = (x) => Math.Pow(2, -((x-sunTop)*(x-sunTop)) * dayLightFunMult);
 
         double invertedSunSize = 150;
@@ -36,8 +36,8 @@ namespace WledOrchestrator
             {
                 while (true)
                 {
-                    Thread.Sleep(15_000);
                     UpdateLEDs();
+                    Thread.Sleep(15_000);
                 }
             });
         }
