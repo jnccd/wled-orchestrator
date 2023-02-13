@@ -55,9 +55,7 @@ namespace WledOrchestrator
             Color[] colors = new Color[ColorArrayResolution];
             for (int i = 0; i < ColorArrayResolution; i++)
             {
-                var sunRiseDayTime = curDayTimePercent - sunRise;
-                if (sunRiseDayTime < 0)
-                    sunRiseDayTime += 1;
+                var sunRiseDayTime = curDayTimePercent / sunTime - sunRise;
 
                 var x = (i / (double)ColorArrayResolution) - sunRiseDayTime;
                 var gaussianSun = Math.Exp(-(x * x) * invertedSunSize);
