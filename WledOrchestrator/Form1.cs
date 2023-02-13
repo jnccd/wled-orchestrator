@@ -48,7 +48,7 @@ namespace WledOrchestrator
             var curDayTimePercent = DateTime.Now.TimeOfDay.TotalDays;
             {
                 var funOut = DayLightFunction(curDayTimePercent);
-                WLEDOrchestrator.SetGlobalBrightness((int)(funOut * 255));
+                WLEDOrchestrator.SetGlobalBrightness((int)(funOut * 253) + 2);
             }
 
             // Create Color Array
