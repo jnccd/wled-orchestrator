@@ -33,6 +33,7 @@
             this.ledsPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.ledButtonTemplate = new System.Windows.Forms.Button();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.stateLabel = new System.Windows.Forms.Label();
             this.ledsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,11 +65,21 @@
             this.notifyIcon.Visible = true;
             this.notifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseDoubleClick);
             // 
+            // stateLabel
+            // 
+            this.stateLabel.AutoSize = true;
+            this.stateLabel.Location = new System.Drawing.Point(12, 426);
+            this.stateLabel.Name = "stateLabel";
+            this.stateLabel.Size = new System.Drawing.Size(42, 15);
+            this.stateLabel.TabIndex = 1;
+            this.stateLabel.Text = "Status:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.stateLabel);
             this.Controls.Add(this.ledsPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
@@ -78,6 +89,7 @@
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.ledsPanel.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -86,5 +98,6 @@
         private FlowLayoutPanel ledsPanel;
         private Button ledButtonTemplate;
         private NotifyIcon notifyIcon;
+        private Label stateLabel;
     }
 }
