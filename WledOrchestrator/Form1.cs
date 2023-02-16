@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace WledOrchestrator
@@ -34,10 +35,21 @@ namespace WledOrchestrator
 
             Task.Run(() =>
             {
+                var labelUpdateInterval = 1000;
+                var updateInterval = 15000;
+
+                var luPerUu = updateInterval / labelUpdateInterval;
+
                 while (true)
                 {
                     UpdateLEDs();
-                    Thread.Sleep(15_000);
+
+                    for (int i = 0; i < luPerUu; i++)
+                    {
+                        stateLabel.InvokeIfRequired(() => stateLabel.Text = $"Status: Updating again in {(luPerUu - i) * labelUpdateInterval / 1000} sec");
+                        Thread.Sleep(labelUpdateInterval);
+                    }
+                    
                 }
             });
         }
@@ -46,10 +58,9 @@ namespace WledOrchestrator
         {
             // Set Brightness
             var curDayTimePercent = DateTime.Now.TimeOfDay.TotalDays;
-            {
-                var funOut = DayLightFunction(curDayTimePercent);
-                WLEDOrchestrator.SetGlobalBrightness((int)(funOut * 253) + 2);
-            }
+            var funOut = DayLightFunction(curDayTimePercent);
+            var bri = (int)(funOut * 255) + 0;
+            WLEDOrchestrator.SetGlobalBrightness(bri);
 
             // Create Color Array
             Color[] colors = new Color[ColorArrayResolution];
