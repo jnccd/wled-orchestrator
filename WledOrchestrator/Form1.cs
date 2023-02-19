@@ -1,3 +1,4 @@
+using Configuration;
 using System;
 using System.Diagnostics;
 
@@ -28,7 +29,15 @@ namespace WledOrchestrator
         private void Form1_Load(object sender, EventArgs e)
         {
             Task.Factory.StartNew(() => this.InvokeIfRequired(this.ForceHide));
-            WLEDOrchestrator.Leds = WLEDOrchestrator.FindLEDs();
+
+            if (Config.Data.Leds == null)
+            {
+                WLEDOrchestrator.Leds = WLEDOrchestrator.FindLEDs();
+                Config.Data.Leds = WLEDOrchestrator.Leds;
+                Config.Save();
+            }
+            else
+                WLEDOrchestrator.Leds = Config.Data.Leds;
 
             foreach (var led in WLEDOrchestrator.Leds)
                 ledsPanel.Controls.Add(new Button() { Text = led.address.Split(".").Last(), Bounds = ledButtonTemplate.Bounds });
