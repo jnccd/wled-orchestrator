@@ -1,25 +1,13 @@
 using Configuration;
 using System;
 using System.Diagnostics;
+using WledOrchestrator.Themes;
 
 namespace WledOrchestrator
 {
     public partial class Form1 : Form
     {
-        Color SkyColor = Color.FromArgb(142, 215, 253);
-        Color SunColor = Color.FromArgb(252, 200, 20);
-        int ColorArrayResolution = 300;
-        static double sunRise = 0.3;
-        static double sunTime = 0.5;
-
-        static double halfSunTime = sunTime / 2;
-        static double sunTop = sunRise + halfSunTime;
-        static double sunSet = sunRise + sunTime;
-
-        static double dayLightFunMult = -Math.Log2(0.05) / (halfSunTime * halfSunTime);
-        Func<double, double> DayLightFunction = (x) => Math.Pow(2, -((x-sunTop)*(x-sunTop)) * dayLightFunMult);
-
-        double invertedSunSize = 150;
+        LedTheme currentTheme = new SunTheme();
 
         public Form1()
         {
@@ -39,9 +27,11 @@ namespace WledOrchestrator
             else
                 WLEDOrchestrator.Leds = Config.Data.Leds;
 
+            // Add leds Gui
             foreach (var led in WLEDOrchestrator.Leds)
                 ledsPanel.Controls.Add(new Button() { Text = led.address.Split(".").Last(), Bounds = ledButtonTemplate.Bounds });
 
+            // Update thread
             Task.Run(() =>
             {
                 var labelUpdateInterval = 1000;
@@ -65,23 +55,10 @@ namespace WledOrchestrator
 
         void UpdateLEDs()
         {
-            // Set Brightness
             var curDayTimePercent = DateTime.Now.TimeOfDay.TotalDays;
-            var funOut = DayLightFunction(curDayTimePercent);
-            var bri = (int)(funOut * 255) + 0;
-            WLEDOrchestrator.SetGlobalBrightness(bri);
 
-            // Create Color Array
-            Color[] colors = new Color[ColorArrayResolution];
-            for (int i = 0; i < ColorArrayResolution; i++)
-            {
-                var sunRiseDayTime = curDayTimePercent / sunTime - sunRise;
-
-                var x = (i / (double)ColorArrayResolution) - sunRiseDayTime;
-                var gaussianSun = Math.Exp(-(x * x) * invertedSunSize);
-                colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
-            }
-            WLEDOrchestrator.SetLedColors(colors);
+            WLEDOrchestrator.SetGlobalBrightness(currentTheme.GetBrightness(curDayTimePercent));
+            WLEDOrchestrator.SetLedColors(currentTheme.GetColors(curDayTimePercent));
 
             Debug.WriteLine("Updated LEDs");
         }
