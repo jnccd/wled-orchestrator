@@ -28,7 +28,7 @@ namespace WledOrchestrator
         private void Form1_Load(object sender, EventArgs e)
         {
             Task.Factory.StartNew(() => this.InvokeIfRequired(this.ForceHide));
-            WLEDOrchestrator.FindLEDs();
+            WLEDOrchestrator.Leds = WLEDOrchestrator.FindLEDs();
 
             foreach (var led in WLEDOrchestrator.Leds)
                 ledsPanel.Controls.Add(new Button() { Text = led.address.Split(".").Last(), Bounds = ledButtonTemplate.Bounds });
