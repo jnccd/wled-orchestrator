@@ -18,6 +18,7 @@ namespace WledOrchestrator
         {
             Task.Factory.StartNew(() => this.InvokeIfRequired(this.ForceHide));
 
+            // Load or find Leds
             if (Config.Data.Leds == null)
             {
                 WLEDOrchestrator.Leds = WLEDOrchestrator.FindLEDs();
@@ -27,11 +28,11 @@ namespace WledOrchestrator
             else
                 WLEDOrchestrator.Leds = Config.Data.Leds;
 
-            // Add leds Gui
+            // Add Leds Gui
             foreach (var led in WLEDOrchestrator.Leds)
                 ledsPanel.Controls.Add(new Button() { Text = led.address.Split(".").Last(), Bounds = ledButtonTemplate.Bounds });
 
-            // Update thread
+            // Start Update thread
             Task.Run(() =>
             {
                 var labelUpdateInterval = 1000;
@@ -39,13 +40,23 @@ namespace WledOrchestrator
 
                 var luPerUu = updateInterval / labelUpdateInterval;
 
+                Exception? e = null;
+
                 while (true)
                 {
-                    UpdateLEDs();
+                    try
+                    {
+                        UpdateLEDs();
+                        e = null;
+                    } 
+                    catch (Exception ex) 
+                    {
+                        e = ex;
+                    }
 
                     for (int i = 0; i < luPerUu; i++)
                     {
-                        stateLabel.InvokeIfRequired(() => stateLabel.Text = $"Status: Updating again in {(luPerUu - i) * labelUpdateInterval / 1000} sec");
+                        stateLabel.InvokeIfRequired(() => stateLabel.Text = $"Status: Updating again in {(luPerUu - i) * labelUpdateInterval / 1000} sec" + (e == null ? "" : $" Recent Exception in Update Thread: {e}"));
                         Thread.Sleep(labelUpdateInterval);
                     }
                     
