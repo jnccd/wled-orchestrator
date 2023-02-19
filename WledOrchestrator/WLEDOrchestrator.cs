@@ -34,11 +34,11 @@ namespace WledOrchestrator
             }
         }
 
-        public static void FindLEDs()
+        public static Led[] FindLEDs()
         {
             var localIp = GetLocalIPAddress().GetAddressBytes();
             if (localIp == null)
-                return;
+                return null;
 
             var leds = new List<Led>();
             var tasks = new List<Task>();
@@ -73,7 +73,7 @@ namespace WledOrchestrator
                 Thread.Sleep(200);
 
             Debug.WriteLine("Found LEDs at: " + leds.Select(x => x.address).Combine(", "));
-            Leds = leds.ToArray();
+            return leds.ToArray();
         }
         public static IPAddress GetLocalIPAddress()
         {
