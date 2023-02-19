@@ -67,6 +67,7 @@
             // 
             // stateLabel
             // 
+            this.stateLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.stateLabel.AutoSize = true;
             this.stateLabel.Location = new System.Drawing.Point(12, 426);
             this.stateLabel.Name = "stateLabel";
