@@ -98,6 +98,7 @@ namespace WledOrchestrator
                 $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{led.address}/json/state");
         }
 
+        // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
         public static void SetLedColors(Color[] colors)
         {
             if ((LastColHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
