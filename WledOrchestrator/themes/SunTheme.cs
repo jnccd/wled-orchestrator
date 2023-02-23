@@ -28,10 +28,9 @@ namespace WledOrchestrator.Themes
             // Set Brightness
             var curDayTimePercent = DateTime.Now.TimeOfDay.TotalDays;
             var funOut = DayLightFunction(curDayTimePercent);
-            var bri = (int)(funOut * 255) + 0;
-            WLEDOrchestrator.SetGlobalBrightness(bri);
+            var bri = (funOut * 255) + 0;
 
-            return base.GetBrightness(input);
+            return (byte)bri;
         }
 
         public override Color[] GetColors(double input)
@@ -46,9 +45,8 @@ namespace WledOrchestrator.Themes
                 var gaussianSun = Math.Exp(-(x * x) * invertedSunSize);
                 colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
             }
-            WLEDOrchestrator.SetLedColors(colors);
 
-            return base.GetColors(input);
+            return colors;
         }
     }
 }
