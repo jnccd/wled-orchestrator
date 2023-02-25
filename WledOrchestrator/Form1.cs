@@ -68,10 +68,12 @@ namespace WledOrchestrator
         {
             var curDayTimePercent = DateTime.Now.TimeOfDay.TotalDays;
 
-            WLEDOrchestrator.SetGlobalBrightness(currentTheme.GetBrightness(curDayTimePercent));
-            WLEDOrchestrator.SetLedColors(currentTheme.GetColors(curDayTimePercent));
+            var bri = currentTheme.GetBrightness(curDayTimePercent);
+            WLEDOrchestrator.SetGlobalBrightness(bri);
+            var cols = currentTheme.GetColors(curDayTimePercent);
+            WLEDOrchestrator.SetLedColors(cols);
 
-            Debug.WriteLine("Updated LEDs");
+            Debug.WriteLine($"Updated LEDs {bri} {cols}");
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
