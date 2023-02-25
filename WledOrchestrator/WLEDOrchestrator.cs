@@ -19,8 +19,8 @@ namespace WledOrchestrator
     {
         public static Led[] Leds = new Led[0];
         static double HttpReqCooldownTime = 3;
-        static DateTime LastBriHTTPReq = new DateTime(2999, 5, 4);
-        static DateTime LastColHTTPReq = new DateTime(2999, 5, 4);
+        static DateTime LastBriHTTPReq = new DateTime(1999, 5, 4);
+        static DateTime LastColHTTPReq = new DateTime(1999, 5, 4);
 
         public class Led
         { 
@@ -32,6 +32,11 @@ namespace WledOrchestrator
                 this.address = address;
                 this.state = state;
             }
+        }
+
+        public class CooldownException : Exception
+        {
+            public CooldownException(string message) : base(message) { }
         }
 
         public static Led[] FindLEDs()
@@ -90,8 +95,9 @@ namespace WledOrchestrator
 
         public static void SetGlobalBrightness(int bri)
         {
-            if ((LastBriHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
-                return;
+            var secs = (DateTime.Now - LastBriHTTPReq).TotalSeconds;
+            if (secs < HttpReqCooldownTime)
+                throw new CooldownException($"Not yet {secs}");
             LastBriHTTPReq = DateTime.Now;
 
             foreach (var led in Leds)
@@ -101,8 +107,9 @@ namespace WledOrchestrator
         // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
         public static void SetLedColors(Color[] colors)
         {
-            if ((LastColHTTPReq - DateTime.Now).TotalSeconds < HttpReqCooldownTime)
-                return;
+            var secs = (DateTime.Now - LastColHTTPReq).TotalSeconds;
+            if (secs < HttpReqCooldownTime)
+                throw new CooldownException($"Not yet {secs}");
             LastColHTTPReq = DateTime.Now;
 
             foreach (var led in Leds)
