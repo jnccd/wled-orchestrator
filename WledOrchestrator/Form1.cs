@@ -35,31 +35,38 @@ namespace WledOrchestrator
             // Start Update thread
             Task.Run(() =>
             {
-                var labelUpdateInterval = 1000;
-                var updateInterval = 15000;
-
-                var luPerUu = updateInterval / labelUpdateInterval;
-
-                Exception? e = null;
-
-                while (true)
+                try
                 {
-                    try
-                    {
-                        UpdateLEDs();
-                        e = null;
-                    } 
-                    catch (Exception ex) 
-                    {
-                        e = ex;
-                    }
+                    var labelUpdateInterval = 1000;
+                    var updateInterval = 15000;
 
-                    for (int i = 0; i < luPerUu; i++)
+                    var luPerUu = updateInterval / labelUpdateInterval;
+
+                    Exception? e = null;
+
+                    while (true)
                     {
-                        stateLabel.InvokeIfRequired(() => stateLabel.Text = $"Status: Updating again in {(luPerUu - i) * labelUpdateInterval / 1000} sec" + (e == null ? "" : $" Recent Exception in Update Thread: {e}"));
-                        Thread.Sleep(labelUpdateInterval);
+                        try
+                        {
+                            UpdateLEDs();
+                            e = null;
+                        }
+                        catch (Exception ex)
+                        {
+                            e = ex;
+                        }
+
+                        for (int i = 0; i < luPerUu; i++)
+                        {
+                            stateLabel.InvokeIfRequired(() => stateLabel.Text = $"Status: Updating again in {(luPerUu - i) * labelUpdateInterval / 1000} sec" + (e == null ? "" : $" Recent Exception in Update Thread: {e}"));
+                            Thread.Sleep(labelUpdateInterval);
+                        }
+
                     }
-                    
+                }
+                catch (Exception ex)
+                {
+                    File.AppendAllText("Log.txt", $"==={DateTime.Now}==============================\n{ex}\n==============================");
                 }
             });
         }
