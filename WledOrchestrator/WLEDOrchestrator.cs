@@ -34,11 +34,6 @@ namespace WledOrchestrator
             }
         }
 
-        public class CooldownException : Exception
-        {
-            public CooldownException(string message) : base(message) { }
-        }
-
         public static Led[] FindLEDs()
         {
             var localIp = GetLocalIPAddress().GetAddressBytes();
@@ -90,26 +85,28 @@ namespace WledOrchestrator
                     return ip;
                 }
             }
-            throw new Exception("No network adapters with an IPv4 address in the system!");
+            return null;
+            //throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
-        public static void SetGlobalBrightness(int bri)
+        public static bool SetGlobalBrightness(int bri)
         {
             var secs = (DateTime.Now - LastBriHTTPReq).TotalSeconds;
             if (secs < HttpReqCooldownTime)
-                throw new CooldownException($"Not yet {secs}");
+                return false;
             LastBriHTTPReq = DateTime.Now;
 
             foreach (var led in Leds)
                 $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{led.address}/json/state");
+            return true;
         }
 
         // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
-        public static void SetLedColors(Color[] colors)
+        public static bool SetLedColors(Color[] colors)
         {
             var secs = (DateTime.Now - LastColHTTPReq).TotalSeconds;
             if (secs < HttpReqCooldownTime)
-                throw new CooldownException($"Not yet {secs}");
+                return false;
             LastColHTTPReq = DateTime.Now;
 
             foreach (var led in Leds)
@@ -130,6 +127,7 @@ namespace WledOrchestrator
 
                     $"{{\"seg\":{ledCols}}}".HttpPostAsJsonTo($"{led.address}/json/state");
                 }
+            return true;
         }
     }
 }
