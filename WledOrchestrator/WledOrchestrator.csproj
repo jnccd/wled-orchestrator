@@ -7,6 +7,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>blurple.ico</ApplicationIcon>
+    <UseWPF>False</UseWPF>
+    <Authors>Dobiko</Authors>
+    <Company>Dobiko Indstries</Company>
   </PropertyGroup>
 
   <ItemGroup>
