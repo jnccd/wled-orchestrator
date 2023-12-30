@@ -79,7 +79,14 @@ namespace WledOrchestrator
 
             var contentData = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var res = await client.PostAsync(address, contentData);
+            try
+            {
+                var res = await client.PostAsync(address, contentData);
+            }
+            catch (TaskCanceledException)
+            {
+
+            }
         }
 
         public static void Hide(IntPtr WindowHandle) { ShowWindow(WindowHandle, 0); }
