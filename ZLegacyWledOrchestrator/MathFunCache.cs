@@ -39,7 +39,7 @@ namespace WledOrchestrator
         {
             int index = MapToArraySpace(x);
 
-            if (values[index] == double.NaN)
+            if (double.IsNaN(values[index]))
             {
                 values[index] = function(x);
                 return values[index];
