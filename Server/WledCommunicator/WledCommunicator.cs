@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
 using System.Text;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Server.Helper;
 
@@ -10,35 +11,28 @@ namespace Server.WledCommunicator
 {
     public interface IWledCommunicatorService
     {
+        public WledServer[] Leds { get; }
 
+        public WledServer[]? FindLEDs();
+
+        public bool SetGlobalBrightness(int bri);
+
+        public bool SetLedColors(Color[] colors);
     }
 
     public class WledCommunicatorService : IWledCommunicatorService
     {
-        public static Led[] Leds = new Led[0];
-        static double HttpReqCooldownTime = 3;
-        static DateTime LastBriHTTPReq = new DateTime(1999, 5, 4);
-        static DateTime LastColHTTPReq = new DateTime(1999, 5, 4);
+        public WledServer[] Leds { get; private set; } = [];
+        private const double HttpReqCooldownTime = 3;
+        private DateTime LastBriHTTPReq = new(1999, 5, 4);
+        private DateTime LastColHTTPReq = new(1999, 5, 4);
 
-        public class Led
+        public WledServer[]? FindLEDs()
         {
-            public string address;
-            public LedState state;
+            var localIp = GetLocalIPAddress()?.GetAddressBytes();
+            if (localIp == null) return null;
 
-            public Led(string address, LedState state)
-            {
-                this.address = address;
-                this.state = state;
-            }
-        }
-
-        public static Led[] FindLEDs()
-        {
-            var localIp = GetLocalIPAddress().GetAddressBytes();
-            if (localIp == null)
-                return null;
-
-            var leds = new List<Led>();
+            var leds = new List<WledServer>();
             var tasks = new List<Task>();
             var fac = new TaskFactory();
             int done = 0;
@@ -53,7 +47,7 @@ namespace Server.WledCommunicator
                     {
                         responseText = await $"{address}/json/state".GetHttpResponseFrom();
                     }
-                    catch (Exception e) { }
+                    catch (Exception) { }
 
                     if (string.IsNullOrWhiteSpace(responseText) || !responseText.StartsWith("{\"on\":"))
                     {
@@ -63,18 +57,18 @@ namespace Server.WledCommunicator
 
                     var ledState = JsonConvert.DeserializeObject<LedState>(responseText);
 
-                    leds.Add(new Led(address, ledState));
+                    if (ledState != null) leds.Add(new(address, ledState));
                     done++;
                 }, i));
 
-            Task.WaitAll(tasks.ToArray());
+            Task.WaitAll([.. tasks]);
             while (done < 250)
                 Thread.Sleep(200);
 
             Debug.WriteLine("Found LEDs at: " + leds.Select(x => x.address).Combine(", "));
-            return leds.ToArray();
+            return [.. leds];
         }
-        public static IPAddress GetLocalIPAddress()
+        public IPAddress? GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
@@ -85,10 +79,9 @@ namespace Server.WledCommunicator
                 }
             }
             return null;
-            //throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
-        public static bool SetGlobalBrightness(int bri)
+        public bool SetGlobalBrightness(int bri)
         {
             var secs = (DateTime.Now - LastBriHTTPReq).TotalSeconds;
             if (secs < HttpReqCooldownTime)
@@ -101,7 +94,7 @@ namespace Server.WledCommunicator
         }
 
         // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
-        public static bool SetLedColors(Color[] colors)
+        public bool SetLedColors(Color[] colors)
         {
             var secs = (DateTime.Now - LastColHTTPReq).TotalSeconds;
             if (secs < HttpReqCooldownTime)
