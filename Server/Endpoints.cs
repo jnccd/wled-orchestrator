@@ -2,7 +2,7 @@ using Server.Helper;
 
 namespace Server
 {
-    public static class NotesEndpoints
+    public static class WledOrchestratorEndpoints
     {
         public static void RegisterWledOrchestratorEndpoints(this IEndpointRouteBuilder routes, IServiceProvider services)
         {
