@@ -14,19 +14,9 @@ namespace Server.Helper
                     return false;
             return true;
         }
-        public static b Foldl<a, b>(this IEnumerable<a> xs, b y, Func<b, a, b> f)
-        {
-            foreach (a x in xs)
-                y = f(y, x);
-            return y;
-        }
-        public static b Foldl<a, b>(this IEnumerable<a> xs, Func<b, a, b> f)
-        {
-            return xs.Foldl(default, f);
-        }
         public static string Combine(this IEnumerable<string> s, string combinator = "")
         {
-            return s.Count() == 0 ? "" : s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
+            return s.Count() == 0 ? "" : s.Aggregate("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
         }
 
         // HTTP
