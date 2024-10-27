@@ -2,7 +2,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Server.WledCommunicator;
+namespace Server.Services.WledCommunicator;
 
 public partial class LedState
 {
