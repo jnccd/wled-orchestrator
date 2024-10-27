@@ -1,6 +1,6 @@
 namespace Server.Services;
 
-[AutoRegister(ServiceRegisterType.Singleton, typeof(UpdaterService))]
+[RegisterImplementation(ServiceRegisterType.Singleton, typeof(UpdaterService))]
 public interface IUpdaterService
 {
 
