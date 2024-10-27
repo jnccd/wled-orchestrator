@@ -15,7 +15,7 @@ namespace Server.WledCommunicator
 
         public WledServer[]? FindLEDs();
 
-        public bool SetGlobalBrightness(int bri);
+        public bool SetBrightness(int bri);
 
         public bool SetLedColors(Color[] colors);
     }
@@ -81,7 +81,7 @@ namespace Server.WledCommunicator
             return null;
         }
 
-        public bool SetGlobalBrightness(int bri)
+        public bool SetBrightness(int bri)
         {
             var secs = (DateTime.Now - LastBriHTTPReq).TotalSeconds;
             if (secs < HttpReqCooldownTime)
