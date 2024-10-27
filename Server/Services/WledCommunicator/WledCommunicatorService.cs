@@ -9,7 +9,7 @@ using Server.Helper;
 
 namespace Server.Services.WledCommunicator;
 
-[AutoRegister(ServiceRegisterType.Singleton, typeof(WledCommunicatorService))]
+[RegisterImplementation(ServiceRegisterType.Singleton, typeof(WledCommunicatorService))]
 public interface IWledCommunicatorService
 {
     public WledServer[] Leds { get; }
