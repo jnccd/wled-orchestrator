@@ -1,4 +1,4 @@
-namespace Server.WledCommunicator;
+namespace Server.Services.WledCommunicator;
 
 public class WledServer
 {
