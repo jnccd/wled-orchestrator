@@ -1,13 +1,7 @@
 namespace Server.Services.WledCommunicator;
 
-public class WledServer
+public class WledServer(string address, LedState state)
 {
-    public string address;
-    public LedState state;
-
-    public WledServer(string address, LedState state)
-    {
-        this.address = address;
-        this.state = state;
-    }
+    public string address = address;
+    public LedState state = state;
 }
