@@ -15,14 +15,12 @@ namespace Server
     {
         public static void RegisterServices(this WebApplicationBuilder builder)
         {
-            Type[] assemblyTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                                    from assemblyType in domainAssembly.GetTypes()
-                                    where assemblyType.Module == typeof(Configuration).Module
-                                    select assemblyType).ToArray();
-            var serviceTypes = (from interfaceType in assemblyTypes
-                                where interfaceType.CustomAttributes.Any(x => x.AttributeType == typeof(RegisterImplementation))
-                                    && interfaceType.IsInterface
-                                select interfaceType).ToList();
+            Type[] serviceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                                   from interfaceType in domainAssembly.GetTypes()
+                                   where interfaceType.Module == typeof(Configuration).Module
+                                       && interfaceType.CustomAttributes.Any(x => x.AttributeType == typeof(RegisterImplementation))
+                                       && interfaceType.IsInterface
+                                   select interfaceType).ToArray();
 
             foreach (var interfaceType in serviceTypes)
             {
