@@ -1,7 +1,7 @@
 namespace Server.Services.WledCommunicator;
 
-public class WledServer(string address, LedState state)
+public class WledServer(string address, WledServerState state)
 {
     public string address = address;
-    public LedState state = state;
+    public WledServerState state = state;
 }

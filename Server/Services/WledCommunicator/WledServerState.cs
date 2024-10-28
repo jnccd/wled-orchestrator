@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 namespace Server.Services.WledCommunicator;
 
-public partial class LedState
+public partial class WledServerState
 {
     [JsonProperty("on", NullValueHandling = NullValueHandling.Ignore)]
     public bool? On { get; set; }
