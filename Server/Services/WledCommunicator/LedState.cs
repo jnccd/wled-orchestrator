@@ -125,26 +125,3 @@ public partial class Udpn
     [JsonProperty("recv", NullValueHandling = NullValueHandling.Ignore)]
     public bool? Recv { get; set; }
 }
-
-public partial class LedState
-{
-    public static LedState FromJson(string json) => JsonConvert.DeserializeObject<LedState>(json, Converter.Settings);
-}
-
-public static class Serialize
-{
-    public static string ToJson(this LedState self) => JsonConvert.SerializeObject(self, Converter.Settings);
-}
-
-internal static class Converter
-{
-    public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-            {
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-            },
-    };
-}
