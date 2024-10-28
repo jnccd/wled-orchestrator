@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Server.Helper;
+using Server.Services.WledCommunicator;
 namespace Server;
 
 public static class WledOrchestratorEndpoints
@@ -16,6 +18,7 @@ public static class WledOrchestratorEndpoints
             FileProvider = new PhysicalFileProvider(Path.Combine(webApp.Environment.ContentRootPath, "..", "Frontend", "dist")),
         });
 
+        var routes = (IEndpointRouteBuilder)webApp;
         webApp.MapGet("/hewwo", () =>
         {
             return Results.Extensions.Html(@$"<!doctype html>
@@ -31,5 +34,9 @@ public static class WledOrchestratorEndpoints
                     </body>
                 </html>");
         });
+        webApp.MapGet("/wledServers", (
+            [FromServices] IWledCommunicatorService wledCommunicator,
+            HttpRequest request) =>
+            Results.Json(wledCommunicator.Leds.Select(x => x.address).ToArray()));
     }
 }
