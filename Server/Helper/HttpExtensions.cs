@@ -52,4 +52,13 @@ public static partial class Extensions
         }
         catch (TaskCanceledException) { }
     }
+    public static HttpResponseMessage BlockingHttpPostAsJsonTo(this string json, string address, int timeout = 5)
+    {
+        using var client = new HttpClient();
+        client.Timeout = new TimeSpan(0, 0, timeout);
+
+        var contentData = new StringContent(json, Encoding.UTF8, "application/json");
+
+        return client.PostAsync(address, contentData).Result;
+    }
 }

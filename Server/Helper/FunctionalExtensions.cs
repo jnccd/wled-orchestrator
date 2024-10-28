@@ -9,8 +9,9 @@ public static partial class Extensions
                 return false;
         return true;
     }
-    public static string Combine(this IEnumerable<string> s, string combinator = "")
-    {
-        return !s.Any() ? "" : s.Aggregate("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
-    }
+    public static string Combine(this IEnumerable<string> s, string combinator = "") =>
+        !s.Any() ? "" : s.Aggregate("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
+    public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
+        self.Select((item, index) => (item, index));
+
 }
