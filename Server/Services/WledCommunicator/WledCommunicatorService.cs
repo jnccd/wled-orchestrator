@@ -27,8 +27,8 @@ public class WledCommunicatorService(
 {
     public WledServer[] Leds { get; private set; } = [];
     private const double HttpReqCooldownSecs = 0.1;
-    private Dictionary<string, DateTime> LastBriHTTPReq = [];
-    private Dictionary<LedSegment, DateTime> LastColHTTPReq = [];
+    private readonly Dictionary<string, DateTime> LastBriHTTPReq = [];
+    private readonly Dictionary<LedSegment, DateTime> LastColHTTPReq = [];
 
     public void FindLEDs()
     {
