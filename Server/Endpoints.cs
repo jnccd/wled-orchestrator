@@ -1,25 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Net.Http.Headers;
 using Server.Helper;
 using Server.Services.WledCommunicator;
 namespace Server;
 
 public static class WledOrchestratorEndpoints
 {
-    public static void RegisterEndpoints(this WebApplication webApp, IServiceProvider services)
+    public static void RegisterEndpoints(this WebApplication app, IServiceProvider services)
     {
-        webApp.UseDefaultFiles(new DefaultFilesOptions
+        app.UseCors(policy => policy.AllowAnyOrigin());
+        app.UseDefaultFiles(new DefaultFilesOptions
         {
             DefaultFileNames = ["index.html"],
-            FileProvider = new PhysicalFileProvider(Path.Combine(webApp.Environment.ContentRootPath, "..", "Frontend", "dist")),
+            FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "..", "Frontend", "dist")),
         });
-        webApp.UseStaticFiles(new StaticFileOptions
+        app.UseStaticFiles(new StaticFileOptions
         {
-            FileProvider = new PhysicalFileProvider(Path.Combine(webApp.Environment.ContentRootPath, "..", "Frontend", "dist")),
+            FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "..", "Frontend", "dist")),
         });
 
-        var routes = (IEndpointRouteBuilder)webApp;
-        webApp.MapGet("/hewwo", () =>
+        var routes = (IEndpointRouteBuilder)app;
+        app.MapGet("/hewwo", () =>
         {
             return Results.Extensions.Html(@$"<!doctype html>
                 <html>
@@ -34,7 +36,7 @@ public static class WledOrchestratorEndpoints
                     </body>
                 </html>");
         });
-        webApp.MapGet("/wledServers", (
+        app.MapGet("/wledServers", (
             [FromServices] IWledCommunicatorService wledCommunicator,
             HttpRequest request) =>
             Results.Json(wledCommunicator.Leds.Select(x => x.address).ToArray()));
