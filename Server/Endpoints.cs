@@ -1,11 +1,22 @@
+using Microsoft.Extensions.FileProviders;
 using Server.Helper;
 namespace Server;
 
 public static class WledOrchestratorEndpoints
 {
-    public static void RegisterEndpoints(this IEndpointRouteBuilder routes, IServiceProvider services)
+    public static void RegisterEndpoints(this WebApplication webApp, IServiceProvider services)
     {
-        routes.MapGet("/", () =>
+        webApp.UseDefaultFiles(new DefaultFilesOptions
+        {
+            DefaultFileNames = ["index.html"],
+            FileProvider = new PhysicalFileProvider(Path.Combine(webApp.Environment.ContentRootPath, "..", "Frontend", "dist")),
+        });
+        webApp.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(webApp.Environment.ContentRootPath, "..", "Frontend", "dist")),
+        });
+
+        webApp.MapGet("/hewwo", () =>
         {
             return Results.Extensions.Html(@$"<!doctype html>
                     <html>
