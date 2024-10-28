@@ -5,6 +5,6 @@ builder.ConfigureWebhost();
 builder.RegisterServices();
 
 var app = builder.Build();
-app.RegisterEndpoints(app.Services);
+app.RegisterEndpoints();
 app.Services.StartBackgroundServices();
 app.Run();

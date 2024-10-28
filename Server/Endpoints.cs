@@ -7,7 +7,7 @@ namespace Server;
 
 public static class WledOrchestratorEndpoints
 {
-    public static void RegisterEndpoints(this WebApplication app, IServiceProvider services)
+    public static void RegisterEndpoints(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
