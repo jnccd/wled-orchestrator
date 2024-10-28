@@ -14,37 +14,6 @@ public enum ServiceRegisterType { Singleton, Transient }
 
 public static class Configuration
 {
-    public static void ConfigureWebhost(this WebApplicationBuilder builder)
-    {
-        ushort port = string.IsNullOrWhiteSpace(builder.Configuration["PORT"]) ?
-            (ushort)7778 :
-            Convert.ToUInt16(builder.Configuration["PORT"]);
-
-        //X509Certificate2 x509 = GetCertificateFromConfig(builder);
-        builder.WebHost.ConfigureKestrel(options =>
-        {
-            options.Listen(IPAddress.Any, port, listenOptions =>
-            {
-                //listenOptions.UseHttps(x509);
-            });
-        });
-    }
-
-    // // Enable if HTTPS is needed
-    // private static X509Certificate2 GetCertificateFromConfig(WebApplicationBuilder builder)
-    // {
-    //     char _s = Path.DirectorySeparatorChar;
-    //     if (string.IsNullOrWhiteSpace(builder.Configuration["CERT_PATH"]))
-    //     {
-    //         Logger.WriteLine($"CERT_PATH is empty!");
-    //         throw new ArgumentException("CERT_PATH is empty!");
-    //     }
-    //     var certPem = File.ReadAllText($"{builder.Configuration["CERT_PATH"]}{_s}fullchain.pem");
-    //     var keyPem = File.ReadAllText($"{builder.Configuration["CERT_PATH"]}{_s}privkey.pem");
-    //     var x509 = X509Certificate2.CreateFromPem(certPem, keyPem);
-    //     return x509;
-    // }
-
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
         Type[] serviceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
@@ -69,4 +38,37 @@ public static class Configuration
                 builder.Services.AddTransient(interfaceType, serviceImplType);
         }
     }
+
+    public static void ConfigureWebhost(this WebApplicationBuilder builder)
+    {
+        ushort port = string.IsNullOrWhiteSpace(builder.Configuration["PORT"]) ?
+            (ushort)7778 :
+            Convert.ToUInt16(builder.Configuration["PORT"]);
+
+        //X509Certificate2 x509 = GetCertificateFromConfig(builder);
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Listen(IPAddress.Any, port, listenOptions =>
+            {
+                //listenOptions.UseHttps(x509);
+            });
+        });
+
+        builder.Services.AddCors(c => { c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin()); });
+    }
+
+    // // Enable if HTTPS is needed
+    // private static X509Certificate2 GetCertificateFromConfig(WebApplicationBuilder builder)
+    // {
+    //     char _s = Path.DirectorySeparatorChar;
+    //     if (string.IsNullOrWhiteSpace(builder.Configuration["CERT_PATH"]))
+    //     {
+    //         Logger.WriteLine($"CERT_PATH is empty!");
+    //         throw new ArgumentException("CERT_PATH is empty!");
+    //     }
+    //     var certPem = File.ReadAllText($"{builder.Configuration["CERT_PATH"]}{_s}fullchain.pem");
+    //     var keyPem = File.ReadAllText($"{builder.Configuration["CERT_PATH"]}{_s}privkey.pem");
+    //     var x509 = X509Certificate2.CreateFromPem(certPem, keyPem);
+    //     return x509;
+    // }
 }
