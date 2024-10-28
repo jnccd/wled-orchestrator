@@ -26,7 +26,7 @@ public class WledCommunicatorService(
     : IWledCommunicatorService
 {
     public WledServer[] Leds { get; private set; } = [];
-    private const double HttpReqCooldownSecs = 1;
+    private const double HttpReqCooldownSecs = 0.1;
     private Dictionary<string, DateTime> LastBriHTTPReq = [];
     private Dictionary<LedSegment, DateTime> LastColHTTPReq = [];
 
@@ -94,12 +94,12 @@ public class WledCommunicatorService(
     }
     public bool SetBrightnessOnWledServer(int bri, string wledServerAddress)
     {
-        logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...");
-
-        var secs = (DateTime.Now - LastBriHTTPReq[wledServerAddress]).TotalSeconds;
+        var secs = (DateTime.Now - LastBriHTTPReq.GetValueOrDefault(wledServerAddress)).TotalSeconds;
         if (secs < HttpReqCooldownSecs)
             return false;
         LastBriHTTPReq[wledServerAddress] = DateTime.Now;
+
+        logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...");
 
         $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{wledServerAddress}/json/state");
         return true;
@@ -116,12 +116,12 @@ public class WledCommunicatorService(
     }
     public bool SetLedColorsOnWledSegment(Color[] colors, LedSegment segment)
     {
-        logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...");
-
-        var secs = (DateTime.Now - LastColHTTPReq[segment]).TotalSeconds;
+        var secs = (DateTime.Now - LastColHTTPReq.GetValueOrDefault(segment)).TotalSeconds;
         if (secs < HttpReqCooldownSecs)
             return false;
         LastColHTTPReq[segment] = DateTime.Now;
+
+        logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...");
 
         var seg = Leds.FirstOrDefault(l => l.address == segment.WledServerAddress)?.state.Seg[segment.SegmentIndex];
         if (seg == null || seg.Start == null || seg.Len == null)
