@@ -9,11 +9,6 @@ public class LedThemeDaylight : LedTheme
         return new(GetColors(dayTimePercent), GetBrightness(dayTimePercent));
     }
 
-    // Singleton
-    private static LedThemeDaylight? instance;
-    protected LedThemeDaylight() { }
-    public static new LedThemeDaylight GetInstance() => instance ??= new();
-
     // Code below is adapted from legacy wledOrchestrator proj
     readonly Color SkyColor = new(142, 215, 253);
     readonly Color SunColor = new(252, 200, 20);
