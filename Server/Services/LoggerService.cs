@@ -3,26 +3,33 @@ using System.Text;
 using log4net;
 using log4net.Config;
 
-namespace Server.Helper
+namespace Server.Services
 {
+    [RegisterImplementation(ServiceRegisterType.Singleton, typeof(LoggerService))]
+    public interface ILoggerService
+    {
+        public void WriteLine(object o, LogLevel level = LogLevel.Info);
+    }
+
     public enum LogLevel { Debug, Info, Warn, Error, Fatal }
 
     /// <summary>
     /// A minimalistic wrapper for log4net
     /// </summary>
-    public static class Logger
+    public class LoggerService : ILoggerService
     {
-        // One line static constructor
-        static Logger() => ConfigureLogger();
+        public LoggerService() => ConfigureLogger();
 
         /// <summary>
         /// Write logs
         /// </summary>
-        public static void WriteLine(object o, LogLevel level = LogLevel.Info)
+        public void WriteLine(object o, LogLevel level = LogLevel.Info)
         {
             // Get logger of calling type (this is horrible for performance but the code looks better this way)
             StackTrace st = new(true);
-            var logger = LogManager.GetLogger(st.GetFrames().ElementAt(1).GetMethod()?.DeclaringType);
+            var reconstructedOriginType = st.GetFrames().ElementAt(1).GetMethod()?.DeclaringType;
+            if (reconstructedOriginType == null) return;
+            var logger = LogManager.GetLogger(reconstructedOriginType);
 
             if (level == LogLevel.Debug)
                 logger.Debug(o);
@@ -39,7 +46,7 @@ namespace Server.Helper
         /// <summary>
         /// Override default configuration
         /// </summary>
-        public static void ConfigureLogger(bool logToConsole = true, bool logToDebug = true, bool logToFile = true)
+        public void ConfigureLogger(bool logToConsole = true, bool logToDebug = true, bool logToFile = true)
         {
             // Set log level based on run configuration
 #if DEBUG
