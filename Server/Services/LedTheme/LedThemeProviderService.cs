@@ -9,6 +9,8 @@ public record LedSegmentState(Color[] Colors, int Brightness);
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(LedThemeProviderService))]
 public interface ILedThemeProviderService
 {
+    public Dictionary<LedSegment, LedTheme> LedSegmentToTheme { get; set; }
+
     public LedSegmentState GetNewLedState(LedSegment ledSegment);
 }
 
@@ -16,8 +18,14 @@ public class LedThemeProviderService(
     ILoggerService logger)
     : ILedThemeProviderService
 {
-    readonly Dictionary<LedSegment, LedTheme> LedSegmentToTheme = [];
+    public Dictionary<LedSegment, LedTheme> LedSegmentToTheme { get; set; } = [];
 
     // TODO: Make themes changeable
-    public LedSegmentState GetNewLedState(LedSegment ledSegment) => (LedSegmentToTheme.GetValueOrDefault(ledSegment) ?? new LedThemeDefault()).GetNewState(new(DateTime.Now));
+    public LedSegmentState GetNewLedState(LedSegment ledSegment)
+    {
+        // Populate with default value if empty
+        LedSegmentToTheme[ledSegment] = LedSegmentToTheme.GetValueOrDefault(ledSegment) ?? new LedThemeDaylight();
+
+        return LedSegmentToTheme[ledSegment].GetNewState(new(DateTime.Now));
+    }
 }
