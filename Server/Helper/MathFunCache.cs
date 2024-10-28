@@ -1,0 +1,44 @@
+﻿namespace Server.Helper;
+
+public class MathFunCache
+{
+    readonly double[] values;
+    readonly double resolution, lowerBound, upperBound;
+    readonly Func<double, double> function;
+
+    public MathFunCache(Func<double, double> function, double resolution = 0.01, double lowerBound = 0, double upperBound = 1)
+    {
+        this.function = function;
+        this.resolution = resolution;
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+
+        var boundSize = upperBound - lowerBound;
+        var arrLength = boundSize / resolution;
+
+        values = new double[(int)arrLength];
+        for (int i = 0; i < values.Length; i++)
+            values[i] = double.NaN;
+    }
+
+    int MapToArraySpace(double x)
+    {
+        if (x < lowerBound || x > upperBound)
+            throw new ArgumentOutOfRangeException(x.ToString());
+        else
+            return (int)((x - lowerBound) / resolution);
+    }
+
+    public double Get(double x)
+    {
+        int index = MapToArraySpace(x);
+
+        if (double.IsNaN(values[index]))
+        {
+            values[index] = function(x);
+            return values[index];
+        }
+        else
+            return values[index];
+    }
+}
