@@ -137,7 +137,7 @@ public class WledCommunicatorService(
             var col = colors[(int)(i * (float)colors.Length / seg.Len)];
             if (i > 0)
                 ledCols.Append(',');
-            ledCols.Append($"'{seg.Start + i}','{col.ToHex()}'");
+            ledCols.Append($"{seg.Start + i},'{col.ToHex()}'");
         }
         ledCols.Append("]}");
 
