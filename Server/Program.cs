@@ -1,5 +1,4 @@
 using Server;
-using Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.RegisterServices();

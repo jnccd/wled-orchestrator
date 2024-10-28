@@ -6,7 +6,7 @@ namespace Server
     {
         public static void RegisterEndpoints(this IEndpointRouteBuilder routes, IServiceProvider services)
         {
-            routes.MapGet("/hewwo", () =>
+            routes.MapGet("/", () =>
             {
                 return Results.Extensions.Html(@$"<!doctype html>
                     <html>
