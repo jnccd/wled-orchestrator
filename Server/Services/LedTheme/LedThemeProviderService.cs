@@ -20,5 +20,5 @@ public class LedThemeProviderService(
     readonly Dictionary<LedSegment, LedTheme> LedSegmentToTheme = [];
 
     // TODO: Make themes changeable
-    public LedSegmentState GetNewLedState(LedSegment ledSegment) => (LedSegmentToTheme[ledSegment] ?? LedThemeDefault.GetInstance()).GetNewState(new(DateTime.Now));
+    public LedSegmentState GetNewLedState(LedSegment ledSegment) => (LedSegmentToTheme[ledSegment] ?? new LedThemeDefault()).GetNewState(new(DateTime.Now));
 }
