@@ -1,6 +1,7 @@
 using Server;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.ConfigureWebhost();
 builder.RegisterServices();
 
 var app = builder.Build();
