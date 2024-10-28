@@ -25,23 +25,22 @@ public class LedThemeDaylight : LedTheme
 
     readonly double invertedSunSize = 150;
 
-    public byte GetBrightness(double input)
+    public byte GetBrightness(double curDayTimePercent)
     {
         // Set Brightness
-        var curDayTimePercent = DateTime.Now.TimeOfDay.TotalDays;
         var funOut = DayLightFunction(curDayTimePercent);
         var bri = (funOut * 255) + 0;
 
         return (byte)bri;
     }
 
-    public Color[] GetColors(double input)
+    public Color[] GetColors(double curDayTimePercent)
     {
         // Create Color Array
         Color[] colors = new Color[ColorArrayResolution];
         for (int i = 0; i < ColorArrayResolution; i++)
         {
-            var sunRiseDayTime = input / sunTime - sunRise;
+            var sunRiseDayTime = curDayTimePercent / sunTime - sunRise;
 
             var x = (i / (double)ColorArrayResolution) - sunRiseDayTime;
             var gaussianSun = Math.Exp(-(x * x) * invertedSunSize);
