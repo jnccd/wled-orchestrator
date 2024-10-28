@@ -6,7 +6,7 @@ public interface IUpdaterService
 
 }
 
-public class UpdaterService
+public class UpdaterService : IUpdaterService
 {
 
 }
