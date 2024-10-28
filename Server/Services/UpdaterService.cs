@@ -1,4 +1,5 @@
 using Server.Helper;
+using Server.Services.LedTheme;
 using Server.Services.WledCommunicator;
 namespace Server.Services;
 
@@ -10,13 +11,13 @@ public interface IUpdaterService
 
 public class UpdaterService(
     IWledCommunicatorService communicatorService,
+    ILedThemeProviderService ledThemeProvider,
     ILoggerService logger)
     : IUpdaterService
 {
     Task? updateTask;
     CancellationTokenSource? cts;
-    readonly IWledCommunicatorService communicatorService = communicatorService;
-    const int ledUpdateIntervalMillis = 2000;
+    const int ledUpdateIntervalMillis = 500;
 
     public void StartUpdateThread()
     {
@@ -33,8 +34,7 @@ public class UpdaterService(
             {
                 try
                 {
-                    communicatorService.SetLedColors([new Color(0, 255, 255)]);
-                    communicatorService.SetBrightness(128);
+                    UpdateLedSegments();
                 }
                 catch (Exception ex)
                 {
@@ -44,5 +44,23 @@ public class UpdaterService(
                 Task.Delay(ledUpdateIntervalMillis).Wait();
             }
         }, cts.Token);
+    }
+
+    private void UpdateLedSegments()
+    {
+        foreach (var led in communicatorService.Leds)
+        {
+            var themeBrightnesses = new List<int>();
+
+            foreach (var (seg, i) in led.state.Seg.WithIndex())
+            {
+                LedSegment segment = new(led.address, i);
+                var newLedState = ledThemeProvider.GetNewLedState(segment);
+                communicatorService.SetLedColorsOnWledSegment(newLedState.Colors, segment);
+                themeBrightnesses.Add(newLedState.Brightness);
+            }
+
+            communicatorService.SetBrightnessOnWledServer((int)themeBrightnesses.Average(), led.address);
+        }
     }
 }
