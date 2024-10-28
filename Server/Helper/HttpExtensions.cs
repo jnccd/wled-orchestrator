@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Net.Mime;
 using System.Text;
-
 namespace Server.Helper;
 
 public static partial class Extensions

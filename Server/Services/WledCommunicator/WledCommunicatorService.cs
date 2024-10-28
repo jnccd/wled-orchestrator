@@ -1,12 +1,8 @@
-using System.Diagnostics;
 using System.Net;
-using System.Net.Http.Json;
 using System.Net.Sockets;
 using System.Text;
-using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Server.Helper;
-
 namespace Server.Services.WledCommunicator;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(WledCommunicatorService))]

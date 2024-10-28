@@ -1,6 +1,5 @@
 using Server.Helper;
 using Server.Services.WledCommunicator;
-
 namespace Server.Services;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(UpdaterService))]
