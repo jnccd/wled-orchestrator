@@ -9,7 +9,10 @@ public static class WledOrchestratorEndpoints
 {
     public static void RegisterEndpoints(this WebApplication app, IServiceProvider services)
     {
-        app.UseCors(policy => policy.AllowAnyOrigin());
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseCors(policy => policy.AllowAnyOrigin());
+        }
         app.UseDefaultFiles(new DefaultFilesOptions
         {
             DefaultFileNames = ["index.html"],
