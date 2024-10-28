@@ -1,14 +1,13 @@
 using Server.Helper;
+namespace Server;
 
-namespace Server
+public static class WledOrchestratorEndpoints
 {
-    public static class WledOrchestratorEndpoints
+    public static void RegisterEndpoints(this IEndpointRouteBuilder routes, IServiceProvider services)
     {
-        public static void RegisterEndpoints(this IEndpointRouteBuilder routes, IServiceProvider services)
+        routes.MapGet("/", () =>
         {
-            routes.MapGet("/", () =>
-            {
-                return Results.Extensions.Html(@$"<!doctype html>
+            return Results.Extensions.Html(@$"<!doctype html>
                     <html>
                         <head>
                             <title>Hewwo</title>
@@ -20,7 +19,6 @@ namespace Server
                             <h1>Hewwo Wowld :3</h1>
                         </body>
                     </html>");
-            });
-        }
+        });
     }
 }
