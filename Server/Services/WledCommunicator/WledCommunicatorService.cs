@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Principal;
 using System.Text;
 using Newtonsoft.Json;
 using Server.Helper;
+using Server.Services.LedTheme;
 namespace Server.Services.WledCommunicator;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(WledCommunicatorService))]
@@ -12,9 +14,11 @@ public interface IWledCommunicatorService
 
     public void FindLEDs();
 
-    public bool SetBrightness(int bri);
+    public bool SetBrightnessGlobally(int bri);
+    public bool SetBrightnessOnWledServer(int bri, string wledServerAddress);
 
-    public bool SetLedColors(Color[] colors);
+    public bool SetLedColorsGlobally(Color[] colors);
+    public bool SetLedColorsOnWledSegment(Color[] colors, LedSegment segment);
 }
 
 public class WledCommunicatorService(
@@ -22,9 +26,9 @@ public class WledCommunicatorService(
     : IWledCommunicatorService
 {
     public WledServer[] Leds { get; private set; } = [];
-    private const double HttpReqCooldownTime = 3;
-    private DateTime LastBriHTTPReq = new(1999, 5, 4);
-    private DateTime LastColHTTPReq = new(1999, 5, 4);
+    private const double HttpReqCooldownSecs = 1;
+    private Dictionary<string, DateTime> LastBriHTTPReq = [];
+    private Dictionary<LedSegment, DateTime> LastColHTTPReq = [];
 
     public void FindLEDs()
     {
@@ -59,7 +63,7 @@ public class WledCommunicatorService(
                     return;
                 }
 
-                var ledState = JsonConvert.DeserializeObject<LedState>(responseText);
+                var ledState = JsonConvert.DeserializeObject<WledServerState>(responseText);
 
                 if (ledState != null) leds.Add(new(address, ledState));
                 done++;
@@ -76,57 +80,68 @@ public class WledCommunicatorService(
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
         foreach (var ip in host.AddressList)
-        {
             if (ip.AddressFamily == AddressFamily.InterNetwork)
-            {
                 return ip;
-            }
-        }
         return null;
     }
 
-    public bool SetBrightness(int bri)
+    public bool SetBrightnessGlobally(int bri)
     {
-        logger.WriteLine($"Setting led brightness to {bri}...");
-
-        var secs = (DateTime.Now - LastBriHTTPReq).TotalSeconds;
-        if (secs < HttpReqCooldownTime)
-            return false;
-        LastBriHTTPReq = DateTime.Now;
-
         foreach (var led in Leds)
-            $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{led.address}/json/state");
+            if (!SetBrightnessOnWledServer(bri, led.address))
+                return false;
+        return true;
+    }
+    public bool SetBrightnessOnWledServer(int bri, string wledServerAddress)
+    {
+        logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...");
+
+        var secs = (DateTime.Now - LastBriHTTPReq[wledServerAddress]).TotalSeconds;
+        if (secs < HttpReqCooldownSecs)
+            return false;
+        LastBriHTTPReq[wledServerAddress] = DateTime.Now;
+
+        $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{wledServerAddress}/json/state");
         return true;
     }
 
     // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
-    public bool SetLedColors(Color[] colors)
+    public bool SetLedColorsGlobally(Color[] colors)
     {
-        logger.WriteLine($"Setting led colors with resolution of {colors.Length}...");
-
-        var secs = (DateTime.Now - LastColHTTPReq).TotalSeconds;
-        if (secs < HttpReqCooldownTime)
-            return false;
-        LastColHTTPReq = DateTime.Now;
-
         foreach (var led in Leds)
-            foreach (var seg in led.state.Seg)
-            {
-                // TODO: Implement multi segment thingys correctly
+            foreach (var (seg, i) in led.state.Seg.WithIndex())
+                if (!SetLedColorsOnWledSegment(colors, new(led.address, i)))
+                    return false;
+        return true;
+    }
+    public bool SetLedColorsOnWledSegment(Color[] colors, LedSegment segment)
+    {
+        logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...");
 
-                var ledCols = new StringBuilder();
-                ledCols.Append("{\"i\":[");
-                for (int i = 0; i < seg.Len; i++)
-                {
-                    var col = colors[(int)(i * (float)colors.Length / seg.Len)];
-                    if (i > 0)
-                        ledCols.Append(',');
-                    ledCols.Append($"'{col.ToHex()}'");
-                }
-                ledCols.Append("]}");
+        var secs = (DateTime.Now - LastColHTTPReq[segment]).TotalSeconds;
+        if (secs < HttpReqCooldownSecs)
+            return false;
+        LastColHTTPReq[segment] = DateTime.Now;
 
-                $"{{\"seg\":{ledCols}}}".HttpPostAsJsonTo($"{led.address}/json/state");
-            }
+        var seg = Leds.FirstOrDefault(l => l.address == segment.WledServerAddress)?.state.Seg[segment.SegmentIndex];
+        if (seg == null || seg.Start == null || seg.Len == null)
+        {
+            logger.WriteLine($"Segment {segment} does not exist!", LogLevel.Error);
+            return false;
+        }
+
+        var ledCols = new StringBuilder();
+        ledCols.Append("{\"i\":[");
+        for (int i = 0; i < seg.Len; i++)
+        {
+            var col = colors[(int)(i * (float)colors.Length / seg.Len)];
+            if (i > 0)
+                ledCols.Append(',');
+            ledCols.Append($"'{seg.Start + i}','{col.ToHex()}'");
+        }
+        ledCols.Append("]}");
+
+        $"{{\"seg\":{ledCols}}}".HttpPostAsJsonTo($"{segment.WledServerAddress}/json/state");
         return true;
     }
 }
