@@ -73,7 +73,7 @@ public class WledCommunicatorService(
         while (done < 250)
             Thread.Sleep(200);
 
-        logger.WriteLine("Found LEDs at: " + leds.Select(x => x.address).Combine(", "));
+        logger.WriteLine("Found Wled Servers at: " + leds.Select(x => x.address).Combine(", "));
         Leds = [.. leds];
     }
     public IPAddress? GetLocalIPAddress()
