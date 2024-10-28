@@ -14,24 +14,31 @@ public interface IWledCommunicatorService
 {
     public WledServer[] Leds { get; }
 
-    public WledServer[]? FindLEDs();
+    public void FindLEDs();
 
     public bool SetBrightness(int bri);
 
     public bool SetLedColors(Color[] colors);
 }
 
-public class WledCommunicatorService : IWledCommunicatorService
+public class WledCommunicatorService(
+    ILoggerService logger)
+    : IWledCommunicatorService
 {
     public WledServer[] Leds { get; private set; } = [];
     private const double HttpReqCooldownTime = 3;
     private DateTime LastBriHTTPReq = new(1999, 5, 4);
     private DateTime LastColHTTPReq = new(1999, 5, 4);
 
-    public WledServer[]? FindLEDs()
+    public void FindLEDs()
     {
+        logger.WriteLine("Finding local wled servers...");
+
         var localIp = GetLocalIPAddress()?.GetAddressBytes();
-        if (localIp == null) return null;
+        if (localIp == null)
+        {
+            return;
+        }
 
         var leds = new List<WledServer>();
         var tasks = new List<Task>();
@@ -66,8 +73,8 @@ public class WledCommunicatorService : IWledCommunicatorService
         while (done < 250)
             Thread.Sleep(200);
 
-        Debug.WriteLine("Found LEDs at: " + leds.Select(x => x.address).Combine(", "));
-        return [.. leds];
+        logger.WriteLine("Found LEDs at: " + leds.Select(x => x.address).Combine(", "));
+        Leds = [.. leds];
     }
     public IPAddress? GetLocalIPAddress()
     {
@@ -84,6 +91,8 @@ public class WledCommunicatorService : IWledCommunicatorService
 
     public bool SetBrightness(int bri)
     {
+        logger.WriteLine($"Setting led brightness to {bri}...");
+
         var secs = (DateTime.Now - LastBriHTTPReq).TotalSeconds;
         if (secs < HttpReqCooldownTime)
             return false;
@@ -97,6 +106,8 @@ public class WledCommunicatorService : IWledCommunicatorService
     // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
     public bool SetLedColors(Color[] colors)
     {
+        logger.WriteLine($"Setting led colors with resolution of {colors.Length}...");
+
         var secs = (DateTime.Now - LastColHTTPReq).TotalSeconds;
         if (secs < HttpReqCooldownTime)
             return false;

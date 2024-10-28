@@ -15,14 +15,17 @@ public class UpdaterService(
     : IUpdaterService
 {
     Task? updateTask;
-    readonly CancellationTokenSource cts = new();
+    CancellationTokenSource? cts;
     readonly IWledCommunicatorService communicatorService = communicatorService;
     const int ledUpdateIntervalMillis = 2000;
 
     public void StartUpdateThread()
     {
-        cts.Cancel();
+        logger.WriteLine("Starting Led Update Loop...");
+
+        cts?.Cancel();
         updateTask?.Dispose();
+        cts = new CancellationTokenSource();
         updateTask = Task.Run(() =>
         {
             communicatorService.FindLEDs();
