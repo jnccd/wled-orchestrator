@@ -13,12 +13,11 @@ public interface ILedThemeProviderService
 }
 
 public class LedThemeProviderService(
-    IWledCommunicatorService communicatorService,
     ILoggerService logger)
     : ILedThemeProviderService
 {
     readonly Dictionary<LedSegment, LedTheme> LedSegmentToTheme = [];
 
     // TODO: Make themes changeable
-    public LedSegmentState GetNewLedState(LedSegment ledSegment) => (LedSegmentToTheme[ledSegment] ?? new LedThemeDefault()).GetNewState(new(DateTime.Now));
+    public LedSegmentState GetNewLedState(LedSegment ledSegment) => (LedSegmentToTheme.GetValueOrDefault(ledSegment) ?? new LedThemeDefault()).GetNewState(new(DateTime.Now));
 }
