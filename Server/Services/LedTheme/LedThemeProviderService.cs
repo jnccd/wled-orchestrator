@@ -1,5 +1,5 @@
 using Server.Helper;
-using Server.Services.WledCommunicator;
+using Server.Services.LedTheme.Themes;
 namespace Server.Services.LedTheme;
 
 public record LedSegment(string WledServerAddress, int SegmentIndex);
@@ -26,6 +26,6 @@ public class LedThemeProviderService(
         // Populate with default value if empty
         LedSegmentToTheme[ledSegment] = LedSegmentToTheme.GetValueOrDefault(ledSegment) ?? new LedThemeDaylight();
 
-        return LedSegmentToTheme[ledSegment].GetNewState(new(DateTime.Now));
+        return LedSegmentToTheme[ledSegment].GetNewModifiedState(new(DateTime.Now));
     }
 }
