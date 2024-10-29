@@ -3,7 +3,7 @@ namespace Server.Services.LedTheme;
 
 public class LedThemeDaylight : LedTheme
 {
-    public override LedSegmentState GetNewState(LedThemeInput input)
+    public override LedSegmentState? GetNewState(LedThemeInput input)
     {
         var dayTimePercent = input.Time.TimeOfDay.TotalDays;
         return new(GetColors(dayTimePercent), GetBrightness(dayTimePercent));

@@ -5,5 +5,5 @@ public record LedThemeInput(DateTime Time);
 
 public abstract class LedTheme
 {
-    public abstract LedSegmentState GetNewState(LedThemeInput input);
+    public abstract LedSegmentState? GetNewState(LedThemeInput input);
 }
