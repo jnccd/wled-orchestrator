@@ -11,7 +11,7 @@ public interface ILedThemeProviderService
 {
     public Dictionary<LedSegment, LedTheme> LedSegmentToTheme { get; set; }
 
-    public LedSegmentState GetNewLedState(LedSegment ledSegment);
+    public LedSegmentState? GetNewLedState(LedSegment ledSegment);
 }
 
 public class LedThemeProviderService(
@@ -21,7 +21,7 @@ public class LedThemeProviderService(
     public Dictionary<LedSegment, LedTheme> LedSegmentToTheme { get; set; } = [];
 
     // TODO: Make themes changeable
-    public LedSegmentState GetNewLedState(LedSegment ledSegment)
+    public LedSegmentState? GetNewLedState(LedSegment ledSegment)
     {
         // Populate with default value if empty
         LedSegmentToTheme[ledSegment] = LedSegmentToTheme.GetValueOrDefault(ledSegment) ?? new LedThemeDaylight();

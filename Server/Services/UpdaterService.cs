@@ -56,6 +56,7 @@ public class UpdaterService(
             {
                 LedSegment segment = new(led.address, i);
                 var newLedState = ledThemeProvider.GetNewLedState(segment);
+                if (newLedState == null) continue;
                 communicatorService.SetLedColorsOnWledSegment(newLedState.Colors, segment);
                 themeBrightnesses.Add(newLedState.Brightness);
             }
