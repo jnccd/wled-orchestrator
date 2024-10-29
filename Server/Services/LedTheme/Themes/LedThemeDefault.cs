@@ -1,5 +1,5 @@
 using Server.Helper;
-namespace Server.Services.LedTheme;
+namespace Server.Services.LedTheme.Themes;
 
 public class LedThemeDefault : LedTheme
 {

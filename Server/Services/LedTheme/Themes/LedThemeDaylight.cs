@@ -1,5 +1,5 @@
 using Server.Helper;
-namespace Server.Services.LedTheme;
+namespace Server.Services.LedTheme.Themes;
 
 public class LedThemeDaylight : LedTheme
 {
@@ -29,7 +29,7 @@ public class LedThemeDaylight : LedTheme
     {
         // Set Brightness
         var funOut = DayLightFunction(curDayTimePercent);
-        var bri = (funOut * 255) + 0;
+        var bri = funOut * 255 + 0;
 
         return (byte)bri;
     }
@@ -42,7 +42,7 @@ public class LedThemeDaylight : LedTheme
         {
             var sunRiseDayTime = curDayTimePercent / sunTime - sunRise;
 
-            var x = (i / (double)ColorArrayResolution) - sunRiseDayTime;
+            var x = i / (double)ColorArrayResolution - sunRiseDayTime;
             var gaussianSun = Math.Exp(-(x * x) * invertedSunSize);
             colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
         }
