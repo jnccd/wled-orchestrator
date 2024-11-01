@@ -7,6 +7,7 @@ namespace Server.Services.DataStore;
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(DataStoreService))]
 public interface IDataStoreService
 {
+    public bool UnsavedChanges { get; }
     public DataStoreRoot Data { get; set; }
     public string ConfigPath { get; }
     public bool Exists();
@@ -22,7 +23,7 @@ public class DataStoreService : IDataStoreService
     readonly static string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) + Path.DirectorySeparatorChar;
     public string ConfigPath { get; } = exePath + "config.json";
     readonly string configBackupPath = exePath + "config_backup.json";
-    bool UnsavedChanges = false;
+    public bool UnsavedChanges { get; private set; } = false;
     readonly JsonSerializerOptions options = new() { WriteIndented = true };
     public DataStoreRoot Data
     {
