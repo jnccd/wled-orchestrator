@@ -2,14 +2,12 @@ using System.Collections;
 using System.Reflection;
 using Newtonsoft.Json;
 
-namespace Server.Services;
-
-using DataDict = Dictionary<string, object>;
+namespace Server.Services.DataStore;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(DataStoreService))]
 public interface IDataStoreService
 {
-    public object this[string key] { get; set; }
+    public DataStoreRoot Data { get; set; }
     public string ConfigPath { get; }
     public bool Exists();
     public void Save();
@@ -25,7 +23,7 @@ public class DataStoreService : IDataStoreService
     public string ConfigPath { get; } = exePath + "config.json";
     readonly string configBackupPath = exePath + "config_backup.json";
     bool UnsavedChanges = false;
-    public DataDict Data
+    public DataStoreRoot Data
     {
         get
         {
@@ -41,26 +39,14 @@ public class DataStoreService : IDataStoreService
             data = value;
         }
     }
-    private DataDict data = [];
+    private DataStoreRoot data = new();
 
     DataStoreService()
     {
         if (Exists())
             Load();
         else
-            Data = [];
-    }
-
-    public object this[string key]
-    {
-        get
-        {
-            return Data[key];
-        }
-        set
-        {
-            Data[key] = value;
-        }
+            Data = new();
     }
 
     public bool Exists()
@@ -83,23 +69,23 @@ public class DataStoreService : IDataStoreService
         lock (lockject)
         {
             if (Exists())
-                Data = JsonConvert.DeserializeObject<DataDict>(File.ReadAllText(ConfigPath)) ?? [];
+                Data = JsonConvert.DeserializeObject<DataStoreRoot>(File.ReadAllText(ConfigPath)) ?? new();
             else
-                Data = [];
+                Data = new();
         }
     }
     public void LoadFrom(string json)
     {
         lock (lockject)
         {
-            Data = JsonConvert.DeserializeObject<DataDict>(json) ?? Data;
+            Data = JsonConvert.DeserializeObject<DataStoreRoot>(json) ?? Data;
         }
     }
     public override string ToString()
     {
         string output = "";
 
-        FieldInfo[] Infos = typeof(DataDict).GetFields();
+        FieldInfo[] Infos = typeof(DataStoreRoot).GetFields();
         foreach (FieldInfo info in Infos)
         {
             output += "\n" + info.Name + ": ";
