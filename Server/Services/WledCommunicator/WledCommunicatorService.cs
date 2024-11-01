@@ -71,7 +71,7 @@ public class WledCommunicatorService(
         Leds = [.. ledServers];
         FillNewSegmentsIntoDatastore();
     }
-    public IPAddress? GetLocalIPAddress()
+    static IPAddress? GetLocalIPAddress()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
         foreach (var ip in host.AddressList)
@@ -79,7 +79,7 @@ public class WledCommunicatorService(
                 return ip;
         return null;
     }
-    public void FillNewSegmentsIntoDatastore()
+    void FillNewSegmentsIntoDatastore()
     {
         var defaultGroup = dataStore.Data.Groups.FirstOrDefault(x => x.Name == "Default");
         if (defaultGroup == null)
