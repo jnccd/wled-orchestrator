@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Server.Services.DataStore;
 
@@ -23,6 +23,7 @@ public class DataStoreService : IDataStoreService
     public string ConfigPath { get; } = exePath + "config.json";
     readonly string configBackupPath = exePath + "config_backup.json";
     bool UnsavedChanges = false;
+    readonly JsonSerializerOptions options = new() { WriteIndented = true };
     public DataStoreRoot Data
     {
         get
@@ -59,7 +60,7 @@ public class DataStoreService : IDataStoreService
         {
             if (File.Exists(ConfigPath))
                 File.Copy(ConfigPath, configBackupPath, true);
-            File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(Data, Formatting.Indented));
+            File.WriteAllText(ConfigPath, JsonSerializer.Serialize(Data, options));
 
             UnsavedChanges = false;
         }
@@ -69,7 +70,7 @@ public class DataStoreService : IDataStoreService
         lock (lockject)
         {
             if (Exists())
-                Data = JsonConvert.DeserializeObject<DataStoreRoot>(File.ReadAllText(ConfigPath)) ?? new();
+                Data = JsonSerializer.Deserialize<DataStoreRoot>(File.ReadAllText(ConfigPath)) ?? new();
             else
                 Data = new();
         }
@@ -78,7 +79,7 @@ public class DataStoreService : IDataStoreService
     {
         lock (lockject)
         {
-            Data = JsonConvert.DeserializeObject<DataStoreRoot>(json) ?? Data;
+            Data = JsonSerializer.Deserialize<DataStoreRoot>(json) ?? Data;
         }
     }
     public override string ToString()
