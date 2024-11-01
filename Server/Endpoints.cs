@@ -1,7 +1,6 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 using Server.Helper;
 using Server.Services.DataStore;
 using Server.Services.WledCommunicator;
@@ -49,7 +48,7 @@ public static class WledOrchestratorEndpoints
 
         app.MapGet("/state", (
             [FromServices] IDataStoreService dataStore) =>
-            Results.Text(JsonConvert.SerializeObject(dataStore.Data), contentType: "application/json"));
+            Results.Text(JsonSerializer.Serialize(dataStore.Data), contentType: "application/json"));
 
         app.MapPost("/state", async (
             [FromServices] IDataStoreService dataStore,

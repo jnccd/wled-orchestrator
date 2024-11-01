@@ -9,14 +9,14 @@ public record LedThemeInput(DateTime Time);
 [JsonDerivedType(typeof(LedThemeDefault), typeDiscriminator: "themeDefault")]
 public abstract class LedTheme
 {
-    public readonly List<LedThemeModifier> modifiers = [];
+    public List<LedThemeModifier> Modifiers { get; } = [];
 
     public abstract LedGroupState? GetNewState(LedThemeInput input);
 
     public LedGroupState? GetNewModifiedState(LedThemeInput input)
     {
         var state = GetNewState(input);
-        foreach (var modifier in modifiers)
+        foreach (var modifier in Modifiers)
             state = modifier.ModifyState(state);
         return state;
     }
