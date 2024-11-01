@@ -3,7 +3,9 @@ using System.Net.Sockets;
 using System.Text;
 using Newtonsoft.Json;
 using Server.Helper;
-using Server.Services.LedTheme;
+using Server.Services.DataStore;
+using Server.Services.DataStore.Types;
+
 namespace Server.Services.WledCommunicator;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(WledCommunicatorService))]
@@ -21,6 +23,7 @@ public interface IWledCommunicatorService
 }
 
 public class WledCommunicatorService(
+    IDataStoreService dataStore,
     ILoggerService logger)
     : IWledCommunicatorService
 {
@@ -39,10 +42,9 @@ public class WledCommunicatorService(
             return;
         }
 
-        var leds = new List<WledServer>();
+        var ledServers = new List<WledServer>();
         var tasks = new List<Task>();
         var fac = new TaskFactory();
-        int done = 0;
 
         for (int i = 0; i < 256; i++)
             tasks.Add(fac.StartNew(async (i) =>
@@ -56,24 +58,19 @@ public class WledCommunicatorService(
                 }
                 catch (Exception) { }
 
-                if (string.IsNullOrWhiteSpace(responseText) || !responseText.StartsWith("{\"on\":"))
-                {
-                    done++;
-                    return;
-                }
+                if (string.IsNullOrWhiteSpace(responseText) || !responseText.StartsWith("{\"on\":")) return;
 
                 var ledState = JsonConvert.DeserializeObject<WledServerState>(responseText);
 
-                if (ledState != null) leds.Add(new(address, ledState));
-                done++;
+                if (ledState != null) ledServers.Add(new(address, ledState));
             }, i));
 
         Task.WaitAll([.. tasks]);
-        while (done < 250)
-            Thread.Sleep(200);
 
-        logger.WriteLine("Found Wled Servers at: " + leds.Select(x => x.address).Combine(", "));
-        Leds = [.. leds];
+        logger.WriteLine("Found Wled Servers at: " + ledServers.Select(x => x.Address).Combine(", "));
+        Leds = [.. ledServers];
+        dataStore.Data.Segments = Leds.SelectMany(x => x.Segments).ToList();
+        dataStore.Save();
     }
     public IPAddress? GetLocalIPAddress()
     {
@@ -87,7 +84,7 @@ public class WledCommunicatorService(
     public bool SetBrightnessGlobally(int bri)
     {
         foreach (var led in Leds)
-            if (!SetBrightnessOnWledServer(bri, led.address))
+            if (!SetBrightnessOnWledServer(bri, led.Address))
                 return false;
         return true;
     }
@@ -108,8 +105,8 @@ public class WledCommunicatorService(
     public bool SetLedColorsGlobally(Color[] colors)
     {
         foreach (var led in Leds)
-            foreach (var (seg, i) in led.state.Seg.WithIndex())
-                if (!SetLedColorsOnWledSegment(colors, new(led.address, i)))
+            foreach (var (seg, i) in led.State.Seg.WithIndex())
+                if (!SetLedColorsOnWledSegment(colors, new(led.Address, i)))
                     return false;
         return true;
     }
@@ -122,7 +119,7 @@ public class WledCommunicatorService(
 
         logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...");
 
-        var seg = Leds.FirstOrDefault(l => l.address == segment.WledServerAddress)?.state.Seg[segment.SegmentIndex];
+        var seg = Leds.FirstOrDefault(l => l.Address == segment.WledServerAddress)?.State.Seg[segment.SegmentIndex];
         if (seg == null || seg.Start == null || seg.Len == null)
         {
             logger.WriteLine($"Segment {segment} does not exist!", LogLevel.Error);

@@ -42,6 +42,6 @@ public static class WledOrchestratorEndpoints
         app.MapGet("/wledServers", (
             [FromServices] IWledCommunicatorService wledCommunicator,
             HttpRequest request) =>
-            Results.Json(wledCommunicator.Leds.Select(x => x.address).ToArray()));
+            Results.Json(wledCommunicator.Leds.Select(x => x.Address).ToArray()));
     }
 }
