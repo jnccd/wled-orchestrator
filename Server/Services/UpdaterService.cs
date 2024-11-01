@@ -25,12 +25,13 @@ public class UpdaterService(
 
         cts?.Cancel();
         updateTask?.Dispose();
+        cts?.Dispose();
         cts = new CancellationTokenSource();
         updateTask = Task.Run(() =>
         {
             communicatorService.FindLEDs();
 
-            while (true)
+            while (!cts.Token.IsCancellationRequested)
             {
                 try
                 {
