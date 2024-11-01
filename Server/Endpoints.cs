@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 using Server.Helper;
+using Server.Services.DataStore;
 using Server.Services.WledCommunicator;
 namespace Server;
 
@@ -24,6 +26,7 @@ public static class WledOrchestratorEndpoints
         });
 
         var routes = (IEndpointRouteBuilder)app;
+
         app.MapGet("/hewwo", () =>
         {
             return Results.Extensions.Html(@$"<!doctype html>
@@ -39,9 +42,22 @@ public static class WledOrchestratorEndpoints
                     </body>
                 </html>");
         });
+
         app.MapGet("/wledServers", (
-            [FromServices] IWledCommunicatorService wledCommunicator,
-            HttpRequest request) =>
+            [FromServices] IWledCommunicatorService wledCommunicator) =>
             Results.Json(wledCommunicator.Leds.Select(x => x.Address).ToArray()));
+
+        app.MapGet("/state", (
+            [FromServices] IDataStoreService dataStore) =>
+            Results.Text(JsonConvert.SerializeObject(dataStore.Data), contentType: "application/json"));
+
+        app.MapPost("/state", async (
+            [FromServices] IDataStoreService dataStore,
+            HttpRequest request) =>
+        {
+            using StreamReader bodyStream = new(request.Body);
+            string body = await bodyStream.ReadToEndAsync();
+            dataStore.LoadFrom(body);
+        });
     }
 }
