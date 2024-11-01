@@ -84,7 +84,7 @@ public class WledCommunicatorService(
         var defaultGroup = dataStore.Data.Groups.FirstOrDefault(x => x.Name == "Default");
         if (defaultGroup == null)
         {
-            defaultGroup = new([], null, "Default", new(255, 255, 255));
+            defaultGroup = LedSegmentGroup.DefaultGroup;
             dataStore.Data.Groups.Add(defaultGroup);
         }
 
