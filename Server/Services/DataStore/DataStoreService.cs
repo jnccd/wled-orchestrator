@@ -41,7 +41,7 @@ public class DataStoreService : IDataStoreService
     }
     private DataStoreRoot data = new();
 
-    DataStoreService()
+    public DataStoreService()
     {
         if (Exists())
             Load();
