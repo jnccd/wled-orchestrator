@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
+using Server.Services.LedTheme.Themes;
+
 namespace Server.Services.LedTheme;
 
 public record LedThemeInput(DateTime Time);
 
-// TODO: Polymorphism support for json
+[JsonDerivedType(typeof(LedThemeDaylight), typeDiscriminator: "themeDaylight")]
+[JsonDerivedType(typeof(LedThemeDefault), typeDiscriminator: "themeDefault")]
 public abstract class LedTheme
 {
     public readonly List<LedThemeModifier> modifiers = [];
