@@ -8,6 +8,6 @@ public class DataStoreRoot
 
     public DataStoreRoot()
     {
-        Groups = [LedSegmentGroup.DefaultGroup];
+        Groups = [];
     }
 }
