@@ -19,10 +19,8 @@ public class LedThemeProviderService(IDataStoreService dataStore) : ILedThemePro
     public LedGroupState? GetNewLedState(LedSegment ledSegment)
     {
         var ledSegmentGroup = dataStore.Data.Groups.FirstOrDefault(x => x.LedSegments.Contains(ledSegment));
-
-        if (ledSegmentGroup == null) return defaultTheme.GetNewModifiedState(GetNewLedThemeInput());
-
-        return ledSegmentGroup.Theme.GetNewModifiedState(GetNewLedThemeInput());
+        if (ledSegmentGroup == null) return null;
+        return (ledSegmentGroup.Theme ?? defaultTheme).GetNewModifiedState(GetNewLedThemeInput());
     }
 
     static LedThemeInput GetNewLedThemeInput() => new(DateTime.Now);

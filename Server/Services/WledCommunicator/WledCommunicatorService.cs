@@ -69,8 +69,7 @@ public class WledCommunicatorService(
 
         logger.WriteLine("Found Wled Servers at: " + ledServers.Select(x => x.Address).Combine(", "));
         Leds = [.. ledServers];
-        dataStore.Data.Segments = Leds.SelectMany(x => x.Segments).ToList();
-        dataStore.Save();
+        FillNewSegmentsIntoDatastore();
     }
     public IPAddress? GetLocalIPAddress()
     {
@@ -79,6 +78,25 @@ public class WledCommunicatorService(
             if (ip.AddressFamily == AddressFamily.InterNetwork)
                 return ip;
         return null;
+    }
+    public void FillNewSegmentsIntoDatastore()
+    {
+        var defaultGroup = dataStore.Data.Groups.FirstOrDefault(x => x.Name == "Default");
+        if (defaultGroup == null)
+        {
+            defaultGroup = new([], null, "Default", new(255, 255, 255));
+            dataStore.Data.Groups.Add(defaultGroup);
+        }
+
+        var segments = Leds.SelectMany(x => x.Segments).ToList();
+
+        foreach (var segment in segments)
+        {
+            var associatedGroup = dataStore.Data.Groups.FirstOrDefault(x => x.LedSegments.Contains(segment)) ?? defaultGroup;
+            if (!associatedGroup.LedSegments.Contains(segment)) associatedGroup.LedSegments.Add(segment);
+        }
+
+        dataStore.Save();
     }
 
     public bool SetBrightnessGlobally(int bri)
