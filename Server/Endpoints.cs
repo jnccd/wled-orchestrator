@@ -63,7 +63,7 @@ public static class WledOrchestratorEndpoints
             }
             catch
             {
-
+                // TODO: Throw exception to user?
             }
         });
     }
