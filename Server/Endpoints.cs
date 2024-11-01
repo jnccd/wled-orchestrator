@@ -48,7 +48,7 @@ public static class WledOrchestratorEndpoints
 
         app.MapGet("/state", (
             [FromServices] IDataStoreService dataStore) =>
-            Results.Text(JsonSerializer.Serialize(dataStore.Data), contentType: "application/json"));
+            Results.Json(dataStore.Data));
 
         app.MapPost("/state", async (
             [FromServices] IDataStoreService dataStore,
