@@ -21,7 +21,6 @@ public class LedThemeProviderService(IDataStoreService dataStore) : ILedThemePro
     {
         var ledSegmentGroup = dataStore.Data.Groups.FirstOrDefault(x => x.LedSegments.Contains(ledSegment));
         if (ledSegmentGroup == null) return null;
-        ledSegmentGroup.Theme = new LedThemeDaylight();
         return (ledSegmentGroup.Theme ?? defaultTheme).GetNewModifiedState(GetNewLedThemeInput());
     }
 
