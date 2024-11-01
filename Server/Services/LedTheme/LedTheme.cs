@@ -2,6 +2,7 @@ namespace Server.Services.LedTheme;
 
 public record LedThemeInput(DateTime Time);
 
+// TODO: Polymorphism support for json
 public abstract class LedTheme
 {
     public readonly List<LedThemeModifier> modifiers = [];
