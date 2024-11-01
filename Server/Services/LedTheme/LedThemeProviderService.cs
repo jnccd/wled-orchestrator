@@ -2,26 +2,27 @@ using Server.Helper;
 using Server.Services.LedTheme.Themes;
 namespace Server.Services.LedTheme;
 
-public record LedSegment(string WledServerAddress, int SegmentIndex);
+public record LedSegment(string WledServerAddress, int SegmentIndex)
+{
+    public Guid Id = Guid.NewGuid();
+    public string WledServerAddress = WledServerAddress;
+    public int SegmentIndex = SegmentIndex;
+}
 
-public record LedSegmentState(Color[] Colors, int Brightness);
+public record LedGroupState(Color[] Colors, int Brightness);
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(LedThemeProviderService))]
 public interface ILedThemeProviderService
 {
-    public Dictionary<LedSegment, LedTheme> LedSegmentToTheme { get; set; }
-
-    public LedSegmentState? GetNewLedState(LedSegment ledSegment);
+    public LedGroupState? GetNewLedState(LedSegment ledSegment);
 }
 
-public class LedThemeProviderService(
-    ILoggerService logger)
-    : ILedThemeProviderService
+public class LedThemeProviderService : ILedThemeProviderService
 {
     public Dictionary<LedSegment, LedTheme> LedSegmentToTheme { get; set; } = [];
 
     // TODO: Make themes changeable
-    public LedSegmentState? GetNewLedState(LedSegment ledSegment)
+    public LedGroupState? GetNewLedState(LedSegment ledSegment)
     {
         // Populate with default value if empty
         LedSegmentToTheme[ledSegment] = LedSegmentToTheme.GetValueOrDefault(ledSegment) ?? new LedThemeDaylight();

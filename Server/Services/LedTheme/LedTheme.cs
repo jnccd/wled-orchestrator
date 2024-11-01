@@ -6,9 +6,9 @@ public abstract class LedTheme
 {
     public readonly List<LedThemeModifier> modifiers = [];
 
-    public abstract LedSegmentState? GetNewState(LedThemeInput input);
+    public abstract LedGroupState? GetNewState(LedThemeInput input);
 
-    public LedSegmentState? GetNewModifiedState(LedThemeInput input)
+    public LedGroupState? GetNewModifiedState(LedThemeInput input)
     {
         var state = GetNewState(input);
         foreach (var modifier in modifiers)
@@ -19,6 +19,6 @@ public abstract class LedTheme
 
 public abstract class LedThemeModifier
 {
-    public abstract LedSegmentState? ModifyState(LedSegmentState? input);
+    public abstract LedGroupState? ModifyState(LedGroupState? input);
 }
 
