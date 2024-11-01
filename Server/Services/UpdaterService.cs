@@ -1,4 +1,5 @@
 using Server.Helper;
+using Server.Services.DataStore.Types;
 using Server.Services.LedTheme;
 using Server.Services.WledCommunicator;
 namespace Server.Services;
@@ -53,16 +54,16 @@ public class UpdaterService(
         {
             var themeBrightnesses = new List<int>();
 
-            foreach (var (seg, i) in led.state.Seg.WithIndex())
+            foreach (var (seg, i) in led.State.Seg.WithIndex())
             {
-                LedSegment segment = new(led.address, i);
+                LedSegment segment = new(led.Address, i);
                 var newLedState = ledThemeProvider.GetNewLedState(segment);
                 if (newLedState == null) continue;
                 communicatorService.SetLedColorsOnWledSegment(newLedState.Colors, segment);
                 themeBrightnesses.Add(newLedState.Brightness);
             }
 
-            communicatorService.SetBrightnessOnWledServer((int)themeBrightnesses.Average(), led.address);
+            communicatorService.SetBrightnessOnWledServer((int)themeBrightnesses.Average(), led.Address);
         }
     }
 }

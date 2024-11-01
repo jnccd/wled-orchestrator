@@ -1,7 +1,15 @@
+using Server.Helper;
+using Server.Services.DataStore.Types;
+
 namespace Server.Services.WledCommunicator;
 
-public class WledServer(string address, WledServerState state)
+public record WledServer(string Address, WledServerState State)
 {
-    public string address = address;
-    public WledServerState state = state;
+    public LedSegment[] Segments
+    {
+        get
+        {
+            return State.Seg.WithIndex().Select((x, i) => new LedSegment(Address, i)).ToArray();
+        }
+    }
 }
