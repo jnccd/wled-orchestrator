@@ -72,7 +72,7 @@ public class WledCommunicatorService(
             }, i));
 
         Task.WaitAll([.. tasks]);
-        while (done < 250)
+        while (done < 240)
             Thread.Sleep(200);
 
         logger.WriteLine("Found Wled Servers at: " + ledServers.Select(x => x.Address).Combine(", "));
@@ -92,6 +92,7 @@ public class WledCommunicatorService(
         var defaultGroup = dataStore.Data.Groups.FirstOrDefault(x => x.Name == "Default");
         if (defaultGroup == null)
         {
+            logger.WriteLine("Creating new Default LedSegmentGroup!");
             defaultGroup = LedSegmentGroup.DefaultGroup;
             dataStore.Data.Groups.Add(defaultGroup);
         }
