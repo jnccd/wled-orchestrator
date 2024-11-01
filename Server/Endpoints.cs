@@ -56,7 +56,15 @@ public static class WledOrchestratorEndpoints
         {
             using StreamReader bodyStream = new(request.Body);
             string body = await bodyStream.ReadToEndAsync();
-            dataStore.LoadFrom(body);
+            try
+            {
+                dataStore.LoadFrom(body);
+                dataStore.Save();
+            }
+            catch
+            {
+
+            }
         });
     }
 }
