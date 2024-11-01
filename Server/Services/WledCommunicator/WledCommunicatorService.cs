@@ -45,6 +45,7 @@ public class WledCommunicatorService(
         var ledServers = new List<WledServer>();
         var tasks = new List<Task>();
         var fac = new TaskFactory();
+        int done = 0;
 
         for (int i = 0; i < 256; i++)
             tasks.Add(fac.StartNew(async (i) =>
@@ -58,14 +59,21 @@ public class WledCommunicatorService(
                 }
                 catch (Exception) { }
 
-                if (string.IsNullOrWhiteSpace(responseText) || !responseText.StartsWith("{\"on\":")) return;
+                if (string.IsNullOrWhiteSpace(responseText) || !responseText.StartsWith("{\"on\":"))
+                {
+                    done++;
+                    return;
+                }
 
                 var ledState = JsonConvert.DeserializeObject<WledServerState>(responseText);
 
                 if (ledState != null) ledServers.Add(new(address, ledState));
+                done++;
             }, i));
 
         Task.WaitAll([.. tasks]);
+        while (done < 250)
+            Thread.Sleep(200);
 
         logger.WriteLine("Found Wled Servers at: " + ledServers.Select(x => x.Address).Combine(", "));
         Leds = [.. ledServers];
