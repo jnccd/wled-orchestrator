@@ -51,6 +51,7 @@ public static partial class Extensions
             var res = await client.PostAsync(address, contentData);
         }
         catch (TaskCanceledException) { }
+        catch (HttpRequestException) { }
     }
     public static HttpResponseMessage BlockingHttpPostAsJsonTo(this string json, string address, int timeout = 5)
     {
