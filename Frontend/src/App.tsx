@@ -1,48 +1,45 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-import ListGroup from "./components/ListGroup";
+import NavBar from "./components/NavBar";
 import useWledAddresses from "./hooks/useWledAddresses";
+import { Text, Grid, GridItem, Show } from "@chakra-ui/react";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const { wledAddresses, error, isLoading, apiClient } = useWledAddresses();
+  //const { wledAddresses, error, isLoading, apiClient } = useWledAddresses();
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Wled Orchestrator</h1>
-
-      {
-        <p>
-          {error}
-          {apiClient.defaults.baseURL}
-        </p>
-      }
-      {isLoading && (
-        <ListGroup items={["Loading.", "Loading..", "Loading..."]}></ListGroup>
-      )}
-      {!isLoading && <ListGroup items={wledAddresses.addresses}></ListGroup>}
-
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Grid
+        templateAreas={{
+          base: `"nav" "main"`,
+          lg: `"nav nav" 
+             "aside main"`,
+        }}
+        templateColumns={{
+          base: "1fr",
+          lg: "200px 1fr",
+        }}
+        width={"100%"}
+        height={"100%"}
+        paddingTop={"100px"}
+      >
+        <GridItem area="nav">
+          <NavBar
+            onSearch={function (searchText: string): void {
+              throw new Error("Function not implemented.");
+            }}
+          ></NavBar>
+        </GridItem>
+        <Show above="lg">
+          <GridItem area="aside" paddingX={5}>
+            Sidebar?
+          </GridItem>
+        </Show>
+        <GridItem area="main">
+          {[...Array(50).keys()].map((_) => (
+            <Text>Heeey</Text>
+          ))}
+        </GridItem>
+      </Grid>
     </>
   );
 }
