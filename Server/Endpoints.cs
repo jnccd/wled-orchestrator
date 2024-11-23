@@ -50,7 +50,7 @@ public static class WledOrchestratorEndpoints
             [FromServices] IDataStoreService dataStore) =>
             Results.Json(dataStore.Data));
 
-        app.MapPost("/state", async (
+        app.MapPut("/state", async (
             [FromServices] IDataStoreService dataStore,
             HttpRequest request) =>
         {
