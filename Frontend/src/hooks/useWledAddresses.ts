@@ -12,6 +12,7 @@ const useWledAddresses = () => {
     const [wledAddresses, setWledAddresses] = useState<WledAddresses>({ addresses: [""] });
     const [error, setError] = useState<string>("");
     const [isLoading, setLoading] = useState(false);
+    const [isDone, setIsDone] = useState(false);
   
     useEffect(() => {
       setLoading(true)
@@ -20,18 +21,20 @@ const useWledAddresses = () => {
         .then((res) => {
           setWledAddresses({ addresses: res.data })
           setLoading(false)
+          setIsDone(true)
         })
         .catch((err: AxiosError) => {
             if (err instanceof CanceledError) return;
           setError(err.message);
           setLoading(false)
+          setIsDone(true)
         });
 
         return () => {
         }
     }, []);
 
-    return {wledAddresses, error, isLoading, apiClient}
+    return {wledAddresses, error, isLoading, isDone, apiClient}
 }
 
 export default useWledAddresses
