@@ -9,11 +9,11 @@ const NavBar = () => {
   const navbarId = "navbar-container";
   const serverButtonIdPrefix = "server-button";
   const { colorMode } = useColorMode();
-  const { wledAddresses, isDone } = useWledAddresses();
+  const { wledAddresses, isDone: addressesLoaded } = useWledAddresses();
   const [wledNames, setWledNames] = useState([""]);
 
   useEffect(() => {
-    if (isDone) {
+    if (addressesLoaded) {
       setWledNames(
         wledAddresses.addresses.map((a) => a.split(".").slice(-1)[0])
       );
@@ -37,8 +37,8 @@ const NavBar = () => {
         colorMode == "light" ? "rgba(255,255,255,.8)" : "rgba(24, 30, 41,.8)"
       }
     >
-      <Text>Dev</Text>
-      {isDone && (
+      <Text>Wled Orchestrator</Text>
+      {addressesLoaded && (
         <Box flexDirection={"row"}>
           {wledNames.map((a) => (
             <DraggableButton
