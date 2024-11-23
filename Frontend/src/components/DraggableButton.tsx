@@ -34,7 +34,7 @@ const DraggableButton = ({ ownId, buttonName }: Props) => {
     setDragging(true);
   };
 
-  const dragMouseMove = (e: React.MouseEvent) => {
+  const dragMouseMove = (e: MouseEvent) => {
     if (debuggingLogs) console.log("dragMouseMove, " + dragging + ownId);
     if (!dragging) {
       return;
@@ -92,6 +92,7 @@ const DraggableButton = ({ ownId, buttonName }: Props) => {
     }
   };
 
+  document.onmousemove = dragMouseMove;
   document.onmouseup = dragMouseUp;
 
   return (
@@ -103,7 +104,6 @@ const DraggableButton = ({ ownId, buttonName }: Props) => {
       size="lg"
       cursor={"move"}
       onMouseDown={dragMouseDown}
-      onMouseMove={dragMouseMove}
     >
       {buttonName}
     </Button>
