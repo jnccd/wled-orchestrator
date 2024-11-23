@@ -43,7 +43,7 @@ const NavBar = () => {
           {wledNames.map((a) => (
             <DraggableButton
               buttonName={a}
-              ownId={serverButtonIdPrefix + "-" + a}
+              id={serverButtonIdPrefix + "-" + a}
             ></DraggableButton>
           ))}
         </Box>
