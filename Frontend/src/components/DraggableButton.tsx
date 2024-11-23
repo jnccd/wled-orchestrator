@@ -4,12 +4,12 @@ import React, { useState } from "react";
 const debuggingLogs = false;
 
 interface Props {
-  ownId: string;
+  id: string;
   buttonName: string;
   onDragEnd?: (elem: HTMLElement, mousePos: number[]) => void;
 }
 
-const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
+const DraggableButton = ({ id, buttonName, onDragEnd }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
@@ -20,7 +20,7 @@ const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
     if (debuggingLogs) console.log("dragMouseDown");
     e.preventDefault();
 
-    var thisInDocument = document.getElementById(ownId);
+    var thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
       if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
       return;
@@ -37,14 +37,14 @@ const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
   };
 
   const dragMouseMove = (e: MouseEvent) => {
-    if (debuggingLogs) console.log("dragMouseMove, " + dragging + ownId);
+    if (debuggingLogs) console.log("dragMouseMove, " + dragging + id);
     if (!dragging) {
       return;
     }
 
     e.preventDefault();
 
-    var thisInDocument = document.getElementById(ownId);
+    var thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
       if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
       return;
@@ -61,7 +61,7 @@ const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
 
   const dragMouseUp = () => {
     if (debuggingLogs) console.log("dragMouseUp");
-    var thisInDocument = document.getElementById(ownId);
+    var thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
       if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
       return;
@@ -102,7 +102,7 @@ const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
 
   return (
     <Button
-      id={ownId}
+      id={id}
       position={"relative"}
       className="wledServerButton"
       margin={2}
