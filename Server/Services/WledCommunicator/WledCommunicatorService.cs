@@ -92,7 +92,7 @@ public class WledCommunicatorService(
         var defaultGroup = dataStore.Data.Groups.FirstOrDefault(x => x.Name == "Default");
         if (defaultGroup == null)
         {
-            logger.WriteLine("Creating new Default LedSegmentGroup!");
+            logger.WriteLine("Creating new Default LedSegmentGroup!", LogLevel.Warn);
             defaultGroup = LedSegmentGroup.DefaultGroup;
             dataStore.Data.Groups.Add(defaultGroup);
         }
@@ -122,7 +122,7 @@ public class WledCommunicatorService(
             return false;
         LastBriHTTPReq[wledServerAddress] = DateTime.Now;
 
-        logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...");
+        logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...", LogLevel.Debug);
 
         $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{wledServerAddress}/json/state");
         return true;
@@ -144,12 +144,12 @@ public class WledCommunicatorService(
             return false;
         LastColHTTPReq[segment] = DateTime.Now;
 
-        logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...");
+        logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...", LogLevel.Debug);
 
         var seg = Leds.FirstOrDefault(l => l.Address == segment.WledServerAddress)?.State.Seg[segment.SegmentIndex];
         if (seg == null || seg.Start == null || seg.Len == null)
         {
-            logger.WriteLine($"Segment {segment} does not exist!", LogLevel.Error);
+            logger.WriteLine($"Segment {segment} does not exist!", LogLevel.Warn);
             return false;
         }
 

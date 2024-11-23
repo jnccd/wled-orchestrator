@@ -45,13 +45,13 @@ public class LoggerService : ILoggerService
     /// <summary>
     /// Override default configuration
     /// </summary>
-    public void ConfigureLogger(bool logToConsole = true, bool logToDebug = true, bool logToFile = true)
+    public void ConfigureLogger(bool logToConsole = true, bool logToDebug = false, bool logToFile = true)
     {
         // Set log level based on run configuration
 #if DEBUG
         var levelValue = @"<level value=""ALL"" />";
 #else
-            var levelValue = @"<level value=""INFO"" />";
+        var levelValue = @"<level value=""INFO"" />";
 #endif
 
         // Add used loggers
@@ -62,13 +62,13 @@ public class LoggerService : ILoggerService
             (logToConsole ? @"
                 <appender name=""ConsoleAppender"" type=""log4net.Appender.ConsoleAppender"">
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level %logger [%property{{NDC}}] - %message%newline"" />
+                        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
                     </layout>
                 </appender>" : "") +
             (logToDebug ? @"
                 <appender name=""DebugAppender"" type=""log4net.Appender.DebugAppender"">
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level %logger [%property{{NDC}}] - %message%newline"" />
+                        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
                     </layout>
                 </appender>" : "") +
             (logToFile ? @"
@@ -81,8 +81,9 @@ public class LoggerService : ILoggerService
                     <maximumFileSize value=""500KB"" />
                     <staticLogFileName value=""true"" />
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level %logger [%property{{NDC}}] - %message%newline"" />
+                        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
                     </layout>
+                    <threshold value=""INFO""/>
                 </appender>" : "");
 
         // Combine
