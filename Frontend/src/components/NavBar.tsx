@@ -1,4 +1,12 @@
-import { Box, Button, HStack, Text, useColorMode } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Card,
+  Heading,
+  HStack,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 import ColorModeSwitch from "./ColorModeSwitch";
 import SearchInput from "./SearchInput";
 import useWledAddresses from "../hooks/useWledAddresses";
@@ -24,6 +32,7 @@ const NavBar = ({ onSearch }: Props) => {
       top={0}
       left={0}
       right={0}
+      paddingY={6}
       bg={"none"}
       backdropFilter={"auto"}
       backdropBlur={"5px"}
@@ -34,17 +43,34 @@ const NavBar = ({ onSearch }: Props) => {
       zIndex={99999}
     >
       <Text>Dev</Text>
-      <Box>
-        {wledAddresses.addresses.map((a) => (
-          <Button
-            className="wledServerButton"
-            transition="all 0.5s"
-            margin={2}
-            size="lg"
-          >
-            {a.split(".").slice(-1)[0]}
-          </Button>
-        ))}
+      <Box justifyItems={"flex-start"}>
+        <Card
+          margin={0}
+          display={"inline-block"}
+          borderRadius={"var(--card-radius) var(--card-radius) 0px 0px"}
+        >
+          <Text padding={2} textAlign={"start"} fontSize={"small"}>
+            TestHeader
+          </Text>
+        </Card>
+        <Card
+          borderRadius={
+            "0px var(--card-radius) var(--card-radius) var(--card-radius)"
+          }
+        >
+          <Box flexDirection={"row"}>
+            {wledAddresses.addresses.map((a) => (
+              <Button
+                className="wledServerButton"
+                transition="all 0.5s"
+                margin={2}
+                size="lg"
+              >
+                {a.split(".").slice(-1)[0]}
+              </Button>
+            ))}
+          </Box>
+        </Card>
       </Box>
       <ColorModeSwitch></ColorModeSwitch>
     </HStack>
