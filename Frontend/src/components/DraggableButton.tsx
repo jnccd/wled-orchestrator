@@ -6,7 +6,7 @@ const debuggingLogs = false;
 interface Props {
   ownId: string;
   buttonName: string;
-  onDragEnd?: (elem: HTMLElement, draggingLastPos: number[]) => void;
+  onDragEnd?: (elem: HTMLElement, mousePos: number[]) => void;
 }
 
 const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
