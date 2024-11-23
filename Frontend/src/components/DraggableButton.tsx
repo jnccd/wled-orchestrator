@@ -6,12 +6,13 @@ const debuggingLogs = false;
 interface Props {
   ownId: string;
   buttonName: string;
-  onDragEnd?: (elem: HTMLElement) => void;
+  onDragEnd?: (elem: HTMLElement, draggingLastPos: number[]) => void;
 }
 
 const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
+  const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
   const dragY = false;
   const dragAreaPaddingX = 200;
 
@@ -26,8 +27,8 @@ const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
     }
 
     setDraggingStartPos([
-      e.clientX - (parseInt(thisInDocument.style.left) || 0),
-      e.clientY - (parseInt(thisInDocument.style.top) || 0),
+      e.clientX - (parseInt(thisInDocument.style.left.split("p")[0]) || 0),
+      e.clientY - (parseInt(thisInDocument.style.top.split("p")[0]) || 0),
     ]);
     thisInDocument.style.transition = "";
     thisInDocument.style.zIndex = "10";
@@ -54,6 +55,8 @@ const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
       e.clientX - draggingStartPos[0],
       e.clientY - draggingStartPos[1]
     );
+
+    setDraggingLastPos([e.clientX, e.clientY]);
   };
 
   const dragMouseUp = () => {
@@ -68,7 +71,7 @@ const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
     thisInDocument.style.zIndex = "1";
     setPos(thisInDocument, 0, 0);
     setDragging(false);
-    if (onDragEnd) onDragEnd(thisInDocument);
+    if (onDragEnd) onDragEnd(thisInDocument, draggingLastPos);
   };
 
   const setPos = (e: HTMLElement, x: number, y: number) => {
