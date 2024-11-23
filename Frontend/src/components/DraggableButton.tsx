@@ -6,9 +6,10 @@ const debuggingLogs = false;
 interface Props {
   ownId: string;
   buttonName: string;
+  onDragEnd?: (elem: HTMLElement) => void;
 }
 
-const DraggableButton = ({ ownId, buttonName }: Props) => {
+const DraggableButton = ({ ownId, buttonName, onDragEnd }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const dragY = false;
@@ -67,6 +68,7 @@ const DraggableButton = ({ ownId, buttonName }: Props) => {
     thisInDocument.style.zIndex = "1";
     setPos(thisInDocument, 0, 0);
     setDragging(false);
+    if (onDragEnd) onDragEnd(thisInDocument);
   };
 
   const setPos = (e: HTMLElement, x: number, y: number) => {
