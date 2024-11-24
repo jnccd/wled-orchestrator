@@ -42,23 +42,21 @@ public static class WledOrchestratorEndpoints
                 </html>");
         });
 
-        app.MapGet("/wledServers", (
+        app.MapGet("/wledServers", [ProducesResponseType(typeof(string[]), 200)] (
             [FromServices] IWledCommunicatorService wledCommunicator) =>
             Results.Json(wledCommunicator.Leds.Select(x => x.Address).ToArray()));
 
-        app.MapGet("/state", (
+        app.MapGet("/state", [ProducesResponseType(typeof(DataStoreRoot), 200)] (
             [FromServices] IDataStoreService dataStore) =>
             Results.Json(dataStore.Data));
 
-        app.MapPut("/state", async (
+        app.MapPut("/state", (
             [FromServices] IDataStoreService dataStore,
-            HttpRequest request) =>
+            DataStoreRoot newState) =>
         {
-            using StreamReader bodyStream = new(request.Body);
-            string body = await bodyStream.ReadToEndAsync();
             try
             {
-                dataStore.LoadFrom(body);
+                dataStore.LoadFrom(JsonSerializer.Serialize(newState));
                 dataStore.Save();
             }
             catch
