@@ -3,7 +3,7 @@ import apiClient from "../services/api-client";
 import { AxiosError, CanceledError } from "axios";
 import { components } from "../types/api";
 
-type LedSegmentGroups = components["schemas"]["DataStoreRoot"][]
+type LedSegmentGroups = components["schemas"]["DataStoreRoot"]
 
 export interface WledOchState {
     ledSegmentGroups: LedSegmentGroups,
@@ -18,14 +18,12 @@ type PutProps = {
   data: LedSegmentGroups
 }
 
-type ConditionalProps = GetProps | PutProps
+type Props =GetProps | PutProps
 
-type Props = WledOchState & ConditionalProps
-
-const useWledOrchState = ({method, data}:Props) => {
+const useWledOrchState = ({method, data}: Props) => {
     const controller = new AbortController()
 
-    const [wledOchState, setWledOchState] = useState<WledOchState>({ ledSegmentGroups: [] });
+    const [wledOchState, setWledOchState] = useState<WledOchState>({ ledSegmentGroups: {} });
     const [error, setError] = useState<string>("");
     const [isLoading, setLoading] = useState(false);
     const [hasData, setHasData] = useState(false);
