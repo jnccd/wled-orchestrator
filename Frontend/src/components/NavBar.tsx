@@ -9,7 +9,7 @@ const NavBar = () => {
   const navbarId = "navbar-container";
   const serverButtonIdPrefix = "server-button";
   const { colorMode } = useColorMode();
-  const { wledAddresses, isDone: addressesLoaded } = useWledAddresses();
+  const { wledAddresses, hasData: addressesLoaded } = useWledAddresses();
   const [wledNames, setWledNames] = useState([""]);
 
   useEffect(() => {
