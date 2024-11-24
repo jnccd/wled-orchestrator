@@ -26,7 +26,8 @@ const DraggableButton = ({ id, buttonName, onDragEnd }: Props) => {
       return;
     }
 
-    const parentBounds = thisInDocument.parentElement?.getBoundingClientRect();
+    const parentBounds =
+      thisInDocument.parentElement?.parentElement?.getBoundingClientRect();
     if (parentBounds) {
       setDragArea([parentBounds.left, parentBounds.right]);
     }
