@@ -2,7 +2,7 @@ import { Box, HStack, Text, useColorMode } from "@chakra-ui/react";
 import ColorModeSwitch from "./ColorModeSwitch";
 import useWledAddresses from "../hooks/useWledAddresses";
 import { useEffect, useState } from "react";
-import DraggableButton from "./DraggableButton";
+import WledSegmentGroupViewer from "./WledSegmentGroupViewer";
 
 const NavBar = () => {
   const height = "100px";
@@ -41,14 +41,9 @@ const NavBar = () => {
       >
         <Text>Wled Orchestrator</Text>
         {addressesLoaded && (
-          <Box flexDirection={"row"} width={"100%"}>
-            {wledNames.map((a) => (
-              <DraggableButton
-                buttonName={a}
-                id={serverButtonIdPrefix + "-" + a}
-              ></DraggableButton>
-            ))}
-          </Box>
+          <WledSegmentGroupViewer
+            serverButtonIdPrefix={serverButtonIdPrefix}
+          ></WledSegmentGroupViewer>
         )}
         <ColorModeSwitch></ColorModeSwitch>
       </HStack>
