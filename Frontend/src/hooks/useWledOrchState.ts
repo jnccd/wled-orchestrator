@@ -49,18 +49,18 @@ const useWledOrchState = ({method, data}:Props) => {
     }
 
     const usePut = (data: LedSegmentGroups) =>
-      {
-        setLoading(true);
-        apiClient
-          .put<LedSegmentGroups>("/state", data, {signal: controller.signal})
-          .then((_) => { })
-          .catch((err: AxiosError) => {
-            if (err instanceof CanceledError) return;
-            setError(err.message);
-          }).finally(() => {
-            setLoading(false);
-          });
-      }
+    {
+      setLoading(true);
+      apiClient
+        .put<LedSegmentGroups>("/state", data, {signal: controller.signal})
+        .then((_) => { })
+        .catch((err: AxiosError) => {
+          if (err instanceof CanceledError) return;
+          setError(err.message);
+        }).finally(() => {
+          setLoading(false);
+        });
+    }
   
     useEffect(() => {
       if (method == 'GET') {
