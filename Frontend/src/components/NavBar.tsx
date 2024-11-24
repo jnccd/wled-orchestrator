@@ -41,7 +41,7 @@ const NavBar = () => {
       >
         <Text>Wled Orchestrator</Text>
         {addressesLoaded && (
-          <Box flexDirection={"row"}>
+          <Box flexDirection={"row"} width={"100%"}>
             {wledNames.map((a) => (
               <DraggableButton
                 buttonName={a}
