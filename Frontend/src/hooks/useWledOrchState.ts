@@ -20,7 +20,10 @@ type PutProps = {
 
 type Props =GetProps | PutProps
 
-const useWledOrchState = ({method, data}: Props) => {
+const useWledOrchState = ({method, data}: Props = {
+  method: "GET",
+  data: undefined,
+}) => {
     const controller = new AbortController()
 
     const [wledOchState, setWledOchState] = useState<WledOrchState>({ ledSegmentGroups: {} });
