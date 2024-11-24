@@ -1,11 +1,8 @@
 import "./App.css";
 import NavBar from "./components/NavBar";
-import useWledAddresses from "./hooks/useWledAddresses";
 import { Text, Grid, GridItem, Show } from "@chakra-ui/react";
 
 function App() {
-  //const { wledAddresses, error, isLoading, apiClient } = useWledAddresses();
-
   return (
     <>
       <Grid
