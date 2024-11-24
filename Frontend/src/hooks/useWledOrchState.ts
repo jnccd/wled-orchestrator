@@ -38,13 +38,14 @@ const useWledOrchState = ({method, data}:Props) => {
         .get<LedSegmentGroups>("/state", {signal: controller.signal})
         .then((res) => {
           setWledOchState({ ledSegmentGroups: res.data });
+          setHasData(true);
         })
         .catch((err: AxiosError) => {
           if (err instanceof CanceledError) return;
           setError(err.message);
-        }).finally(() => {
+        })
+        .finally(() => {
           setLoading(false);
-          setHasData(true);
         });
     }
 
@@ -57,7 +58,8 @@ const useWledOrchState = ({method, data}:Props) => {
         .catch((err: AxiosError) => {
           if (err instanceof CanceledError) return;
           setError(err.message);
-        }).finally(() => {
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
