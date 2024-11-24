@@ -16,21 +16,18 @@ const WledSegmentGroupViewer = ({ serverButtonIdPrefix }: Props) => {
           <Box borderWidth="1px" borderRadius="lg" width={"fit-content"}>
             <Text>{g.name}</Text>
             {g.ledSegments &&
-              g.ledSegments?.map((s) => {
-                return (
-                  <DraggableButton
-                    buttonName={
-                      s.wledServerAddress?.split(".").slice(-1)[0] ??
-                      "Not Found"
-                    }
-                    id={
-                      serverButtonIdPrefix +
-                      "-" +
-                      s.wledServerAddress?.split(".").slice(-1)[0]
-                    }
-                  ></DraggableButton>
-                );
-              })}
+              g.ledSegments?.map((s) => (
+                <DraggableButton
+                  buttonName={
+                    s.wledServerAddress?.split(".").slice(-1)[0] ?? "Not Found"
+                  }
+                  id={
+                    serverButtonIdPrefix +
+                    "-" +
+                    s.wledServerAddress?.split(".").slice(-1)[0]
+                  }
+                ></DraggableButton>
+              ))}
           </Box>
         ))}
       </Box>
