@@ -7,10 +7,7 @@ interface Props {
 }
 
 const WledSegmentGroupViewer = ({ serverButtonIdPrefix }: Props) => {
-  const { wledOchState, hasData: stateLoaded } = useWledOrchState({
-    method: "GET",
-    data: undefined,
-  });
+  const { wledOchState, hasData: stateLoaded } = useWledOrchState();
 
   return (
     stateLoaded && (
