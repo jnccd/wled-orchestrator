@@ -37,6 +37,18 @@ public static class Configuration
             else if (serviceRegisterType == ServiceRegisterType.Transient)
                 builder.Services.AddTransient(interfaceType, serviceImplType);
         }
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+    }
+
+    public static void EnableSwagger(this WebApplication app)
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
     }
 
     public static void ConfigureWebhost(this WebApplicationBuilder builder)
