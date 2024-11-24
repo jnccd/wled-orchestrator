@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/react";
 import React, { useState } from "react";
 
-const debuggingLogs = false;
+const debuggingLogs = true;
 
 interface Props {
   id: string;
@@ -13,8 +13,8 @@ const DraggableButton = ({ id, buttonName, onDragEnd }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
+  const [dragArea, setDragArea] = useState([0, document.body.clientWidth]);
   const dragY = false;
-  const dragAreaPaddingX = 200;
 
   const dragMouseDown = (e: React.MouseEvent) => {
     if (debuggingLogs) console.log("dragMouseDown");
@@ -24,6 +24,11 @@ const DraggableButton = ({ id, buttonName, onDragEnd }: Props) => {
     if (thisInDocument === null) {
       if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
       return;
+    }
+
+    const parentBounds = thisInDocument.parentElement?.getBoundingClientRect();
+    if (parentBounds) {
+      setDragArea([parentBounds.left, parentBounds.right]);
     }
 
     setDraggingStartPos([
@@ -81,19 +86,15 @@ const DraggableButton = ({ id, buttonName, onDragEnd }: Props) => {
     }
 
     const boundingRect = e.getBoundingClientRect();
-    if (boundingRect.left < dragAreaPaddingX) {
+    if (boundingRect.left < dragArea[0]) {
       if (debuggingLogs) console.log("too far left!");
       const left = parseInt(e.style.left.split("p")[0]);
-      e.style.left = String(left + (dragAreaPaddingX - boundingRect.x)) + "px";
+      e.style.left = String(left + (dragArea[0] - boundingRect.x)) + "px";
     }
-    if (boundingRect.right > document.body.clientWidth - dragAreaPaddingX) {
+    if (boundingRect.right > dragArea[1]) {
       if (debuggingLogs) console.log("too far right!");
       const left = parseInt(e.style.left.split("p")[0]);
-      e.style.left =
-        String(
-          left +
-            (document.body.clientWidth - dragAreaPaddingX - boundingRect.right)
-        ) + "px";
+      e.style.left = String(left + (dragArea[1] - boundingRect.right)) + "px";
     }
   };
 
