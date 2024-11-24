@@ -19,15 +19,15 @@ const useWledAddresses = () => {
       apiClient
         .get<[string]>("/wledServers", {signal: controller.signal})
         .then((res) => {
-          setWledAddresses({ addresses: res.data })
-          setLoading(false)
-          setHasData(true)
+          setWledAddresses({ addresses: res.data });
+          setHasData(true);
         })
         .catch((err: AxiosError) => {
-            if (err instanceof CanceledError) return;
+          if (err instanceof CanceledError) return;
           setError(err.message);
-          setLoading(false)
-          setHasData(true)
+        })
+        .finally(() => {
+          setLoading(false);
         });
 
         return () => { }
