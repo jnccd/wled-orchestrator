@@ -20,7 +20,6 @@ function App() {
         }}
         width={"100%"}
         height={"100%"}
-        paddingTop={"100px"}
       >
         <GridItem area="nav">
           <NavBar></NavBar>
