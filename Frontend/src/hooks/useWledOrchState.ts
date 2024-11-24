@@ -5,7 +5,7 @@ import { components } from "../types/api";
 
 type LedSegmentGroups = components["schemas"]["DataStoreRoot"]
 
-export interface WledOchState {
+export interface WledOrchState {
     ledSegmentGroups: LedSegmentGroups,
 }
 
@@ -23,7 +23,7 @@ type Props =GetProps | PutProps
 const useWledOrchState = ({method, data}: Props) => {
     const controller = new AbortController()
 
-    const [wledOchState, setWledOchState] = useState<WledOchState>({ ledSegmentGroups: {} });
+    const [wledOchState, setWledOchState] = useState<WledOrchState>({ ledSegmentGroups: {} });
     const [error, setError] = useState<string>("");
     const [isLoading, setLoading] = useState(false);
     const [hasData, setHasData] = useState(false);
