@@ -33,7 +33,7 @@ const NavBar = () => {
         ></WledSegmentGroupViewer>
         <ColorModeSwitch></ColorModeSwitch>
       </HStack>
-      <Box minHeight={height}></Box>
+      <Box minHeight={height} marginBottom={4}></Box>
     </>
   );
 };
