@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
@@ -52,7 +53,7 @@ public static class WledOrchestratorEndpoints
 
         app.MapPut("/state", (
             [FromServices] IDataStoreService dataStore,
-            DataStoreRoot newState) =>
+            [FromBody, Required] DataStoreRoot newState) =>
         {
             try
             {
