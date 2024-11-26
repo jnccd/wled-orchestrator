@@ -8,12 +8,7 @@ namespace Server.Services.LedTheme;
 public record LedGroupState(Color[] Colors, int Brightness);
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(LedThemeProviderService))]
-public interface ILedThemeProviderService
-{
-    public LedGroupState? GetNewLedState(LedSegment ledSegment);
-}
-
-public class LedThemeProviderService(IDataStoreService dataStore) : ILedThemeProviderService
+public class LedThemeProviderService(DataStoreService dataStore)
 {
     readonly LedThemeDefault defaultTheme = new();
 

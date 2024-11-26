@@ -1,9 +1,10 @@
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Server;
 
-[AttributeUsage(AttributeTargets.Interface)]
+[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class)]
 public class RegisterImplementation(ServiceRegisterType serviceRegisterType, Type serviceType) : Attribute
 {
     public readonly ServiceRegisterType serviceRegisterType = serviceRegisterType;
@@ -17,25 +18,21 @@ public static class Configuration
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
         Type[] serviceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                               from interfaceType in domainAssembly.GetTypes()
-                               where interfaceType.Module == typeof(Configuration).Module
-                                   && interfaceType.CustomAttributes.Any(x => x.AttributeType == typeof(RegisterImplementation))
-                                   && interfaceType.IsInterface
-                               select interfaceType).ToArray();
+                               from declaringType in domainAssembly.GetTypes()
+                               where declaringType.Module == typeof(Configuration).Module
+                                   && declaringType.CustomAttributes.Any(x => x.AttributeType == typeof(RegisterImplementation))
+                               select declaringType).ToArray();
 
-        foreach (var interfaceType in serviceTypes)
+        foreach (var declaringType in serviceTypes)
         {
-            var attr = interfaceType.CustomAttributes.First(x => x.AttributeType == typeof(RegisterImplementation));
+            var attr = declaringType.GetCustomAttribute<RegisterImplementation>();
 
-            var args = attr.ConstructorArguments;
-            ServiceRegisterType serviceRegisterType = (ServiceRegisterType)(args[0].Value ?? 0);
-            Type? serviceImplType = (Type?)args[1].Value;
-            if (serviceImplType == null) continue;
+            if (attr == null || attr?.serviceType == null || attr?.serviceRegisterType == null) continue;
 
-            if (serviceRegisterType == ServiceRegisterType.Singleton)
-                builder.Services.AddSingleton(interfaceType, serviceImplType);
-            else if (serviceRegisterType == ServiceRegisterType.Transient)
-                builder.Services.AddTransient(interfaceType, serviceImplType);
+            if (attr.serviceRegisterType == ServiceRegisterType.Singleton)
+                builder.Services.AddSingleton(declaringType, attr.serviceType);
+            else if (attr?.serviceRegisterType == ServiceRegisterType.Transient)
+                builder.Services.AddTransient(declaringType, attr.serviceType);
         }
 
         builder.Services.AddEndpointsApiExplorer();

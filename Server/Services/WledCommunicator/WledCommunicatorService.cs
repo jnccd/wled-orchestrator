@@ -9,23 +9,9 @@ using Server.Services.DataStore.Types;
 namespace Server.Services.WledCommunicator;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(WledCommunicatorService))]
-public interface IWledCommunicatorService
-{
-    public WledServer[] Leds { get; }
-
-    public void FindLEDs();
-
-    public bool SetBrightnessGlobally(int bri);
-    public bool SetBrightnessOnWledServer(int bri, string wledServerAddress);
-
-    public bool SetLedColorsGlobally(Color[] colors);
-    public bool SetLedColorsOnWledSegment(Color[] colors, LedSegment segment);
-}
-
 public class WledCommunicatorService(
-    IDataStoreService dataStore,
-    ILoggerService logger)
-    : IWledCommunicatorService
+    DataStoreService dataStore,
+    LoggerService logger)
 {
     public WledServer[] Leds { get; private set; } = [];
     private const double HttpReqCooldownSecs = 0.1;

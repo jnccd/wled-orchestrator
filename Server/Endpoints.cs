@@ -44,15 +44,15 @@ public static class WledOrchestratorEndpoints
         });
 
         app.MapGet("/wledServers", [ProducesResponseType(typeof(string[]), 200)] (
-            [FromServices] IWledCommunicatorService wledCommunicator) =>
+            [FromServices] WledCommunicatorService wledCommunicator) =>
             Results.Json(wledCommunicator.Leds.Select(x => x.Address).ToArray()));
 
         app.MapGet("/state", [ProducesResponseType(typeof(DataStoreRoot), 200)] (
-            [FromServices] IDataStoreService dataStore) =>
+            [FromServices] DataStoreService dataStore) =>
             Results.Json(dataStore.Data));
 
         app.MapPut("/state", (
-            [FromServices] IDataStoreService dataStore,
+            [FromServices] DataStoreService dataStore,
             [FromBody, Required] DataStoreRoot newState) =>
         {
             try

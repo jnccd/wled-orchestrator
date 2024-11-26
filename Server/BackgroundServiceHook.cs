@@ -9,7 +9,7 @@ public static class BackgroundServiceHook
         {
             Task.Delay(1).Wait();
 
-            if (services.GetService(typeof(IUpdaterService)) is not IUpdaterService updaterService) return;
+            if (services.GetService(typeof(UpdaterService)) is not UpdaterService updaterService) return;
             updaterService.StartUpdateThread();
         });
     }
