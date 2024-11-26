@@ -5,16 +5,10 @@ using Server.Services.WledCommunicator;
 namespace Server.Services;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(UpdaterService))]
-public interface IUpdaterService
-{
-    public void StartUpdateThread();
-}
-
 public class UpdaterService(
-    IWledCommunicatorService communicatorService,
-    ILedThemeProviderService ledThemeProvider,
-    ILoggerService logger)
-    : IUpdaterService
+    WledCommunicatorService communicatorService,
+    LedThemeProviderService ledThemeProvider,
+    LoggerService logger)
 {
     Task? updateTask;
     CancellationTokenSource? cts;

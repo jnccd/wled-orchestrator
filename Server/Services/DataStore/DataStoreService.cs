@@ -5,19 +5,7 @@ using System.Text.Json;
 namespace Server.Services.DataStore;
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(DataStoreService))]
-public interface IDataStoreService
-{
-    public bool UnsavedChanges { get; }
-    public DataStoreRoot Data { get; set; }
-    public string ConfigPath { get; }
-    public bool Exists();
-    public void Save();
-    public void Load();
-    public void LoadFrom(string json);
-    public string ToString();
-}
-
-public class DataStoreService : IDataStoreService
+public class DataStoreService
 {
     readonly object lockject = new();
     readonly static string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) + Path.DirectorySeparatorChar;

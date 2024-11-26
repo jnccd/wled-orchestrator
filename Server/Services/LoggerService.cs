@@ -4,18 +4,13 @@ using log4net;
 using log4net.Config;
 namespace Server.Services;
 
-[RegisterImplementation(ServiceRegisterType.Singleton, typeof(LoggerService))]
-public interface ILoggerService
-{
-    public void WriteLine(object o, LogLevel level = LogLevel.Info);
-}
-
 public enum LogLevel { Debug, Info, Warn, Error, Fatal }
 
 /// <summary>
 /// A minimalistic wrapper for log4net
 /// </summary>
-public class LoggerService : ILoggerService
+[RegisterImplementation(ServiceRegisterType.Singleton, typeof(LoggerService))]
+public class LoggerService
 {
     public LoggerService() => ConfigureLogger();
 
