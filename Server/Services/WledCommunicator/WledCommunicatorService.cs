@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Server.Helper;
 using Server.Services.DataStore;
@@ -68,10 +69,20 @@ public class WledCommunicatorService(
     static IPAddress? GetLocalIPAddress()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
-        foreach (var ip in host.AddressList)
-            if (ip.AddressFamily == AddressFamily.InterNetwork)
-                return ip;
-        return null;
+        var interNetworkAddresses = host.AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork).OrderByDescending(x =>
+        {
+            var score = 0;
+            var address = x.GetAddressBytes();
+
+            if (address[0] == 192)
+                score += 10;
+
+            if (address[3] != 1)
+                score += 1;
+
+            return score;
+        });
+        return interNetworkAddresses.FirstOrDefault();
     }
     void FillNewSegmentsIntoDatastore()
     {
