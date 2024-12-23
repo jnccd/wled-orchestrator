@@ -66,6 +66,7 @@ export interface components {
       wledServerAddress?: string | null;
       /** Format: int32 */
       segmentIndex?: number;
+      name?: string | null;
     };
     LedSegmentGroup: {
       name?: string | null;
