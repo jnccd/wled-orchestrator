@@ -67,6 +67,7 @@ export interface components {
       /** Format: int32 */
       segmentIndex?: number;
       name?: string | null;
+      id?: string | null;
     };
     LedSegmentGroup: {
       /** Format: uuid */
