@@ -4,6 +4,8 @@ namespace Server.Services.DataStore.Types;
 
 public class LedSegmentGroup(string Name, List<LedSegment> LedSegments, LedTheme.LedTheme? Theme, Color DisplayColor)
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
+
     public string Name { get; } = Name;
     public List<LedSegment> LedSegments { get; } = LedSegments;
     public LedTheme.LedTheme? Theme { get; set; } = Theme;

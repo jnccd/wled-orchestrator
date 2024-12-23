@@ -9,6 +9,8 @@ public record LedThemeInput(DateTime Time);
 [JsonDerivedType(typeof(LedThemeDefault), typeDiscriminator: "themeDefault")]
 public abstract class LedTheme
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
+
     public List<LedThemeModifier> Modifiers { get; } = [];
 
     public abstract LedGroupState? GetNewState(LedThemeInput input);
