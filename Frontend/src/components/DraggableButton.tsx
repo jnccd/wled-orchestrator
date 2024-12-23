@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/react";
 import React, { useState } from "react";
 
-const debuggingLogs = true;
+const debuggingLogs = false;
 
 interface Props {
   id: string;
