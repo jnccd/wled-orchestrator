@@ -13,6 +13,7 @@ public class DataStoreService
     readonly string configBackupPath = exePath + "config_backup.json";
     public bool UnsavedChanges { get; private set; } = false;
     readonly JsonSerializerOptions options = new() { WriteIndented = true };
+    readonly LoggerService _logger;
     public DataStoreRoot Data
     {
         get
@@ -31,8 +32,10 @@ public class DataStoreService
     }
     private DataStoreRoot data = new();
 
-    public DataStoreService()
+    public DataStoreService(LoggerService logger)
     {
+        _logger = logger;
+
         if (Exists())
             Load();
         else
@@ -58,10 +61,17 @@ public class DataStoreService
     {
         lock (lockject)
         {
-            if (Exists())
-                Data = JsonSerializer.Deserialize<DataStoreRoot>(File.ReadAllText(ConfigPath)) ?? new();
-            else
-                Data = new();
+            try
+            {
+                if (Exists())
+                    Data = JsonSerializer.Deserialize<DataStoreRoot>(File.ReadAllText(ConfigPath)) ?? new();
+                else
+                    Data = new();
+            }
+            catch (Exception e)
+            {
+                _logger.WriteLine(e);
+            }
         }
     }
     public void LoadFrom(string json)
