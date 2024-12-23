@@ -69,12 +69,16 @@ export interface components {
       name?: string | null;
     };
     LedSegmentGroup: {
+      /** Format: uuid */
+      id?: string;
       name?: string | null;
       ledSegments?: components["schemas"]["LedSegment"][] | null;
       theme?: components["schemas"]["LedTheme"];
       displayColor?: components["schemas"]["Color"];
     };
     LedTheme: {
+      /** Format: uuid */
+      id?: string;
       modifiers?: components["schemas"]["LedThemeModifier"][] | null;
     };
     LedThemeModifier: { [key: string]: unknown };
