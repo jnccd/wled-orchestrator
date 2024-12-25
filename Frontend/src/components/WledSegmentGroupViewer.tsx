@@ -59,7 +59,7 @@ const WledSegmentGroupViewer = ({ serverButtonIdPrefix }: Props) => {
             {g.ledSegments &&
               g.ledSegments.map((s) => (
                 <DraggableButton
-                  className={s.readonlyId ?? "id-not-found"}
+                  className={s.readonlyId ?? "error-id-less-segment"}
                   buttonName={
                     s.wledServerAddress?.split(".").slice(-1)[0] ?? "Not Found"
                   }
