@@ -1,17 +1,18 @@
-import { HStack, Switch, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@chakra-ui/react";
+import { IoMoon } from "react-icons/io5";
+import { IoMoonOutline } from "react-icons/io5";
 
 const ColorModeSwitch = () => {
   const { toggleColorMode, colorMode } = useColorMode();
 
   return (
-    <HStack>
-      <Switch
-        colorScheme="green"
-        isChecked={colorMode === "dark"}
-        onChange={toggleColorMode}
-      ></Switch>
-      <Text whiteSpace={"nowrap"}>Dark Mode</Text>
-    </HStack>
+    <button
+      style={{ border: "none", background: "none", outline: "none" }}
+      onClick={toggleColorMode}
+    >
+      {colorMode !== "dark" && <IoMoonOutline size={25} />}
+      {colorMode === "dark" && <IoMoon size={25} />}
+    </button>
   );
 };
 
