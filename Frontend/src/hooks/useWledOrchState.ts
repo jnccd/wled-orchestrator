@@ -30,6 +30,7 @@ const useWledOrchState = ({method, data}: Props = {
     const [error, setError] = useState<string>("");
     const [isLoading, setLoading] = useState(false);
     const [hasData, setHasData] = useState(false);
+    const [effectTrigger, setEffectTrigger] = useState(false);
 
     const useGet = () =>
     {
@@ -65,7 +66,6 @@ const useWledOrchState = ({method, data}: Props = {
         });
     }
   
-    var effectTrigger = false;
     useEffect(() => {
       if (method == 'GET') {
         useGet();
@@ -75,7 +75,7 @@ const useWledOrchState = ({method, data}: Props = {
     }, [effectTrigger]);
 
     const refresh = () => {
-      effectTrigger = !effectTrigger;
+      setEffectTrigger(!effectTrigger);
     };
 
     return {wledOrchState, error, isLoading, hasData, refresh}
