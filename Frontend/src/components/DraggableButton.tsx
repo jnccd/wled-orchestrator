@@ -111,7 +111,7 @@ const DraggableButton = ({ id, buttonName, onDragEnd, className }: Props) => {
       margin={2}
       size="lg"
       cursor="move"
-      onMouseDown={dragMouseDown}
+      onMouseDown={dragMouseDown} // TODO: Add touch event
     >
       {buttonName}
     </Button>

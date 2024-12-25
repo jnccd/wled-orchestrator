@@ -1,11 +1,9 @@
 import { Box, HStack, Text, useColorMode } from "@chakra-ui/react";
 import ColorModeSwitch from "./ColorModeSwitch";
-import WledSegmentGroupViewer from "./WledSegmentGroupViewer";
 
 const NavBar = () => {
   const height = "100px";
   const navbarId = "navbar-container";
-  const serverButtonIdPrefix = "server-button";
 
   const { colorMode } = useColorMode();
 
@@ -28,12 +26,9 @@ const NavBar = () => {
         }
       >
         <Text>Wled Orchestrator</Text>
-        <WledSegmentGroupViewer
-          serverButtonIdPrefix={serverButtonIdPrefix}
-        ></WledSegmentGroupViewer>
         <ColorModeSwitch></ColorModeSwitch>
       </HStack>
-      <Box minHeight={height} marginBottom={4}></Box>
+      <Box minHeight={height}></Box>
     </>
   );
 };
