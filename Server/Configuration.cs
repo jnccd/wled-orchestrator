@@ -63,7 +63,7 @@ public static class Configuration
             });
         });
 
-        builder.Services.AddCors(c => { c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin()); });
+        builder.Services.AddCors(c => { });
     }
 
     // // Enable if HTTPS is needed
