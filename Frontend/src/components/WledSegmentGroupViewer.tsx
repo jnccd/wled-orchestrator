@@ -24,7 +24,6 @@ const WledSegmentGroupViewer = ({ serverButtonIdPrefix }: Props) => {
     const hitGroupData = wledOrchState.ledSegmentGroups?.groups?.filter(
       (x) => x.id === hitGroup[0]?.classList[1]
     );
-    console.log(hitGroupData);
 
     apiClient
       .put("/state/moveSegment", null, {
