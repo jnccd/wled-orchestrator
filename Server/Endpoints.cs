@@ -15,7 +15,10 @@ public static class WledOrchestratorEndpoints
     {
         if (app.Environment.IsDevelopment())
         {
-            app.UseCors(policy => policy.AllowAnyOrigin());
+            app.UseCors(policy => policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
         }
         app.UseDefaultFiles(new DefaultFilesOptions
         {
