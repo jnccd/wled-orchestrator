@@ -26,7 +26,7 @@ const useWledOrchState = ({method, data}: Props = {
 }) => {
     const controller = new AbortController()
 
-    const [wledOchState, setWledOchState] = useState<WledOrchState>({ ledSegmentGroups: {} });
+    const [wledOrchState, setWledOrchState] = useState<WledOrchState>({ ledSegmentGroups: {} });
     const [error, setError] = useState<string>("");
     const [isLoading, setLoading] = useState(false);
     const [hasData, setHasData] = useState(false);
@@ -38,7 +38,7 @@ const useWledOrchState = ({method, data}: Props = {
       apiClient
         .get<LedSegmentGroups>("/state", {signal: controller.signal})
         .then((res) => {
-          setWledOchState({ ledSegmentGroups: res.data });
+          setWledOrchState({ ledSegmentGroups: res.data });
           setHasData(true);
         })
         .catch((err: AxiosError) => {
@@ -65,15 +65,20 @@ const useWledOrchState = ({method, data}: Props = {
         });
     }
   
+    var effectTrigger = false;
     useEffect(() => {
       if (method == 'GET') {
         useGet();
       } else if (method == 'PUT') {
         usePut(data);
       }
-    }, []);
+    }, [effectTrigger]);
 
-    return {wledOchState, error, isLoading, hasData, apiClient}
+    const refresh = () => {
+      effectTrigger = !effectTrigger;
+    };
+
+    return {wledOrchState, error, isLoading, hasData, refresh}
 }
 
 export default useWledOrchState
