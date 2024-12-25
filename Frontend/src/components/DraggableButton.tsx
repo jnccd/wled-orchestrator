@@ -77,8 +77,8 @@ const DraggableButton = ({ id, buttonName, onDragEnd, className }: Props) => {
     thisInDocument.style.transition = "left 0.4s";
     thisInDocument.style.zIndex = "1";
     setPos(thisInDocument, 0, 0);
+    if (onDragEnd && dragging) onDragEnd(thisInDocument, draggingLastPos);
     setDragging(false);
-    if (onDragEnd) onDragEnd(thisInDocument, draggingLastPos);
   };
 
   const setPos = (e: HTMLElement, x: number, y: number) => {
