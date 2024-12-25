@@ -7,7 +7,7 @@ public class LedSegmentGroup(string Name, List<LedSegment> LedSegments, LedTheme
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Name { get; } = Name;
-    public List<LedSegment> LedSegments { get; } = LedSegments;
+    public List<LedSegment> LedSegments { get; } = LedSegments ?? [];
     public LedTheme.LedTheme? Theme { get; set; } = Theme;
     public Color DisplayColor { get; set; } = DisplayColor;
 
