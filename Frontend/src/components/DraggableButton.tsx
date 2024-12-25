@@ -7,9 +7,10 @@ interface Props {
   id: string;
   buttonName: string;
   onDragEnd?: (elem: HTMLElement, mousePos: number[]) => void;
+  className: string;
 }
 
-const DraggableButton = ({ id, buttonName, onDragEnd }: Props) => {
+const DraggableButton = ({ id, buttonName, onDragEnd, className }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
@@ -105,11 +106,11 @@ const DraggableButton = ({ id, buttonName, onDragEnd }: Props) => {
   return (
     <Button
       id={id}
-      position={"relative"}
-      className="wledServerButton"
+      position="relative"
+      className={className + " wledServerButton"}
       margin={2}
       size="lg"
-      cursor={"move"}
+      cursor="move"
       onMouseDown={dragMouseDown}
     >
       {buttonName}
