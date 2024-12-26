@@ -82,6 +82,15 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
       return;
     }
 
+    const elemsAtPoint = document.elementsFromPoint(
+      draggingLastPos[0],
+      draggingLastPos[1]
+    );
+    const filteredElems = elemsAtPoint.filter((x) =>
+      x.classList.contains("consumes-click")
+    );
+    if (filteredElems[0] !== thisInDocument) return;
+
     thisInDocument.style.transition = "left 0.4s";
     thisInDocument.style.zIndex = "1";
     setPos(thisInDocument, 0, 0);
