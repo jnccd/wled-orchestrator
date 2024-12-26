@@ -1,6 +1,7 @@
-import useWledOrchState, { WledOrchState } from "../../hooks/useWledOrchState";
 import { Box, HStack, Text } from "@chakra-ui/react";
+import { WledOrchState } from "../../hooks/useWledOrchState";
 import { components } from "../../types/api";
+import EditNameButton from "../EditNameButton";
 import WledSegmentViewer from "./WledSegmentViewer";
 
 const ledSegmentClassName = "led-segment-group";
@@ -34,12 +35,15 @@ const WledSegmentGroupViewer = ({
         if (g.id) setSelectedGroupId(g.id);
       }}
     >
-      <Text
-        fontWeight={selectedGroupId === g.id ? "bold" : "normal"}
-        margin={2}
-      >
-        {g.name}
-      </Text>
+      <HStack justifyContent={"center"} gap={0}>
+        <Text
+          fontWeight={selectedGroupId === g.id ? "bold" : "normal"}
+          margin={2}
+        >
+          {g.name}
+        </Text>
+        <EditNameButton></EditNameButton>
+      </HStack>
       <HStack gap={0}>
         {g.ledSegments &&
           g.ledSegments.map((s) => (
