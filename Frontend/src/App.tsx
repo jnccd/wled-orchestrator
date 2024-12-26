@@ -1,6 +1,6 @@
 import "./App.css";
 import NavBar from "./components/NavBar";
-import { Text, Grid, GridItem } from "@chakra-ui/react";
+import { Text, Grid, GridItem, Divider } from "@chakra-ui/react";
 import WledSegmentGroupViewer from "./components/WledSegmentGroupViewer";
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
         templateColumns={{
           base: "1fr",
         }}
-        width={"100vw"}
+        width={"100%"}
         height={"100%"}
       >
         <GridItem area="nav">
@@ -25,6 +25,7 @@ function App() {
           <WledSegmentGroupViewer
             serverButtonIdPrefix={serverButtonIdPrefix}
           ></WledSegmentGroupViewer>
+          <Divider marginY={5} />
           {[...Array(50).keys()].map((_) => (
             <Text>Heeey</Text>
           ))}
