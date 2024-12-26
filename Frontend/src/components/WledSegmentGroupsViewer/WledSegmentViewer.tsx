@@ -1,24 +1,10 @@
-import useWledOrchState, { WledOrchState } from "../../hooks/useWledOrchState";
-import {
-  Box,
-  FocusLock,
-  HStack,
-  IconButton,
-  Input,
-  Popover,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverTrigger,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
-import Draggable from "../Draggable";
-import apiClient from "../../services/api-client";
+import { HStack, Text } from "@chakra-ui/react";
 import { AxiosError, CanceledError } from "axios";
-import { EditIcon } from "@chakra-ui/icons";
-import React from "react";
+import { WledOrchState } from "../../hooks/useWledOrchState";
+import apiClient from "../../services/api-client";
 import { components } from "../../types/api";
+import Draggable from "../Draggable";
+import EditNameButton from "../EditNameButton";
 
 const serverButtonIdPrefix = "server-button";
 
@@ -59,50 +45,18 @@ const WledSegmentViewer = ({
       });
   };
 
-  const { onOpen, onClose, isOpen } = useDisclosure();
-  const firstFieldRef = React.useRef(null);
+  const lastAddressByte = s.wledServerAddress?.split(".").slice(-1)[0];
 
   return (
     <Draggable
       key={s.readonlyId}
       className={s.readonlyId ?? "error-id-less-segment"}
-      id={
-        serverButtonIdPrefix +
-        "-" +
-        s.wledServerAddress?.split(".").slice(-1)[0]
-      }
+      id={serverButtonIdPrefix + "-" + lastAddressByte}
       onDragEnd={onDragEnd}
     >
       <HStack>
-        <Text marginRight={3}>
-          {s.wledServerAddress?.split(".").slice(-1)[0] ?? "Not Found"}
-        </Text>
-        <Popover
-          isOpen={isOpen}
-          onOpen={onOpen}
-          onClose={onClose}
-          placement="right"
-          closeOnBlur={false}
-        >
-          <PopoverTrigger>
-            <IconButton
-              className="consumes-click"
-              onMouseDown={(_) => {
-                console.log("uwu");
-              }}
-              size="sm"
-              icon={<EditIcon />}
-              aria-label={""}
-            />
-          </PopoverTrigger>
-          <PopoverContent p={5}>
-            <FocusLock persistentFocus={true}>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <Input ref={firstFieldRef} id={s.readonlyId ?? ""} />
-            </FocusLock>
-          </PopoverContent>
-        </Popover>
+        <Text>{lastAddressByte ?? "Not Found"}</Text>
+        <EditNameButton defaultValue={lastAddressByte}></EditNameButton>
       </HStack>
     </Draggable>
   );
