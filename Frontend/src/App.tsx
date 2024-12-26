@@ -1,11 +1,9 @@
 import "./App.css";
 import NavBar from "./components/NavBar";
 import { Text, Grid, GridItem, Divider } from "@chakra-ui/react";
-import WledSegmentGroupViewer from "./components/WledSegmentGroupViewer";
+import WledSegmentGroupsViewer from "./components/WledSegmentGroupsViewer/WledSegmentGroupsViewer";
 
 function App() {
-  const serverButtonIdPrefix = "server-button";
-
   return (
     <>
       <Grid
@@ -23,9 +21,7 @@ function App() {
         </GridItem>
         <GridItem area="main">
           <br />
-          <WledSegmentGroupViewer
-            serverButtonIdPrefix={serverButtonIdPrefix}
-          ></WledSegmentGroupViewer>
+          <WledSegmentGroupsViewer></WledSegmentGroupsViewer>
           <br />
           <Divider width="90%" margin="0rem auto" opacity={1} />
           <br />
