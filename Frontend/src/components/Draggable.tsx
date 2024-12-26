@@ -28,8 +28,14 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
       return;
     }
 
+    const elemsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+    const filteredElems = elemsAtPoint.filter((x) =>
+      x.classList.contains("consumes-click")
+    );
+    if (filteredElems[0] !== thisInDocument) return;
+
     const parentBounds =
-      thisInDocument.parentElement?.parentElement?.parentElement?.getBoundingClientRect();
+      thisInDocument.parentElement?.parentElement?.parentElement?.getBoundingClientRect(); // TODO: Add prop for jumps to bounds giving parent elem
     if (parentBounds) {
       setDragArea([parentBounds.left, parentBounds.right]);
     }
@@ -105,13 +111,13 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
   document.onmouseup = dragMouseUp;
 
   return (
-    <Button
+    <Box
       id={id}
       position="relative"
-      className={className + " wledServerButton"}
+      className={className + " consumes-click wledServerButton"}
       margin={2}
       paddingX={4}
-      size="lg"
+      // size="lg"
       backgroundColor="#2C313D"
       borderRadius={8}
       paddingY={2}
@@ -119,7 +125,7 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
       onMouseDown={dragMouseDown} // TODO: Add touch event
     >
       {children}
-    </Button>
+    </Box>
   );
 };
 
