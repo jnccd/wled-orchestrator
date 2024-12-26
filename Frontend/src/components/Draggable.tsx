@@ -35,7 +35,7 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
     if (filteredElems[0] !== thisInDocument) return;
 
     const parentBounds =
-      thisInDocument.parentElement?.parentElement?.parentElement?.getBoundingClientRect(); // TODO: Add prop for jumps to bounds giving parent elem
+      thisInDocument.parentElement?.parentElement?.parentElement?.getBoundingClientRect(); // TODO: Add prop for number of jumps to bounds giving parent elem
     if (parentBounds) {
       setDragArea([parentBounds.left, parentBounds.right]);
     }
