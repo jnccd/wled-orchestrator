@@ -40,16 +40,18 @@ const WledSegmentGroupViewer = ({
       >
         {g.name}
       </Text>
-      {g.ledSegments &&
-        g.ledSegments.map((s) => (
-          <WledSegmentViewer
-            ledSegmentClassName={ledSegmentClassName}
-            wledOrchState={wledOrchState}
-            refreshWledGroupViewer={refreshWledGroupViewer}
-            segment={s}
-            key={s.readonlyId}
-          ></WledSegmentViewer>
-        ))}
+      <HStack gap={0}>
+        {g.ledSegments &&
+          g.ledSegments.map((s) => (
+            <WledSegmentViewer
+              ledSegmentClassName={ledSegmentClassName}
+              wledOrchState={wledOrchState}
+              refreshWledGroupViewer={refreshWledGroupViewer}
+              segment={s}
+              key={s.readonlyId}
+            ></WledSegmentViewer>
+          ))}
+      </HStack>
     </Box>
   );
 };
