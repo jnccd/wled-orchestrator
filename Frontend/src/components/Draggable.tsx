@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import React, { ReactNode, useState } from "react";
 
 const debuggingLogs = false;
@@ -10,7 +10,7 @@ interface Props {
   className: string;
 }
 
-const DraggableButton = ({ id, children, onDragEnd, className }: Props) => {
+const Draggable = ({ id, children, onDragEnd, className }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
@@ -29,7 +29,7 @@ const DraggableButton = ({ id, children, onDragEnd, className }: Props) => {
     }
 
     const parentBounds =
-      thisInDocument.parentElement?.parentElement?.getBoundingClientRect();
+      thisInDocument.parentElement?.parentElement?.parentElement?.getBoundingClientRect();
     if (parentBounds) {
       setDragArea([parentBounds.left, parentBounds.right]);
     }
@@ -110,7 +110,11 @@ const DraggableButton = ({ id, children, onDragEnd, className }: Props) => {
       position="relative"
       className={className + " wledServerButton"}
       margin={2}
+      paddingX={4}
       size="lg"
+      backgroundColor="#2C313D"
+      borderRadius={8}
+      paddingY={2}
       cursor="move"
       onMouseDown={dragMouseDown} // TODO: Add touch event
     >
@@ -119,4 +123,4 @@ const DraggableButton = ({ id, children, onDragEnd, className }: Props) => {
   );
 };
 
-export default DraggableButton;
+export default Draggable;
