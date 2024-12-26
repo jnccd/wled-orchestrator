@@ -19,7 +19,6 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
 
   const dragMouseDown = (e: React.MouseEvent) => {
     if (debuggingLogs) console.log("dragMouseDown");
-    e.preventDefault();
     if (e.button !== 0) return;
 
     var thisInDocument = document.getElementById(id);
@@ -33,6 +32,8 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
       x.classList.contains("consumes-click")
     );
     if (filteredElems[0] !== thisInDocument) return;
+
+    e.preventDefault();
 
     const parentBounds =
       thisInDocument.parentElement?.parentElement?.parentElement?.getBoundingClientRect(); // TODO: Add prop for number of jumps to bounds giving parent elem
