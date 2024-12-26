@@ -1,16 +1,16 @@
 import { Button } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 
 const debuggingLogs = false;
 
 interface Props {
   id: string;
-  buttonName: string;
+  children: ReactNode;
   onDragEnd?: (elem: HTMLElement, mousePos: number[]) => void;
   className: string;
 }
 
-const DraggableButton = ({ id, buttonName, onDragEnd, className }: Props) => {
+const DraggableButton = ({ id, children, onDragEnd, className }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
@@ -114,7 +114,7 @@ const DraggableButton = ({ id, buttonName, onDragEnd, className }: Props) => {
       cursor="move"
       onMouseDown={dragMouseDown} // TODO: Add touch event
     >
-      {buttonName}
+      {children}
     </Button>
   );
 };

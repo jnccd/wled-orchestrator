@@ -72,22 +72,26 @@ const WledSegmentGroupViewer = ({ serverButtonIdPrefix }: Props) => {
               if (g.id) setSelectedGroupId(g.id);
             }}
           >
-            <Text>{g.name}</Text>
+            <Text
+              fontWeight={selectedGroupId === g.id ? "bold" : "normal"}
+              margin={2}
+            >
+              {g.name}
+            </Text>
             {g.ledSegments &&
               g.ledSegments.map((s) => (
                 <DraggableButton
                   key={s.readonlyId}
                   className={s.readonlyId ?? "error-id-less-segment"}
-                  buttonName={
-                    s.wledServerAddress?.split(".").slice(-1)[0] ?? "Not Found"
-                  }
                   id={
                     serverButtonIdPrefix +
                     "-" +
                     s.wledServerAddress?.split(".").slice(-1)[0]
                   }
                   onDragEnd={onDragEnd}
-                ></DraggableButton>
+                >
+                  {s.wledServerAddress?.split(".").slice(-1)[0] ?? "Not Found"}
+                </DraggableButton>
               ))}
           </Box>
         ))}
