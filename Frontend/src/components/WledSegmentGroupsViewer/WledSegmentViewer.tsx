@@ -46,7 +46,7 @@ const WledSegmentViewer = ({
     apiClient
       .put("/state/moveSegment", null, {
         params: {
-          segmentId: elem.classList[1],
+          segmentId: elem.classList[0],
           targetGroupId: hitGroupData ? hitGroupData[0]?.id : "",
         },
       })
@@ -86,8 +86,9 @@ const WledSegmentViewer = ({
         >
           <PopoverTrigger>
             <IconButton
-              onMouseDown={(e: React.MouseEvent) => {
-                console.log("hey");
+              className="consumes-click"
+              onMouseDown={(_) => {
+                console.log("uwu");
               }}
               size="sm"
               icon={<EditIcon />}
