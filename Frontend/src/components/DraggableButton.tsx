@@ -15,11 +15,12 @@ const DraggableButton = ({ id, buttonName, onDragEnd, className }: Props) => {
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
   const [dragArea, setDragArea] = useState([0, document.body.clientWidth]);
-  const dragY = false;
+  const dragY = true;
 
   const dragMouseDown = (e: React.MouseEvent) => {
     if (debuggingLogs) console.log("dragMouseDown");
     e.preventDefault();
+    if (e.button !== 0) return;
 
     var thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {

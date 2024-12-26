@@ -6,6 +6,8 @@ const NavBar = () => {
   const navbarId = "navbar-container";
 
   const { colorMode } = useColorMode();
+  const color =
+    colorMode == "light" ? "rgba(255,255,255,.8)" : "rgba(24, 30, 41,.8)";
 
   return (
     <>
@@ -19,11 +21,11 @@ const NavBar = () => {
         right={0}
         paddingX={12}
         paddingY={6}
+        boxShadow={"0 7px 25px " + color}
         backdropFilter={"auto"}
-        backdropBlur={"5px"}
-        backgroundColor={
-          colorMode == "light" ? "rgba(255,255,255,.8)" : "rgba(24, 30, 41,.8)"
-        }
+        backdropBlur={"4px"}
+        backgroundColor={color}
+        zIndex={999}
       >
         <Text fontSize={20}>Wled Orchestrator</Text>
         <ColorModeSwitch></ColorModeSwitch>

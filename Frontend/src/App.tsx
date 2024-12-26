@@ -22,10 +22,13 @@ function App() {
           <NavBar></NavBar>
         </GridItem>
         <GridItem area="main">
+          <br />
           <WledSegmentGroupViewer
             serverButtonIdPrefix={serverButtonIdPrefix}
           ></WledSegmentGroupViewer>
-          <Divider marginY={5} />
+          <br />
+          <Divider width="90%" margin="0rem auto" opacity={1} />
+          <br />
           {[...Array(50).keys()].map((_) => (
             <Text>Heeey</Text>
           ))}
