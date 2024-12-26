@@ -94,13 +94,13 @@ public static class WledOrchestratorEndpoints
             var targetGroup = targetGroupId == null ? null : dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(targetGroupId));
             if (targetGroup == null)
             {
-                targetGroup = new LedSegmentGroup("New Group", [], null, new(255, 255, 255));
+                targetGroup = LedSegmentGroup.NewGroup;
                 dataStore.Data.Groups.Add(targetGroup);
             }
 
             segmentGroup.LedSegments.Remove(segment);
             targetGroup.LedSegments.Add(segment);
-            if (segmentGroup.LedSegments.Count == 0)
+            if (segmentGroup.LedSegments.Count == 0 && !segmentGroup.IsEdited)
                 dataStore.Data.Groups.Remove(segmentGroup);
 
             dataStore.Save();
