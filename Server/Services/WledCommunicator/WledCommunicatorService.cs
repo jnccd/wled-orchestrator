@@ -18,6 +18,7 @@ public class WledCommunicatorService(
     private const double HttpReqCooldownSecs = 0.1;
     private readonly Dictionary<string, DateTime> LastBriHTTPReq = [];
     private readonly Dictionary<LedSegment, DateTime> LastColHTTPReq = [];
+    private bool frequentLogging = false;
 
     public void FindLEDs()
     {
@@ -119,7 +120,7 @@ public class WledCommunicatorService(
             return false;
         LastBriHTTPReq[wledServerAddress] = DateTime.Now;
 
-        logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...", LogLevel.Debug);
+        if (frequentLogging) logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...", LogLevel.Debug);
 
         $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{wledServerAddress}/json/state");
         return true;
@@ -141,7 +142,7 @@ public class WledCommunicatorService(
             return false;
         LastColHTTPReq[segment] = DateTime.Now;
 
-        logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...", LogLevel.Debug);
+        if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...", LogLevel.Debug);
 
         var seg = Leds.FirstOrDefault(l => l.Address == segment.WledServerAddress)?.State.Seg[segment.SegmentIndex];
         if (seg == null || seg.Start == null || seg.Len == null)
