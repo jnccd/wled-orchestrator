@@ -25,7 +25,7 @@ const NavBar = () => {
           colorMode == "light" ? "rgba(255,255,255,.8)" : "rgba(24, 30, 41,.8)"
         }
       >
-        <Text>Wled Orchestrator</Text>
+        <Text fontSize={20}>Wled Orchestrator</Text>
         <ColorModeSwitch></ColorModeSwitch>
       </HStack>
       <Box minHeight={height}></Box>
