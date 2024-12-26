@@ -29,8 +29,8 @@ function App() {
           <br />
           <Divider width="90%" margin="0rem auto" opacity={1} />
           <br />
-          {[...Array(50).keys()].map((_) => (
-            <Text>Heeey</Text>
+          {[...Array(50).keys()].map((i) => (
+            <Text key={i}>Heeey</Text>
           ))}
         </GridItem>
       </Grid>
