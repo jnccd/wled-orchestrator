@@ -28,7 +28,7 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
         if (g.id) selectedGroupStore.selectNew(g.id);
       }}
     >
-      <HStack justifyContent={"center"} gap={0}>
+      <HStack justifyContent={"center"} gap={0} padding={1}>
         <Text
           fontWeight={
             selectedGroupStore.selectedGroup === g.id ? "bold" : "normal"

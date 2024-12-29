@@ -1,6 +1,7 @@
 import { EditIcon } from "@chakra-ui/icons";
 import {
   FocusLock,
+  FormLabel,
   IconButton,
   Input,
   Popover,
@@ -21,6 +22,7 @@ interface Props {
 const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const firstFieldRef = React.useRef(null);
+  const inputId = "name-input";
 
   return (
     <Popover
@@ -39,13 +41,14 @@ const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
               aria-label={""}
             />
           </PopoverTrigger>
-          <PopoverContent cursor={"default"}>
+          <PopoverContent cursor={"default"} padding={1}>
             <FocusLock autoFocus={true} persistentFocus={true}>
               <PopoverArrow />
               <PopoverCloseButton />
-              <PopoverBody padding={6}>
+              <PopoverBody>
+                <FormLabel htmlFor={inputId}>Name:</FormLabel>
                 <Input
-                  marginTop={2}
+                  id={inputId}
                   ref={firstFieldRef}
                   defaultValue={defaultValue}
                   //id={popoverInputId}
