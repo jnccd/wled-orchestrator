@@ -5,14 +5,11 @@ export type LedSegmentGroups = components["schemas"]["DataStoreRoot"];
 export type LedSegmentGroup = components["schemas"]["LedSegmentGroup"];
 export type LedSegment = components["schemas"]["LedSegment"];
 
+export const wledOrchStateQueryKey = "wledOrchState"
+
 export const getWledOrchState = () => 
   apiClient
     .get<LedSegmentGroups>("/state")
-    .then((res) => res.data);
-
-export const putWledOrchState = (data: LedSegmentGroups) => 
-  apiClient
-    .put<LedSegmentGroups>("/state", data)
     .then((res) => res.data);
 
 export const moveSegment = (args: {segmentId: string, targetGroupId: string | null}) => 
@@ -25,4 +22,4 @@ export const moveSegment = (args: {segmentId: string, targetGroupId: string | nu
       })
       .then((res) => res.data);
 
-export const wledOrchStateQueryKey = "wledOrchState"
+      
