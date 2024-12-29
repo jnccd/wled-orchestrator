@@ -4,6 +4,7 @@ import {
   wledOrchStateQueryKey,
   getWledOrchState,
   LedSegment,
+  renameSegment,
 } from "../../hooks/useWledOrchState";
 import Draggable from "../Draggable";
 import EditNameButton from "../EditNameButton";
@@ -23,10 +24,15 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
     queryKey: [wledOrchStateQueryKey],
     queryFn: getWledOrchState,
   });
-  const mutation = useMutation({
+  const moveSegmentMutation = useMutation({
     mutationFn: moveSegment,
     onSuccess: () => {
-      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
+    },
+  });
+  const renameSegmentMutation = useMutation({
+    mutationFn: renameSegment,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
     },
   });
@@ -40,13 +46,14 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
       (x) => x.id === hitGroup[0]?.classList[1]
     );
 
-    mutation.mutate({
+    moveSegmentMutation.mutate({
       segmentId: elem.classList[0],
       targetGroupId: hitGroupData ? hitGroupData[0]?.id ?? null : null,
     });
   };
 
   const lastAddressByte = segment.wledServerAddress?.split(".").slice(-1)[0];
+  const displayText = segment.name ?? lastAddressByte ?? "Not Found";
 
   return (
     <Draggable
@@ -56,8 +63,20 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
       onDragEnd={onDragEnd}
     >
       <HStack>
-        <Text>{lastAddressByte ?? "Not Found"}</Text>
-        <EditNameButton defaultValue={lastAddressByte}></EditNameButton>
+        <Text>{displayText}</Text>
+        <EditNameButton
+          defaultValue={displayText}
+          onSubmit={(newName) => {
+            if (!segment || !segment.readonlyId) {
+              console.log("segment null??");
+              return;
+            }
+            renameSegmentMutation.mutate({
+              segmentId: segment.readonlyId,
+              newName: newName,
+            });
+          }}
+        ></EditNameButton>
       </HStack>
     </Draggable>
   );

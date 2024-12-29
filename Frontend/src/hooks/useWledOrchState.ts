@@ -13,13 +13,22 @@ export const getWledOrchState = () =>
     .then((res) => res.data);
 
 export const moveSegment = (args: {segmentId: string, targetGroupId: string | null}) => 
-    apiClient
-      .put("/state/moveSegment", null, {
-        params: {
-          segmentId: args.segmentId,
-          targetGroupId: args.targetGroupId,
-        },
-      })
-      .then((res) => res.data);
+  apiClient
+    .put("/state/segment/move", null, {
+      params: {
+        segmentId: args.segmentId,
+        targetGroupId: args.targetGroupId,
+      },
+    })
+    .then((res) => res.data);
 
+export const renameSegment = (args: {segmentId: string, newName: string}) => 
+  apiClient
+    .put("/state/segment/rename", null, {
+      params: {
+        segmentId: args.segmentId,
+        newName: args.newName,
+      },
+    })
+    .then((res) => res.data);
       

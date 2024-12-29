@@ -29,32 +29,37 @@ const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
       placement="right"
       closeOnBlur={false}
     >
-      <PopoverTrigger>
-        <IconButton
-          className="consumes-click"
-          size="sm"
-          icon={<EditIcon />}
-          aria-label={""}
-        />
-      </PopoverTrigger>
-      <PopoverContent cursor={"default"} p={5}>
-        <FocusLock autoFocus={true} persistentFocus={true}>
-          <PopoverArrow />
-          <PopoverCloseButton />
-          <Input
-            marginTop={2}
-            ref={firstFieldRef}
-            defaultValue={defaultValue}
-            //id={popoverInputId}
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key == "Enter") {
-                const inputVal = (e.target as HTMLInputElement).value;
-                if (onSubmit) onSubmit(inputVal);
-              }
-            }}
-          />
-        </FocusLock>
-      </PopoverContent>
+      {({ onClose }) => (
+        <>
+          <PopoverTrigger>
+            <IconButton
+              className="consumes-click"
+              size="sm"
+              icon={<EditIcon />}
+              aria-label={""}
+            />
+          </PopoverTrigger>
+          <PopoverContent cursor={"default"} p={5}>
+            <FocusLock autoFocus={true} persistentFocus={true}>
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <Input
+                marginTop={2}
+                ref={firstFieldRef}
+                defaultValue={defaultValue}
+                //id={popoverInputId}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key == "Enter") {
+                    const inputVal = (e.target as HTMLInputElement).value;
+                    if (onSubmit) onSubmit(inputVal);
+                    onClose();
+                  }
+                }}
+              />
+            </FocusLock>
+          </PopoverContent>
+        </>
+      )}
     </Popover>
   );
 };
