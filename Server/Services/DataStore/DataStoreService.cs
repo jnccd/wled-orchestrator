@@ -7,13 +7,14 @@ namespace Server.Services.DataStore;
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(DataStoreService))]
 public class DataStoreService
 {
-    readonly object lockject = new();
+    public readonly object lockject = new();
     readonly static string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) + Path.DirectorySeparatorChar;
     public string ConfigPath { get; } = exePath + "config.json";
     readonly string configBackupPath = exePath + "config_backup.json";
     public bool UnsavedChanges { get; private set; } = false;
     readonly JsonSerializerOptions options = new() { WriteIndented = true };
     readonly LoggerService _logger;
+    readonly IHostApplicationLifetime _appLifetime;
     public DataStoreRoot Data
     {
         get
@@ -32,9 +33,10 @@ public class DataStoreService
     }
     private DataStoreRoot data = new();
 
-    public DataStoreService(LoggerService logger)
+    public DataStoreService(LoggerService logger, IHostApplicationLifetime appLifetime)
     {
         _logger = logger;
+        _appLifetime = appLifetime;
 
         if (Exists())
             Load();
@@ -71,6 +73,7 @@ public class DataStoreService
             catch (Exception e)
             {
                 _logger.WriteLine(e);
+                _appLifetime.StopApplication();
             }
         }
     }
@@ -78,7 +81,14 @@ public class DataStoreService
     {
         lock (lockject)
         {
-            Data = JsonSerializer.Deserialize<DataStoreRoot>(json) ?? Data;
+            try
+            {
+                Data = JsonSerializer.Deserialize<DataStoreRoot>(json) ?? Data;
+            }
+            catch (Exception e)
+            {
+                _logger.WriteLine(e);
+            }
         }
     }
     public override string ToString()
