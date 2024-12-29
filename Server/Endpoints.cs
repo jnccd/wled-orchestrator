@@ -32,52 +32,9 @@ public static class WledOrchestratorEndpoints
 
         var routes = (IEndpointRouteBuilder)app;
 
-        app.MapGet("/hewwo", () =>
-        {
-            return Results.Extensions.Html(@$"<!doctype html>
-                <html>
-                    <head>
-                        <title>Hewwo</title>
-                        <style>
-                            body {{font-family: sans-serif;}}
-                        </style>
-                    </head>
-                    <body>
-                        <h1>Hewwo Wowld :3</h1>
-                    </body>
-                </html>");
-        });
-
-        app.MapGet("/wledServers", [ProducesResponseType(typeof(string[]), 200)] (
-            [FromServices] WledCommunicatorService wledCommunicator) =>
-            Results.Json(wledCommunicator.Leds.Select(x => x.Address).ToArray()));
-
         app.MapGet("/state", [ProducesResponseType(typeof(DataStoreRoot), 200)] (
             [FromServices] DataStoreService dataStore) =>
             Results.Json(dataStore.Data));
-
-        app.MapPut("/state", (
-            [FromServices] DataStoreService dataStore,
-            [FromBody, Required] DataStoreRoot newState) =>
-        {
-            dataStore.LoadFrom(JsonSerializer.Serialize(newState));
-            dataStore.Save();
-        });
-
-        app.MapPost("/state/createGroup", (
-            [FromServices] DataStoreService dataStore,
-            string? idOfFirstGroupSegment) =>
-        {
-            (var segmentGroup, var segment) = dataStore.Data.Groups.Select(g => (g, g.LedSegments.Where(x => x.ReadonlyId == idOfFirstGroupSegment).FirstOrDefault())).FirstOrDefault();
-            if (segment != null)
-                segmentGroup.LedSegments.Remove(segment);
-
-            var newGroup = new LedSegmentGroup("New Segment", segment == null ? [] : [segment], null, new(255, 255, 255));
-            dataStore.Data.Groups.Add(newGroup);
-            dataStore.Save();
-
-            return newGroup;
-        });
 
         app.MapPut("/state/moveSegment", (
             [FromServices] DataStoreService dataStore,
