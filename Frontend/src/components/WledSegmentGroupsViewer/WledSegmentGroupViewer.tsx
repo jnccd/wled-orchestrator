@@ -2,37 +2,37 @@ import { Box, HStack, Text } from "@chakra-ui/react";
 import { components } from "../../types/api";
 import EditNameButton from "../EditNameButton";
 import WledSegmentViewer from "./WledSegmentViewer";
+import useSelectedGroupStore from "../../hooks/useLocalStore";
 
 const ledSegmentClassName = "led-segment-group";
 
 interface Props {
-  selectedGroupId: string;
-  setSelectedGroupId: (newId: string) => void;
   group: components["schemas"]["LedSegmentGroup"];
 }
 
-const WledSegmentGroupViewer = ({
-  selectedGroupId,
-  setSelectedGroupId,
-  group: g,
-}: Props) => {
+const WledSegmentGroupViewer = ({ group: g }: Props) => {
+  const selectedGroupStore = useSelectedGroupStore();
+  selectedGroupStore.initialize();
+
   return (
     <Box
       key={g.id}
       className={ledSegmentClassName + " " + (g.id ?? "error-id-less-group")}
-      borderWidth={selectedGroupId === g.id ? "3px" : "1px"}
+      borderWidth={selectedGroupStore.selectedGroup === g.id ? "3px" : "1px"}
       borderRadius="lg"
       margin={2}
       padding="2px"
       width={"fit-content"}
       transition="border .1s"
       onClick={() => {
-        if (g.id) setSelectedGroupId(g.id);
+        if (g.id) selectedGroupStore.selectNew(g.id);
       }}
     >
       <HStack justifyContent={"center"} gap={0}>
         <Text
-          fontWeight={selectedGroupId === g.id ? "bold" : "normal"}
+          fontWeight={
+            selectedGroupStore.selectedGroup === g.id ? "bold" : "normal"
+          }
           margin={2}
         >
           {g.name}
