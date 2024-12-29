@@ -1,5 +1,4 @@
 import { Box, HStack, Text } from "@chakra-ui/react";
-import { WledOrchState } from "../../hooks/useWledOrchState";
 import { components } from "../../types/api";
 import EditNameButton from "../EditNameButton";
 import WledSegmentViewer from "./WledSegmentViewer";
@@ -9,16 +8,12 @@ const ledSegmentClassName = "led-segment-group";
 interface Props {
   selectedGroupId: string;
   setSelectedGroupId: (newId: string) => void;
-  refreshWledGroupViewer: () => void;
-  wledOrchState: WledOrchState;
   group: components["schemas"]["LedSegmentGroup"];
 }
 
 const WledSegmentGroupViewer = ({
   selectedGroupId,
   setSelectedGroupId,
-  refreshWledGroupViewer,
-  wledOrchState,
   group: g,
 }: Props) => {
   return (
@@ -49,8 +44,6 @@ const WledSegmentGroupViewer = ({
           g.ledSegments.map((s) => (
             <WledSegmentViewer
               ledSegmentClassName={ledSegmentClassName}
-              wledOrchState={wledOrchState}
-              refreshWledGroupViewer={refreshWledGroupViewer}
               segment={s}
               key={s.readonlyId}
             ></WledSegmentViewer>

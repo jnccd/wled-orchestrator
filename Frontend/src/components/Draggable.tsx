@@ -5,12 +5,19 @@ const debuggingLogs = false;
 
 interface Props {
   id: string;
-  children: ReactNode;
-  onDragEnd?: (elem: HTMLElement, mousePos: number[]) => void;
   className: string;
+  children: ReactNode;
+  backgroundColor?: string;
+  onDragEnd?: (elem: HTMLElement, mousePos: number[]) => void;
 }
 
-const Draggable = ({ id, children, onDragEnd, className }: Props) => {
+const Draggable = ({
+  id,
+  children,
+  onDragEnd,
+  className,
+  backgroundColor = "#2C313D",
+}: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
@@ -127,8 +134,7 @@ const Draggable = ({ id, children, onDragEnd, className }: Props) => {
       className={className + " consumes-click wledServerButton"}
       margin={2}
       paddingX={4}
-      // size="lg"
-      backgroundColor="#2C313D"
+      backgroundColor={backgroundColor}
       borderRadius={8}
       paddingY={2}
       cursor="move"
