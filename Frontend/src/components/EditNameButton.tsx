@@ -5,6 +5,7 @@ import {
   Input,
   Popover,
   PopoverArrow,
+  PopoverBody,
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
@@ -26,8 +27,7 @@ const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
       isOpen={isOpen}
       onOpen={onOpen}
       onClose={onClose}
-      placement="right"
-      closeOnBlur={false}
+      initialFocusRef={firstFieldRef}
     >
       {({ onClose }) => (
         <>
@@ -39,23 +39,25 @@ const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
               aria-label={""}
             />
           </PopoverTrigger>
-          <PopoverContent cursor={"default"} p={5}>
+          <PopoverContent cursor={"default"}>
             <FocusLock autoFocus={true} persistentFocus={true}>
               <PopoverArrow />
               <PopoverCloseButton />
-              <Input
-                marginTop={2}
-                ref={firstFieldRef}
-                defaultValue={defaultValue}
-                //id={popoverInputId}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key == "Enter") {
-                    const inputVal = (e.target as HTMLInputElement).value;
-                    if (onSubmit) onSubmit(inputVal);
-                    onClose();
-                  }
-                }}
-              />
+              <PopoverBody padding={6}>
+                <Input
+                  marginTop={2}
+                  ref={firstFieldRef}
+                  defaultValue={defaultValue}
+                  //id={popoverInputId}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key == "Enter") {
+                      const inputVal = (e.target as HTMLInputElement).value;
+                      if (onSubmit) onSubmit(inputVal);
+                      onClose();
+                    }
+                  }}
+                />
+              </PopoverBody>
             </FocusLock>
           </PopoverContent>
         </>
