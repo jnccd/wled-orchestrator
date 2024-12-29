@@ -3,8 +3,8 @@ import {
   moveSegment,
   wledOrchStateQueryKey,
   getWledOrchState,
+  LedSegment,
 } from "../../hooks/useWledOrchState";
-import { components } from "../../types/api";
 import Draggable from "../Draggable";
 import EditNameButton from "../EditNameButton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,10 +13,10 @@ const serverButtonIdPrefix = "server-button";
 
 interface Props {
   ledSegmentClassName: string;
-  segment: components["schemas"]["LedSegment"];
+  segment: LedSegment;
 }
 
-const WledSegmentViewer = ({ segment: s, ledSegmentClassName }: Props) => {
+const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
   // React Query setup
   const queryClient = useQueryClient();
   const query = useQuery({
@@ -46,12 +46,12 @@ const WledSegmentViewer = ({ segment: s, ledSegmentClassName }: Props) => {
     });
   };
 
-  const lastAddressByte = s.wledServerAddress?.split(".").slice(-1)[0];
+  const lastAddressByte = segment.wledServerAddress?.split(".").slice(-1)[0];
 
   return (
     <Draggable
-      key={s.readonlyId}
-      className={s.readonlyId ?? "error-id-less-segment"}
+      key={segment.readonlyId}
+      className={segment.readonlyId ?? "error-id-less-segment"}
       id={serverButtonIdPrefix + "-" + lastAddressByte}
       onDragEnd={onDragEnd}
     >

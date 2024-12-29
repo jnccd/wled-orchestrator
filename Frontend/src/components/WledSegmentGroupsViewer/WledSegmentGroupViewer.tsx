@@ -1,13 +1,13 @@
 import { Box, HStack, Text } from "@chakra-ui/react";
-import { components } from "../../types/api";
 import EditNameButton from "../EditNameButton";
 import WledSegmentViewer from "./WledSegmentViewer";
 import useSelectedGroupStore from "../../hooks/useLocalStore";
+import { LedSegmentGroup } from "../../hooks/useWledOrchState";
 
 const ledSegmentClassName = "led-segment-group";
 
 interface Props {
-  group: components["schemas"]["LedSegmentGroup"];
+  group: LedSegmentGroup;
 }
 
 const WledSegmentGroupViewer = ({ group: g }: Props) => {
