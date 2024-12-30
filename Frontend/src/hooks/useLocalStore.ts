@@ -11,11 +11,13 @@ export interface SelectedGroupStore {
 const useSelectedGroupStore = create<SelectedGroupStore>(set => ({
     selectedGroup: "",
     initialize: () => set(set => {
-        if (set.selectedGroup === "") {
-            return { selectedGroup: useQuery({
-                queryKey: [wledOrchStateQueryKey],
-                queryFn: getWledOrchState,
-              }).data?.groups?.at(0)?.id }
+        const groups = useQuery({
+            queryKey: [wledOrchStateQueryKey],
+            queryFn: getWledOrchState,
+          }).data?.groups
+
+        if (groups?.filter(x => x.id === set.selectedGroup).length === 0) {
+            return { selectedGroup: groups?.at(0)?.id }
         }
 
         return set;
