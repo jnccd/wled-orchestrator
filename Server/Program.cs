@@ -5,6 +5,7 @@ builder.ConfigureWebhost();
 builder.RegisterServices();
 
 var app = builder.Build();
+app.EnableRequestLogging();
 app.EnableSwagger();
 app.RegisterEndpoints();
 app.Services.StartBackgroundServices();
