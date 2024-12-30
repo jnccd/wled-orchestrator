@@ -1,5 +1,6 @@
 import { Box, HStack, Text, useColorMode } from "@chakra-ui/react";
 import ColorModeSwitch from "./ColorModeSwitch";
+import WledOrchActivationSwitch from "./WledOrchActivationSwitch";
 
 const NavBar = () => {
   const height = "100px";
@@ -19,7 +20,7 @@ const NavBar = () => {
         top={0}
         left={0}
         right={0}
-        paddingX={12}
+        paddingX={20}
         paddingY={6}
         boxShadow={"0 7px 25px " + color}
         backdropFilter={"auto"}
@@ -28,7 +29,10 @@ const NavBar = () => {
         zIndex={999}
       >
         <Text fontSize={20}>Wled Orchestrator</Text>
-        <ColorModeSwitch></ColorModeSwitch>
+        <HStack gap={5}>
+          <ColorModeSwitch></ColorModeSwitch>
+          <WledOrchActivationSwitch></WledOrchActivationSwitch>
+        </HStack>
       </HStack>
       <Box minHeight={height}></Box>
     </>

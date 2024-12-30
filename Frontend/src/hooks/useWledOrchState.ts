@@ -42,3 +42,11 @@ export const renameGroup = (args: {groupId: string, newName: string}) =>
     })
     .then((res) => res.data);
       
+export const setActivated = (args: {newActivated: boolean}) => 
+  apiClient
+    .put("/state/activated", null, {
+      params: {
+        newACtivated: args.newActivated,
+      },
+    })
+    .then((res) => res.data);

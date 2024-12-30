@@ -58,6 +58,19 @@ export interface paths {
       };
     };
   };
+  "/state/activated": {
+    put: {
+      parameters: {
+        query: {
+          newActivated: boolean;
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
 }
 
 export interface components {
@@ -71,6 +84,7 @@ export interface components {
       b?: number;
     };
     DataStoreRoot: {
+      activated?: boolean;
       groups?: components["schemas"]["LedSegmentGroup"][] | null;
     };
     LedSegment: {

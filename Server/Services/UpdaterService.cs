@@ -1,4 +1,5 @@
 using Server.Helper;
+using Server.Services.DataStore;
 using Server.Services.DataStore.Types;
 using Server.Services.LedTheme;
 using Server.Services.WledCommunicator;
@@ -8,6 +9,7 @@ namespace Server.Services;
 public class UpdaterService(
     WledCommunicatorService communicatorService,
     LedThemeProviderService ledThemeProvider,
+    DataStoreService dataStore,
     LoggerService logger)
 {
     Task? updateTask;
@@ -46,6 +48,12 @@ public class UpdaterService(
     {
         foreach (var led in communicatorService.Leds)
         {
+            if (!dataStore.Data.Activated)
+            {
+                communicatorService.SetBrightnessOnWledServer(0, led.Address);
+                continue;
+            }
+
             var themeBrightnesses = new List<int>();
 
             foreach (var (seg, i) in led.State.Seg.WithIndex())

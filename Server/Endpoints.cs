@@ -105,5 +105,19 @@ public static class WledOrchestratorEndpoints
 
             return Results.Accepted();
         });
+
+        app.MapPut("/state/activated", (
+            [FromServices] DataStoreService dataStore,
+            [Required] bool newActivated) =>
+        {
+            lock (dataStore.lockject)
+            {
+                dataStore.Data.Activated = newActivated;
+
+                dataStore.Save();
+            }
+
+            return Results.Accepted();
+        });
     }
 }
