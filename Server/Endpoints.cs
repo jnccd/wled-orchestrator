@@ -36,6 +36,25 @@ public static class WledOrchestratorEndpoints
             [FromServices] DataStoreService dataStore) =>
             Results.Json(dataStore.Data));
 
+        app.MapPut("/state/group/rename", (
+            [FromServices] DataStoreService dataStore,
+            [Required] string groupId,
+            [Required] string newName) =>
+        {
+            lock (dataStore.lockject)
+            {
+                var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
+                if (group == null)
+                    return Results.NotFound("The GroupId was not found in any groups");
+
+                group.Name = newName;
+
+                dataStore.Save();
+            }
+
+            return Results.Accepted();
+        });
+
         app.MapPut("/state/segment/move", (
             [FromServices] DataStoreService dataStore,
             [Required] string segmentId,

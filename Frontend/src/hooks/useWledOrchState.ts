@@ -31,4 +31,14 @@ export const renameSegment = (args: {segmentId: string, newName: string}) =>
       },
     })
     .then((res) => res.data);
+
+export const renameGroup = (args: {groupId: string, newName: string}) => 
+  apiClient
+    .put("/state/group/rename", null, {
+      params: {
+        groupId: args.groupId,
+        newName: args.newName,
+      },
+    })
+    .then((res) => res.data);
       
