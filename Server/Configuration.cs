@@ -1,6 +1,7 @@
 using System.Net;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using Server.Services;
 
 namespace Server;
 
@@ -46,6 +47,16 @@ public static class Configuration
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+    }
+
+    public static void EnableRequestLogging(this WebApplication app)
+    {
+        var logger = app.Services.GetService(typeof(LoggerService)) as LoggerService;
+        app.Use(async (context, next) =>
+        {
+            logger?.WriteLine($"{context.Request.Method} req on {context.Request.Path} from {context.Request.Headers.Origin}");
+            await next.Invoke();
+        });
     }
 
     public static void ConfigureWebhost(this WebApplicationBuilder builder)
