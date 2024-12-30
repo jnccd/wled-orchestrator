@@ -4,26 +4,6 @@
  */
 
 export interface paths {
-  "/hewwo": {
-    get: {
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
-  "/wledServers": {
-    get: {
-      responses: {
-        /** OK */
-        200: {
-          content: {
-            "application/json": string[];
-          };
-        };
-      };
-    };
-  };
   "/state": {
     get: {
       responses: {
@@ -35,15 +15,46 @@ export interface paths {
         };
       };
     };
+  };
+  "/state/group/rename": {
     put: {
+      parameters: {
+        query: {
+          groupId: string;
+          newName: string;
+        };
+      };
       responses: {
         /** OK */
         200: unknown;
       };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["DataStoreRoot"];
+    };
+  };
+  "/state/segment/move": {
+    put: {
+      parameters: {
+        query: {
+          segmentId: string;
+          targetGroupId?: string;
         };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
+  "/state/segment/rename": {
+    put: {
+      parameters: {
+        query: {
+          segmentId: string;
+          newName: string;
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
       };
     };
   };
@@ -76,6 +87,7 @@ export interface components {
       ledSegments?: components["schemas"]["LedSegment"][] | null;
       theme?: components["schemas"]["LedTheme"];
       displayColor?: components["schemas"]["Color"];
+      isEdited?: boolean;
     };
     LedTheme: {
       /** Format: uuid */
