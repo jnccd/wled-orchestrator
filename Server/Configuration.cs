@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using Server.Services;
 
 namespace Server;
@@ -53,9 +55,21 @@ public static class Configuration
         var logger = app.Services.GetService(typeof(LoggerService)) as LoggerService;
         app.Use(async (context, next) =>
         {
-            logger?.WriteLine($"{context.Request.Method} req on {context.Request.Path} from {context.Request.Headers.Origin}");
+            logger?.WriteLine($"{context.Request.Method} {context.Request.Path}{context.Request.QueryString} - ORIGIN: {context.Request.Headers.Origin} - {{{GetRequestBody(context.Request).Result}}}");
             await next.Invoke();
         });
+    }
+    public static async Task<string> GetRequestBody(HttpRequest request)
+    {
+        if (!request.Body.CanSeek)
+            request.EnableBuffering();
+        request.Body.Position = 0;
+
+        var rawRequestBody = await new StreamReader(request.Body).ReadToEndAsync();
+
+        request.Body.Position = 0;
+
+        return rawRequestBody;
     }
 
     public static void ConfigureWebhost(this WebApplicationBuilder builder)
