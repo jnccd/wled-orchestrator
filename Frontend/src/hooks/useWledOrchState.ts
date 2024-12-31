@@ -1,9 +1,14 @@
-import apiClient from "../services/api-client";
 import { components } from "../types/api";
+import axios from "axios";
 
 export type LedSegmentGroups = components["schemas"]["DataStoreRoot"];
 export type LedSegmentGroup = components["schemas"]["LedSegmentGroup"];
 export type LedSegment = components["schemas"]["LedSegment"];
+
+const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_DEV_BACKEND_ADDRESS ? import.meta.env.VITE_DEV_BACKEND_ADDRESS : window.location.href,
+    withCredentials: false,
+})
 
 export const wledOrchStateQueryKey = "wledOrchState"
 
