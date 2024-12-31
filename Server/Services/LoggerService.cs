@@ -17,13 +17,26 @@ public class LoggerService
     /// <summary>
     /// Write logs
     /// </summary>
-    public void WriteLine(object o, LogLevel level = LogLevel.Info)
+    public void WriteLine(object o, LogLevel level = LogLevel.Info, ILog? log4netLoggerInstance = null)
     {
-        // Get logger of calling type (this is horrible for performance but the code looks better this way)
-        StackTrace st = new(true);
-        var reconstructedOriginType = st.GetFrames().ElementAt(1).GetMethod()?.DeclaringType;
-        if (reconstructedOriginType == null) return;
-        var logger = LogManager.GetLogger(reconstructedOriginType);
+        ILog logger;
+
+        if (log4netLoggerInstance != null)
+        {
+            logger = log4netLoggerInstance;
+        }
+        else
+        {
+            // Get logger of calling type (this is horrible for performance but the caller code looks better this way)
+            StackTrace st = new(true);
+            var stFrames = st.GetFrames();
+            var reconstructedOriginType = stFrames.ElementAt(1).GetMethod()?.DeclaringType;
+            if (reconstructedOriginType == null) return;
+            while (reconstructedOriginType != null && reconstructedOriginType.FullName != null && reconstructedOriginType.FullName.Contains("DisplayClass"))
+                reconstructedOriginType = reconstructedOriginType.DeclaringType;
+            if (reconstructedOriginType == null) return;
+            logger = LogManager.GetLogger(reconstructedOriginType);
+        }
 
         if (level == LogLevel.Debug)
             logger.Debug(o);
@@ -57,13 +70,13 @@ public class LoggerService
             (logToConsole ? @"
                 <appender name=""ConsoleAppender"" type=""log4net.Appender.ConsoleAppender"">
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
+                        <conversionPattern value=""%date [%thread] %-5level%logger - %message%newline"" />
                     </layout>
                 </appender>" : "") +
             (logToDebug ? @"
                 <appender name=""DebugAppender"" type=""log4net.Appender.DebugAppender"">
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
+                        <conversionPattern value=""%date [%thread] %-5level%logger - %message%newline"" />
                     </layout>
                 </appender>" : "") +
             (logToFile ? @"
@@ -76,7 +89,7 @@ public class LoggerService
                     <maximumFileSize value=""500KB"" />
                     <staticLogFileName value=""true"" />
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
+                        <conversionPattern value=""%date [%thread] %-5level%logger - %message%newline"" />
                     </layout>
                     <threshold value=""INFO""/>
                 </appender>" : "");
