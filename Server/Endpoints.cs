@@ -54,6 +54,25 @@ public static class WledOrchestratorEndpoints
             return Results.Accepted();
         });
 
+        app.MapPut("/state/group/theme", (
+            [FromServices] DataStoreService dataStore,
+            [Required] string groupId,
+            [Required] LedTheme newTheme) =>
+        {
+            lock (dataStore.lockject)
+            {
+                var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
+                if (group == null)
+                    return Results.NotFound("The GroupId was not found in any groups");
+
+                group.Theme = newTheme;
+
+                dataStore.Save();
+            }
+
+            return Results.Accepted();
+        });
+
         app.MapPut("/state/segment/move", (
             [FromServices] DataStoreService dataStore,
             [Required] string segmentId,
@@ -118,22 +137,5 @@ public static class WledOrchestratorEndpoints
 
             return Results.Accepted();
         });
-
-        {
-            Type ledThemeType = typeof(LedTheme);
-            var attrs = ledThemeType.GetCustomAttributes<JsonDerivedTypeAttribute>();
-            foreach (var attr in attrs)
-            {
-                //attr.DerivedType.;
-            }
-
-            app.MapGet("/themes", (
-                [FromServices] DataStoreService dataStore) =>
-            {
-                // TODO: Get from refelction?
-
-                return Results.Accepted(value: attrs);
-            });
-        }
     }
 }
