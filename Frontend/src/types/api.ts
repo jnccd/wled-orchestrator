@@ -71,6 +71,14 @@ export interface paths {
       };
     };
   };
+  "/themes": {
+    get: {
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
 }
 
 export interface components {
@@ -99,7 +107,12 @@ export interface components {
       id?: string;
       name?: string | null;
       ledSegments?: components["schemas"]["LedSegment"][] | null;
-      theme?: components["schemas"]["LedTheme"];
+      theme?:
+        | (
+            | components["schemas"]["LedThemeDaylight"]
+            | components["schemas"]["LedThemeSingleColor"]
+          )
+        | null;
       displayColor?: components["schemas"]["Color"];
       isEdited?: boolean;
     };
@@ -108,7 +121,14 @@ export interface components {
       id?: string;
       modifiers?: components["schemas"]["LedThemeModifier"][] | null;
     };
+    LedThemeDaylight: components["schemas"]["LedTheme"] & {
+      skyColor?: components["schemas"]["Color"];
+      sunColor?: components["schemas"]["Color"];
+    };
     LedThemeModifier: { [key: string]: unknown };
+    LedThemeSingleColor: components["schemas"]["LedTheme"] & {
+      color?: components["schemas"]["Color"];
+    };
   };
 }
 

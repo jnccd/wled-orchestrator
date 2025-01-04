@@ -9,9 +9,8 @@ public class LedThemeDaylight : LedTheme
         return new(GetColors(dayTimePercent), GetBrightness(dayTimePercent));
     }
 
-    // Code below is adapted from legacy wledOrchestrator proj
-    readonly Color SkyColor = new(142, 215, 253);
-    readonly Color SunColor = new(252, 200, 20);
+    public Color SkyColor { get; set; } = new(142, 215, 253);
+    public Color SunColor { get; set; } = new(252, 200, 20);
     readonly int ColorArrayResolution = 300;
     static readonly double sunRise = 0.3;
     static readonly double sunTime = 0.5;

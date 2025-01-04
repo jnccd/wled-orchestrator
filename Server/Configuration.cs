@@ -38,7 +38,7 @@ public static class Configuration
         }
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c => c.UseOneOfForPolymorphism());
     }
 
     public static void EnableSwagger(this WebApplication app)

@@ -6,7 +6,7 @@ namespace Server.Services.LedTheme;
 public record LedThemeInput(DateTime Time);
 
 [JsonDerivedType(typeof(LedThemeDaylight), typeDiscriminator: "themeDaylight")]
-[JsonDerivedType(typeof(LedThemeDefault), typeDiscriminator: "themeDefault")]
+[JsonDerivedType(typeof(LedThemeSingleColor), typeDiscriminator: "themeDefault")]
 public abstract class LedTheme
 {
     public Guid Id { get; set; } = Guid.NewGuid();
