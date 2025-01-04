@@ -30,6 +30,26 @@ export interface paths {
       };
     };
   };
+  "/state/group/theme": {
+    put: {
+      parameters: {
+        query: {
+          groupId: string;
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+      requestBody: {
+        content: {
+          "application/json":
+            | components["schemas"]["LedThemeDaylight"]
+            | components["schemas"]["LedThemeSingleColor"];
+        };
+      };
+    };
+  };
   "/state/segment/move": {
     put: {
       parameters: {
@@ -65,14 +85,6 @@ export interface paths {
           newActivated: boolean;
         };
       };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
-  "/themes": {
-    get: {
       responses: {
         /** OK */
         200: unknown;
