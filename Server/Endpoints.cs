@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Server.Services.DataStore;
 using Server.Services.DataStore.Types;
+using Server.Services.LedTheme;
 namespace Server;
 
 public static class WledOrchestratorEndpoints
@@ -115,5 +118,22 @@ public static class WledOrchestratorEndpoints
 
             return Results.Accepted();
         });
+
+        {
+            Type ledThemeType = typeof(LedTheme);
+            var attrs = ledThemeType.GetCustomAttributes<JsonDerivedTypeAttribute>();
+            foreach (var attr in attrs)
+            {
+                //attr.DerivedType.;
+            }
+
+            app.MapGet("/themes", (
+                [FromServices] DataStoreService dataStore) =>
+            {
+                // TODO: Get from refelction?
+
+                return Results.Accepted(value: attrs);
+            });
+        }
     }
 }

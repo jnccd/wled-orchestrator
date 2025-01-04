@@ -9,7 +9,7 @@ public record LedGroupState(Color[] Colors, int Brightness);
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(LedThemeProviderService))]
 public class LedThemeProviderService(DataStoreService dataStore)
 {
-    readonly LedThemeDefault defaultTheme = new();
+    readonly LedThemeSingleColor defaultTheme = new();
 
     public LedGroupState? GetNewLedState(LedSegment ledSegment)
     {
