@@ -36,7 +36,7 @@ public static class RegisterEndpoints
         app.MapPut("/state/group/theme", (
             [FromServices] DataStoreService dataStore,
             [Required] string groupId,
-            [Required] LedTheme newTheme) =>
+            [FromBody, Required] LedTheme newTheme) =>
         {
             lock (dataStore.lockject)
             {

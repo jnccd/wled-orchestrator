@@ -34,6 +34,6 @@ public static class RegisterTypeInfoEndpoints
                     .Where(y => y.DeclaringType == x.DerivedType)
                     .Select(y => new LedThemeModifierImplProperty(y.Name, y.PropertyType.Name))));
 
-        app.MapGet("/themes", () => new LedThemeTypes(themeTypesInfo, themeModifierTypesInfo));
+        app.MapGet("/theme-types", () => new LedThemeTypes(themeTypesInfo, themeModifierTypesInfo));
     }
 }

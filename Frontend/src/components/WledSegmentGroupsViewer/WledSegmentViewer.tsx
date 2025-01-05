@@ -22,7 +22,7 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
 
   // React Query setup
   const queryClient = useQueryClient();
-  const query = useQuery({
+  const wledOrchStateQuery = useQuery({
     queryKey: [wledOrchStateQueryKey],
     queryFn: getWledOrchState,
   });
@@ -44,7 +44,7 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
     const hitGroup = hitElements.filter((x) =>
       x.classList.contains(ledSegmentClassName)
     );
-    const hitGroupData = query.data?.groups?.filter(
+    const hitGroupData = wledOrchStateQuery.data?.groups?.filter(
       (x) => x.id === hitGroup[0]?.classList[1]
     );
 

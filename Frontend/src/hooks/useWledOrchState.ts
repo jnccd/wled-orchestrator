@@ -6,6 +6,12 @@ export type LedSegmentGroup = components["schemas"]["LedSegmentGroup"];
 export type LedSegment = components["schemas"]["LedSegment"];
 export type LedTheme = components["schemas"]["LedTheme"];
 
+export type LedThemeTypes = components["schemas"]["LedThemeTypes"];
+export type LedThemeImpl = components["schemas"]["LedThemeImpl"];
+export type LedThemeImplProperty = components["schemas"]["LedThemeImplProperty"];
+export type LedThemeModifierImpl = components["schemas"]["LedThemeModifierImpl"];
+export type LedThemeModifierImplProperty = components["schemas"]["LedThemeModifierImplProperty"];
+
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_DEV_BACKEND_ADDRESS ? import.meta.env.VITE_DEV_BACKEND_ADDRESS : window.location.href,
     withCredentials: false,
@@ -47,12 +53,11 @@ export const renameGroup = (args: {groupId: string, newName: string}) =>
     })
     .then((res) => res.data);
 
-export const setGroupTheme = (args: {groupId: string, newTheme: LedTheme}) => 
+export const setGroupTheme = (args: {groupId: string, newTheme: any}) => 
   apiClient
-    .put("/state/group/theme", null, {
+    .put("/state/group/theme", args.newTheme, {
       params: {
         groupId: args.groupId,
-        newTheme: args.newTheme,
       },
     })
     .then((res) => res.data);
@@ -66,8 +71,7 @@ export const setActivated = (args: {newActivated: boolean}) =>
     })
     .then((res) => res.data);
 
-export const openApiSchemaQueryKey = "openApiSchema"
-export const getOpenApiSchema = () => 
+export const getThemeTypes = () => 
   apiClient
-    .get<any>("/swagger/v1/swagger.json")
+    .get<LedThemeTypes>("/theme-types")
     .then((res) => res.data);

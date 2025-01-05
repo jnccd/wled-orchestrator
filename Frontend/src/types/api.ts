@@ -91,6 +91,18 @@ export interface paths {
       };
     };
   };
+  "/theme-types": {
+    get: {
+      responses: {
+        /** OK */
+        200: {
+          content: {
+            "application/json": components["schemas"]["LedThemeTypes"];
+          };
+        };
+      };
+    };
+  };
 }
 
 export interface components {
@@ -129,6 +141,7 @@ export interface components {
       isEdited?: boolean;
     };
     LedTheme: {
+      type?: string | null;
       /** Format: uuid */
       id?: string;
       modifiers?: components["schemas"]["LedThemeModifier"][] | null;
@@ -136,10 +149,36 @@ export interface components {
     LedThemeDaylight: components["schemas"]["LedTheme"] & {
       skyColor?: components["schemas"]["Color"];
       sunColor?: components["schemas"]["Color"];
+      /** Format: double */
+      invertedSunSize?: number;
+    };
+    LedThemeImpl: {
+      name?: string | null;
+      properties?: components["schemas"]["LedThemeImplProperty"][] | null;
+    };
+    LedThemeImplProperty: {
+      name?: string | null;
+      type?: string | null;
     };
     LedThemeModifier: { [key: string]: unknown };
+    LedThemeModifierImpl: {
+      name?: string | null;
+      properties?:
+        | components["schemas"]["LedThemeModifierImplProperty"][]
+        | null;
+    };
+    LedThemeModifierImplProperty: {
+      name?: string | null;
+      type?: string | null;
+    };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["Color"];
+      /** Format: int32 */
+      brightness?: number;
+    };
+    LedThemeTypes: {
+      themes?: components["schemas"]["LedThemeImpl"][] | null;
+      modifiers?: components["schemas"]["LedThemeModifierImpl"][] | null;
     };
   };
 }
