@@ -12,7 +12,6 @@ const apiClient = axios.create({
 })
 
 export const wledOrchStateQueryKey = "wledOrchState"
-
 export const getWledOrchState = () => 
   apiClient
     .get<LedSegmentGroups>("/state")
@@ -67,6 +66,7 @@ export const setActivated = (args: {newActivated: boolean}) =>
     })
     .then((res) => res.data);
 
+export const openApiSchemaQueryKey = "openApiSchema"
 export const getOpenApiSchema = () => 
   apiClient
     .get<any>("/swagger/v1/swagger.json")
