@@ -22,7 +22,7 @@ public class LedThemeDaylight : LedTheme
     static readonly double dayLightFunMult = -Math.Log2(0.05) / (halfSunTime * halfSunTime);
     readonly Func<double, double> DayLightFunction = (x) => Math.Pow(2, -((x - sunTop) * (x - sunTop)) * dayLightFunMult);
 
-    readonly double invertedSunSize = 150;
+    public double InvertedSunSize { get; set; } = 150;
 
     public byte GetBrightness(double curDayTimePercent)
     {
@@ -42,7 +42,7 @@ public class LedThemeDaylight : LedTheme
             var sunRiseDayTime = curDayTimePercent / sunTime - sunRise;
 
             var x = i / (double)ColorArrayResolution - sunRiseDayTime;
-            var gaussianSun = Math.Exp(-(x * x) * invertedSunSize);
+            var gaussianSun = Math.Exp(-(x * x) * InvertedSunSize);
             colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
         }
 
