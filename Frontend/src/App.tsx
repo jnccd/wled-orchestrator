@@ -2,6 +2,7 @@ import "./App.css";
 import NavBar from "./components/NavBar";
 import { Text, Grid, GridItem, Divider } from "@chakra-ui/react";
 import WledSegmentGroupsViewer from "./components/WledSegmentGroupsViewer/WledSegmentGroupsViewer";
+import WledOrchThemeEditor from "./components/WledOrchThemeEditor/WledOrchThemeEditor";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <br />
           <Divider width="90%" margin="0rem auto" opacity={1} />
           <br />
+          <WledOrchThemeEditor></WledOrchThemeEditor>
           {[...Array(50).keys()].map((i) => (
             <Text key={i}>Heeey</Text>
           ))}
