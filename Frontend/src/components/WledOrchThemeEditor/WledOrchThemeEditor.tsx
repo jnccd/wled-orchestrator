@@ -1,18 +1,18 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  getWledOrchState,
-  wledOrchStateQueryKey,
+  getOpenApiSchema,
+  openApiSchemaQueryKey,
 } from "../../hooks/useWledOrchState";
 
 const WledOrchThemeEditor = () => {
   // React Query setup
   const queryClient = useQueryClient();
   const query = useQuery({
-    queryKey: [wledOrchStateQueryKey],
-    queryFn: getWledOrchState,
+    queryKey: [openApiSchemaQueryKey],
+    queryFn: getOpenApiSchema,
   });
 
-  return <div>WledOrchThemeEditor</div>;
+  return <div>{query.data ?? ""}</div>;
 };
 
 export default WledOrchThemeEditor;
