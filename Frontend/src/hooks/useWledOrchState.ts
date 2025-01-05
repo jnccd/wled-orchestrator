@@ -4,6 +4,7 @@ import axios from "axios";
 export type LedSegmentGroups = components["schemas"]["DataStoreRoot"];
 export type LedSegmentGroup = components["schemas"]["LedSegmentGroup"];
 export type LedSegment = components["schemas"]["LedSegment"];
+export type LedTheme = components["schemas"]["LedTheme"];
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_DEV_BACKEND_ADDRESS ? import.meta.env.VITE_DEV_BACKEND_ADDRESS : window.location.href,
@@ -46,6 +47,16 @@ export const renameGroup = (args: {groupId: string, newName: string}) =>
       },
     })
     .then((res) => res.data);
+
+export const setGroupTheme = (args: {groupId: string, newTheme: LedTheme}) => 
+  apiClient
+    .put("/state/group/theme", null, {
+      params: {
+        groupId: args.groupId,
+        newTheme: args.newTheme,
+      },
+    })
+    .then((res) => res.data);
       
 export const setActivated = (args: {newActivated: boolean}) => 
   apiClient
@@ -54,4 +65,9 @@ export const setActivated = (args: {newActivated: boolean}) =>
         newACtivated: args.newActivated,
       },
     })
+    .then((res) => res.data);
+
+export const getOpenApiSchema = () => 
+  apiClient
+    .get<any>("/swagger/v1/swagger.json")
     .then((res) => res.data);
