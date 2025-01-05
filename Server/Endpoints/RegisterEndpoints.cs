@@ -1,36 +1,15 @@
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
 using Server.Services.DataStore;
 using Server.Services.DataStore.Types;
 using Server.Services.LedTheme;
-namespace Server;
 
-public static class WledOrchestratorEndpoints
+namespace Server.Endpoints;
+
+public static class RegisterEndpoints
 {
-    public static void RegisterEndpoints(this WebApplication app)
+    public static void RegisterWledEndpoints(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseCors(policy => policy
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
-        }
-        app.UseDefaultFiles(new DefaultFilesOptions
-        {
-            DefaultFileNames = ["index.html"],
-            FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "..", "Frontend", "dist")),
-        });
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "..", "Frontend", "dist")),
-        });
-
-        var routes = (IEndpointRouteBuilder)app;
-
         app.MapGet("/state", [ProducesResponseType(typeof(DataStoreRoot), 200)] (
             [FromServices] DataStoreService dataStore) =>
             Results.Json(dataStore.Data));
