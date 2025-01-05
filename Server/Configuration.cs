@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using Server.Services;
 
 namespace Server;
@@ -41,16 +39,21 @@ public static class Configuration
         builder.Services.AddSwaggerGen(c => c.UseOneOfForPolymorphism());
     }
 
-    public static void EnableSwagger(this WebApplication app)
+    public static void ConfigureWebApp(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+
+            app.UseCors(policy => policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
         }
     }
 
-    public static void EnableRequestLogging(this WebApplication app)
+    public static void AddRequestLoggingMiddleware(this WebApplication app)
     {
         var logger = app.Services.GetService(typeof(LoggerService)) as LoggerService;
         app.Use(async (context, next) =>
