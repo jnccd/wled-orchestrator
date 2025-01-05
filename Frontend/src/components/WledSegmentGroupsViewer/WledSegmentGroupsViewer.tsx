@@ -9,15 +9,15 @@ import { useQuery } from "@tanstack/react-query";
 interface Props {}
 
 const WledSegmentGroupsViewer = ({}: Props) => {
-  const query = useQuery({
+  const wledOrchStateQuery = useQuery({
     queryKey: [wledOrchStateQueryKey],
     queryFn: getWledOrchState,
   });
 
   return (
-    !query.isPending && (
+    !wledOrchStateQuery.isPending && (
       <HStack justifyContent="center" width="100%">
-        {query.data?.groups?.map((g) => (
+        {wledOrchStateQuery.data?.groups?.map((g) => (
           <WledSegmentGroupViewer group={g} key={g.id}></WledSegmentGroupViewer>
         ))}
       </HStack>

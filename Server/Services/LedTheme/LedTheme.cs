@@ -7,13 +7,17 @@ public record LedThemeInput(DateTime Time);
 
 [JsonDerivedType(typeof(LedThemeDaylight), typeDiscriminator: "themeDaylight")]
 [JsonDerivedType(typeof(LedThemeSingleColor), typeDiscriminator: "themeDefault")]
-public abstract class LedTheme
+public class LedTheme
 {
+    public LedTheme() { }
+
+    public string Type => GetType().Name;
+
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public List<LedThemeModifier> Modifiers { get; } = [];
 
-    public abstract LedGroupState? GetNewState(LedThemeInput input);
+    public virtual LedGroupState? GetNewState(LedThemeInput input) => null;
 
     public LedGroupState? GetNewModifiedState(LedThemeInput input)
     {
