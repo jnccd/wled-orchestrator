@@ -13,6 +13,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Box,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import useSelectedGroupStore from "../../hooks/useLocalStore";
@@ -43,17 +44,11 @@ const WledOrchThemeEditor = () => {
 
   return (
     <>
-      {/* {themeTypesQuery.data?.themes?.map((x) => (
-        <p>
-          {x.name + ": " + x.properties?.map((y) => y.name + ": " + y.type)}
-        </p>
-      )) ?? ""}
-      <br /> */}
       <HStack justifyContent={"center"}>
         <Text as="b">The theme of group '{selectedGroup?.name}' is: </Text>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            {selectedGroup?.theme?.type}
+            {selectedGroup?.theme?.typeName}
           </MenuButton>
           <MenuList>
             {themeTypesQuery.data?.themes?.map((x) => (
@@ -74,6 +69,16 @@ const WledOrchThemeEditor = () => {
           </MenuList>
         </Menu>
       </HStack>
+      <Box display="flex" flexDirection="column">
+        {themeTypesQuery.data?.themes
+          ?.filter((x) => x.name === selectedGroup?.theme?.typeName)[0]
+          .properties?.map((x) => (
+            <HStack justifyContent={"center"}>
+              <Text>{x.name}:</Text>
+              <Text>{x.type} input field</Text>
+            </HStack>
+          ))}
+      </Box>
     </>
   );
 };

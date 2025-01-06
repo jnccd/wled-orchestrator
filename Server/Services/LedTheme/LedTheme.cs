@@ -11,7 +11,7 @@ public class LedTheme
 {
     public LedTheme() { }
 
-    public string Type => GetType().Name;
+    public string TypeName => GetType().Name;
 
     public Guid Id { get; set; } = Guid.NewGuid();
 
