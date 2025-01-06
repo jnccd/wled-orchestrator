@@ -48,7 +48,7 @@ const WledOrchThemeEditor = () => {
         <Text as="b">The theme of group '{selectedGroup?.name}' is: </Text>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            {selectedGroup?.theme?.typeName}
+            {selectedGroup?.theme?.typeName ?? "None"}
           </MenuButton>
           <MenuList>
             {themeTypesQuery.data?.themes?.map((x) => (
@@ -70,14 +70,18 @@ const WledOrchThemeEditor = () => {
         </Menu>
       </HStack>
       <Box display="flex" flexDirection="column">
-        {themeTypesQuery.data?.themes
-          ?.filter((x) => x.name === selectedGroup?.theme?.typeName)[0]
-          .properties?.map((x) => (
-            <HStack justifyContent={"center"}>
-              <Text>{x.name}:</Text>
-              <Text>{x.type} input field</Text>
-            </HStack>
-          ))}
+        {!selectedGroup?.theme ? (
+          <Text>-</Text>
+        ) : (
+          themeTypesQuery.data?.themes
+            ?.filter((x) => x.name === selectedGroup?.theme?.typeName)[0]
+            .properties?.map((x) => (
+              <HStack justifyContent={"center"}>
+                <Text>{x.name}:</Text>
+                <Text>{x.type} input field</Text>
+              </HStack>
+            ))
+        )}
       </Box>
     </>
   );
