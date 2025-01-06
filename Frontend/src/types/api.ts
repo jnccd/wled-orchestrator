@@ -44,6 +44,7 @@ export interface paths {
       requestBody: {
         content: {
           "application/json":
+            | components["schemas"]["LedTheme"]
             | components["schemas"]["LedThemeDaylight"]
             | components["schemas"]["LedThemeSingleColor"];
         };
@@ -133,6 +134,7 @@ export interface components {
       ledSegments?: components["schemas"]["LedSegment"][] | null;
       theme?:
         | (
+            | components["schemas"]["LedTheme"]
             | components["schemas"]["LedThemeDaylight"]
             | components["schemas"]["LedThemeSingleColor"]
           )
@@ -141,7 +143,7 @@ export interface components {
       isEdited?: boolean;
     };
     LedTheme: {
-      type?: string | null;
+      typeName?: string | null;
       /** Format: uuid */
       id?: string;
       modifiers?: components["schemas"]["LedThemeModifier"][] | null;
@@ -152,33 +154,24 @@ export interface components {
       /** Format: double */
       invertedSunSize?: number;
     };
-    LedThemeImpl: {
-      name?: string | null;
-      properties?: components["schemas"]["LedThemeImplProperty"][] | null;
-    };
-    LedThemeImplProperty: {
-      name?: string | null;
-      type?: string | null;
-    };
     LedThemeModifier: { [key: string]: unknown };
-    LedThemeModifierImpl: {
-      name?: string | null;
-      properties?:
-        | components["schemas"]["LedThemeModifierImplProperty"][]
-        | null;
-    };
-    LedThemeModifierImplProperty: {
-      name?: string | null;
-      type?: string | null;
-    };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["Color"];
       /** Format: int32 */
       brightness?: number;
     };
     LedThemeTypes: {
-      themes?: components["schemas"]["LedThemeImpl"][] | null;
-      modifiers?: components["schemas"]["LedThemeModifierImpl"][] | null;
+      themes?: components["schemas"]["TypeInfo"][] | null;
+      modifiers?: components["schemas"]["TypeInfo"][] | null;
+    };
+    TypeInfo: {
+      name?: string | null;
+      typeDiscriminator?: string | null;
+      properties?: components["schemas"]["TypePropertyInfo"][] | null;
+    };
+    TypePropertyInfo: {
+      name?: string | null;
+      type?: string | null;
     };
   };
 }
