@@ -31,9 +31,6 @@ function App() {
           <Divider width="90%" margin="0rem auto" opacity={1} />
           <br />
           <WledOrchThemeEditor></WledOrchThemeEditor>
-          {[...Array(50).keys()].map((i) => (
-            <Text key={i}>Heeey</Text>
-          ))}
         </GridItem>
       </Grid>
     </>
