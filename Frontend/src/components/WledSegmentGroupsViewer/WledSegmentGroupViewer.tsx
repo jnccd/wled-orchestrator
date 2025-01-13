@@ -17,7 +17,6 @@ interface Props {
 
 const WledSegmentGroupViewer = ({ group: g }: Props) => {
   const selectedGroupStore = useSelectedGroupStore();
-  selectedGroupStore.initialize();
 
   // React Query setup
   const queryClient = useQueryClient();
