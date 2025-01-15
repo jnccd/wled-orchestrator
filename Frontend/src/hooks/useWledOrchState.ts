@@ -7,10 +7,8 @@ export type LedSegment = components["schemas"]["LedSegment"];
 export type LedTheme = components["schemas"]["LedTheme"];
 
 export type LedThemeTypes = components["schemas"]["LedThemeTypes"];
-export type LedThemeImpl = components["schemas"]["LedThemeImpl"];
-export type LedThemeImplProperty = components["schemas"]["LedThemeImplProperty"];
-export type LedThemeModifierImpl = components["schemas"]["LedThemeModifierImpl"];
-export type LedThemeModifierImplProperty = components["schemas"]["LedThemeModifierImplProperty"];
+export type LedThemeTypeInfo = components["schemas"]["TypeInfo"];
+export type LedThemeTypePropertyInfo = components["schemas"]["TypePropertyInfo"];
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_DEV_BACKEND_ADDRESS ? import.meta.env.VITE_DEV_BACKEND_ADDRESS : window.location.href,

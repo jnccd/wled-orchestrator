@@ -1,6 +1,6 @@
 import "./App.css";
 import NavBar from "./components/NavBar";
-import { Text, Grid, GridItem, Divider } from "@chakra-ui/react";
+import { Grid, GridItem, Divider } from "@chakra-ui/react";
 import WledSegmentGroupsViewer from "./components/WledSegmentGroupsViewer/WledSegmentGroupsViewer";
 import WledOrchThemeEditor from "./components/WledOrchThemeEditor/WledOrchThemeEditor";
 import useSelectedGroupStore from "./hooks/useLocalStore";
