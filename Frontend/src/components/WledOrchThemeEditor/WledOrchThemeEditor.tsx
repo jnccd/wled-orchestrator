@@ -3,7 +3,7 @@ import {
   getWledOrchState,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchState";
-import { Text, Box, Center, VStack } from "@chakra-ui/react";
+import { Text, Box, SimpleGrid, Heading } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import ThemePicker from "./ThemePicker";
 import ThemePropertiesEditor from "./ThemePropertiesEditor";
@@ -21,20 +21,23 @@ const WledOrchThemeEditor = () => {
   )[0];
 
   return (
-    <>
+    <Box paddingTop={2}>
       <ThemePicker></ThemePicker>
-      <Box display="flex" flexDirection="column">
-        {!selectedGroup?.theme ? (
-          <Text>-</Text>
-        ) : (
-          <Center>
-            <VStack>
-              <ThemePropertiesEditor></ThemePropertiesEditor>
-            </VStack>
-          </Center>
-        )}
-      </Box>
-    </>
+      <SimpleGrid columns={2} gap={8} padding={6}>
+        <Box display="flex" flexDirection="column">
+          {!selectedGroup?.theme ? (
+            <Text>-</Text>
+          ) : (
+            <ThemePropertiesEditor></ThemePropertiesEditor>
+          )}
+        </Box>
+        <Box border={"red solid 3px"} width={"300px"}>
+          <Heading fontSize={30} padding={4}>
+            Preview:
+          </Heading>
+        </Box>
+      </SimpleGrid>
+    </Box>
   );
 };
 
