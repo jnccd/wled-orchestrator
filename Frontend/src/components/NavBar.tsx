@@ -1,4 +1,4 @@
-import { Box, HStack, Show, Text, useColorMode } from "@chakra-ui/react";
+import { Box, HStack, Text, useColorMode } from "@chakra-ui/react";
 import ColorModeSwitch from "./ColorModeSwitch";
 import WledOrchActivationSwitch from "./WledOrchActivationSwitch";
 import { useMaxPageWidthStore } from "../hooks/useLocalStore";
