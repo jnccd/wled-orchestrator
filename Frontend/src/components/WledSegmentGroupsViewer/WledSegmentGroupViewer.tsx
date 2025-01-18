@@ -1,7 +1,7 @@
 import { Box, HStack, Text } from "@chakra-ui/react";
 import EditNameButton from "../EditNameButton";
 import WledSegmentViewer from "./WledSegmentViewer";
-import useSelectedGroupStore from "../../hooks/useLocalStore";
+import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import {
   LedSegmentGroup,
   renameGroup,
@@ -41,7 +41,7 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
         if (g.id) selectedGroupStore.selectNew(g.id);
       }}
     >
-      <HStack justifyContent={"center"} gap={0} padding={1}>
+      <HStack justifyContent={"center"} gap={0} padding={1} flexWrap={"wrap"}>
         <Text
           fontWeight={
             selectedGroupStore.selectedGroup === g.id ? "bold" : "normal"

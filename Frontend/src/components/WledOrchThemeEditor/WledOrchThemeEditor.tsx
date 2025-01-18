@@ -4,7 +4,7 @@ import {
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchState";
 import { Text, Box, Center, VStack } from "@chakra-ui/react";
-import useSelectedGroupStore from "../../hooks/useLocalStore";
+import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import ThemePicker from "./ThemePicker";
 import ThemePropertiesEditor from "./ThemePropertiesEditor";
 

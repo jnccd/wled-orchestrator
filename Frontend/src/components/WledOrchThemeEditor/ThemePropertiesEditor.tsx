@@ -5,7 +5,7 @@ import {
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchState";
 import { Text, HStack, Heading } from "@chakra-ui/react";
-import useSelectedGroupStore from "../../hooks/useLocalStore";
+import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import ThemePropertyColorEditor from "./ThemePropertyColorEditor";
 import ThemePropertyDoubleEditor from "./ThemePropertyDoubleEditor";
 

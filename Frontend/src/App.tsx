@@ -3,11 +3,16 @@ import NavBar from "./components/NavBar";
 import { Grid, GridItem, Divider } from "@chakra-ui/react";
 import WledSegmentGroupsViewer from "./components/WledSegmentGroupsViewer/WledSegmentGroupsViewer";
 import WledOrchThemeEditor from "./components/WledOrchThemeEditor/WledOrchThemeEditor";
-import useSelectedGroupStore from "./hooks/useLocalStore";
+import {
+  useMaxPageWidthStore,
+  useSelectedGroupStore,
+} from "./hooks/useLocalStore";
 
 function App() {
   const selectedGroupStore = useSelectedGroupStore();
   selectedGroupStore.initialize();
+
+  const maxPageWidthStore = useMaxPageWidthStore();
 
   return (
     <>
@@ -24,7 +29,11 @@ function App() {
         <GridItem area="nav">
           <NavBar></NavBar>
         </GridItem>
-        <GridItem area="main">
+        <GridItem
+          area="main"
+          margin={"0 auto"}
+          maxWidth={maxPageWidthStore.maxPageWidth}
+        >
           <br />
           <WledSegmentGroupsViewer></WledSegmentGroupsViewer>
           <br />

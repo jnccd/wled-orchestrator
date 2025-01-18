@@ -15,7 +15,7 @@ import {
   MenuList,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import useSelectedGroupStore from "../../hooks/useLocalStore";
+import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 
 const ThemePicker = () => {
   // React Query setup
@@ -41,7 +41,7 @@ const ThemePicker = () => {
   )[0];
 
   return (
-    <HStack justifyContent={"center"}>
+    <HStack justifyContent={"center"} flexWrap={"wrap"}>
       <Text as="b">The theme of group '{selectedGroup?.name}' is </Text>
       <Menu>
         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
