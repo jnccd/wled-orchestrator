@@ -16,7 +16,7 @@ const WledSegmentGroupsViewer = ({}: Props) => {
 
   return (
     !wledOrchStateQuery.isPending && (
-      <HStack justifyContent="center" width="100%">
+      <HStack justifyContent="center" width="100%" flexWrap="wrap">
         {wledOrchStateQuery.data?.groups?.map((g) => (
           <WledSegmentGroupViewer group={g} key={g.id}></WledSegmentGroupViewer>
         ))}
