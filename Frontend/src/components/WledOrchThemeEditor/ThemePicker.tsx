@@ -4,7 +4,7 @@ import {
   getWledOrchState,
   setGroupTheme,
   wledOrchStateQueryKey,
-} from "../../hooks/useWledOrchState";
+} from "../../hooks/useWledOrchApi";
 import {
   Button,
   Text,

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { create } from "zustand/react";
-import { getWledOrchState, wledOrchStateQueryKey } from "./useWledOrchState";
+import { getWledOrchState, wledOrchStateQueryKey } from "./useWledOrchApi";
 
 export interface SelectedGroupStore {
     selectedGroup: string;
@@ -32,5 +32,5 @@ export interface MaxPageWidthStore {
 }
 
 export const useMaxPageWidthStore = create<MaxPageWidthStore>(_ => ({
-    maxPageWidth: "1000px",
+    maxPageWidth: "1200px",
 }));

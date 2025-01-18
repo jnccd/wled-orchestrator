@@ -1,7 +1,7 @@
 import {
   getWledOrchState,
   wledOrchStateQueryKey,
-} from "../../hooks/useWledOrchState";
+} from "../../hooks/useWledOrchApi";
 import { HStack } from "@chakra-ui/react";
 import WledSegmentGroupViewer from "./WledSegmentGroupViewer";
 import { useQuery } from "@tanstack/react-query";

@@ -2,11 +2,13 @@ import { Box, HStack, Show, Text, useColorMode } from "@chakra-ui/react";
 import ColorModeSwitch from "./ColorModeSwitch";
 import WledOrchActivationSwitch from "./WledOrchActivationSwitch";
 import { useMaxPageWidthStore } from "../hooks/useLocalStore";
+import { usePageWidth } from "../hooks/usePageWidth";
 
 const NavBar = () => {
   const height = "100px";
   const navbarId = "navbar-container";
   const maxPageWidthStore = useMaxPageWidthStore();
+  const pageWidth = usePageWidth();
 
   const { colorMode } = useColorMode();
   const color =
@@ -17,7 +19,6 @@ const NavBar = () => {
       <HStack
         id={navbarId}
         position={"fixed"}
-        justifyContent={"space-between"}
         maxWidth={"100vw"}
         minHeight={height}
         top={0}
@@ -25,26 +26,24 @@ const NavBar = () => {
         right={0}
         paddingX={20}
         paddingY={6}
+        justifyContent={"center"}
         boxShadow={"0 7px 25px " + color}
         backdropFilter={"auto"}
         backdropBlur={"4px"}
         backgroundColor={color}
         zIndex={999}
       >
-        <Show breakpoint="(min-width: 440px)">
-          <Text fontSize={20}>Wled Orchestrator</Text>
-          <HStack gap={5} maxWidth={maxPageWidthStore.maxPageWidth}>
+        <HStack
+          width={"100%"}
+          maxWidth={maxPageWidthStore.maxPageWidth}
+          justifyContent={"space-between"}
+        >
+          <Text fontSize={pageWidth > 440 ? 20 : 16}>Wled Orchestrator</Text>
+          <HStack gap={5}>
             <ColorModeSwitch></ColorModeSwitch>
             <WledOrchActivationSwitch></WledOrchActivationSwitch>
           </HStack>
-        </Show>
-        <Show breakpoint="(max-width: 439px)">
-          <Text fontSize={16}>Wled Orchestrator</Text>
-          <HStack gap={5} maxWidth={maxPageWidthStore.maxPageWidth}>
-            <ColorModeSwitch></ColorModeSwitch>
-            <WledOrchActivationSwitch></WledOrchActivationSwitch>
-          </HStack>
-        </Show>
+        </HStack>
       </HStack>
       <Box minHeight={height}></Box>
     </>

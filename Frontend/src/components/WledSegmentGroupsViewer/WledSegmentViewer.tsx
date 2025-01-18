@@ -5,7 +5,7 @@ import {
   getWledOrchState,
   LedSegment,
   renameSegment,
-} from "../../hooks/useWledOrchState";
+} from "../../hooks/useWledOrchApi";
 import Draggable from "../Draggable";
 import EditNameButton from "../EditNameButton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

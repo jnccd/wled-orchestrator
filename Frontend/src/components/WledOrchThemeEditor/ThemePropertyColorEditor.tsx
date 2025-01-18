@@ -3,7 +3,7 @@ import {
   getWledOrchState,
   setGroupTheme,
   wledOrchStateQueryKey,
-} from "../../hooks/useWledOrchState";
+} from "../../hooks/useWledOrchApi";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import { Colorful, ColorResult, rgbaToHsva } from "@uiw/react-color";
 import { useState } from "react";
