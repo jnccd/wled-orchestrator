@@ -7,14 +7,13 @@ import {
 import useSelectedGroupStore from "../../hooks/useLocalStore";
 import { Colorful, ColorResult, rgbaToHsva } from "@uiw/react-color";
 import { useState } from "react";
-import { writeProperty } from "../../utils/untypedPropertyAccess";
+import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
 
 interface Props {
   propertyName: string;
-  propertyValue: any;
 }
 
-const ThemePropertyColorEditor = ({ propertyName, propertyValue }: Props) => {
+const ThemePropertyColorEditor = ({ propertyName }: Props) => {
   const [refreshBool, refresh] = useState(false);
 
   // React Query setup
@@ -34,6 +33,8 @@ const ThemePropertyColorEditor = ({ propertyName, propertyValue }: Props) => {
   const selectedGroup = wledOrchStateQuery.data?.groups?.filter(
     (x) => x.id == selectedGroupStore.selectedGroup
   )[0];
+
+  const propertyValue = readProperty(selectedGroup?.theme, propertyName);
 
   return (
     <Colorful
