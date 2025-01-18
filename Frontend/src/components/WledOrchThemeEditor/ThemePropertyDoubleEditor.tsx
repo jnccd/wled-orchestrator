@@ -4,7 +4,7 @@ import {
   setGroupTheme,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchState";
-import useSelectedGroupStore from "../../hooks/useLocalStore";
+import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import {
   Box,
   Slider,

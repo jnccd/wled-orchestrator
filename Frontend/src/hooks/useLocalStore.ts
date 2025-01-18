@@ -8,7 +8,7 @@ export interface SelectedGroupStore {
     selectNew: (newSelectedGroup: string) => void;
 }
 
-const useSelectedGroupStore = create<SelectedGroupStore>(set => ({
+export const useSelectedGroupStore = create<SelectedGroupStore>(set => ({
     selectedGroup: "",
     initialize: () => set(set => {
         const groups = useQuery({
@@ -25,4 +25,12 @@ const useSelectedGroupStore = create<SelectedGroupStore>(set => ({
     selectNew: (newSelectedGroup) => set(_ => ({ selectedGroup: newSelectedGroup}) )
 }));
 
-export default useSelectedGroupStore;
+// --------------------------------------------------------------------------------------
+
+export interface MaxPageWidthStore {
+    maxPageWidth: string;
+}
+
+export const useMaxPageWidthStore = create<MaxPageWidthStore>(_ => ({
+    maxPageWidth: "1000px",
+}));
