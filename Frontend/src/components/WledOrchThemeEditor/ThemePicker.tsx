@@ -42,7 +42,7 @@ const ThemePicker = () => {
 
   return (
     <HStack justifyContent={"center"}>
-      <Text as="b">The theme of group '{selectedGroup?.name}' is: </Text>
+      <Text as="b">The theme of group '{selectedGroup?.name}' is </Text>
       <Menu>
         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
           {selectedGroup?.theme?.typeName ?? "None"}
@@ -65,6 +65,7 @@ const ThemePicker = () => {
           ))}
         </MenuList>
       </Menu>
+      <Text as="b">.</Text>
     </HStack>
   );
 };
