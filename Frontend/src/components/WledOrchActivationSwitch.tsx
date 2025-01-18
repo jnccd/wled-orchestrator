@@ -3,7 +3,7 @@ import {
   getWledOrchState,
   setActivated,
   wledOrchStateQueryKey,
-} from "../hooks/useWledOrchState";
+} from "../hooks/useWledOrchApi";
 import { IoPower } from "react-icons/io5";
 
 const WledOrchActivationSwitch = () => {

@@ -6,7 +6,7 @@ import {
   LedSegmentGroup,
   renameGroup,
   wledOrchStateQueryKey,
-} from "../../hooks/useWledOrchState";
+} from "../../hooks/useWledOrchApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const ledSegmentClassName = "led-segment-group";

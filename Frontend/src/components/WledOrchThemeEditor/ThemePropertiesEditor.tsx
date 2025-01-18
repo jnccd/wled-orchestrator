@@ -3,7 +3,7 @@ import {
   getThemeTypes,
   getWledOrchState,
   wledOrchStateQueryKey,
-} from "../../hooks/useWledOrchState";
+} from "../../hooks/useWledOrchApi";
 import { Text, HStack, Heading } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import ThemePropertyColorEditor from "./ThemePropertyColorEditor";
