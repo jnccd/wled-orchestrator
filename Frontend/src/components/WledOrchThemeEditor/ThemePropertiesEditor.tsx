@@ -32,7 +32,7 @@ const ThemePropertiesEditor = () => {
 
   return (
     <>
-      <Heading padding={4} paddingTop={7} fontSize={30}>
+      <Heading padding={4} fontSize={30}>
         Theme Properties:
       </Heading>
       {themeTypesQuery.data?.themes
@@ -65,7 +65,7 @@ const ThemePropertiesEditor = () => {
           }
 
           return (
-            <HStack width={"100%"} key={propertyName} padding={3}>
+            <HStack width={"100%"} key={propertyName} padding={5}>
               <Text padding={2}>{themeTypeProperty.name}:</Text>
               {themePropertyUi}
             </HStack>
