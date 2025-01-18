@@ -14,18 +14,13 @@ import {
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
+  Heading,
 } from "@chakra-ui/react";
 import useSelectedGroupStore from "../../hooks/useLocalStore";
-import { Colorful, ColorResult, rgbaToHsva } from "@uiw/react-color";
 import { useState } from "react";
-
-const readProperty = (obj: any, prop: string): any => {
-  return obj[prop];
-};
-
-const writeProperty = (obj: any, prop: string, newValue: any): void => {
-  obj[prop] = newValue;
-};
+import { readProperty } from "../../utils/untypedPropertyAccess";
+import ThemePropertyColorEditor from "./ThemePropertyColorEditor";
+import ThemePropertyDoubleEditor from "./ThemePropertyDoubleEditor";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -59,7 +54,9 @@ const ThemePropertiesEditor = () => {
 
   return (
     <>
-      <Text>Theme Properties:</Text>
+      <Heading padding={4} paddingTop={7} fontSize={30}>
+        Theme Properties:
+      </Heading>
       {themeTypesQuery.data?.themes
         ?.filter(
           (themeTypes) => themeTypes.name === selectedGroup?.theme?.typeName
@@ -77,80 +74,27 @@ const ThemePropertiesEditor = () => {
           var themePropertyUi: JSX.Element = <></>;
           if (themeTypeProperty.type === "Color") {
             themePropertyUi = (
-              <Colorful
-                color={rgbaToHsva({
-                  r: propertyValue.r,
-                  g: propertyValue.g,
-                  b: propertyValue.b,
-                  a: 1,
-                })}
-                onChange={(colorRes: ColorResult) => {
-                  writeProperty(
-                    selectedGroup?.theme,
-                    propertyName,
-                    colorRes.rgb
-                  );
-                  refresh(!refreshBool);
-                }}
-                onMouseUp={() => {
-                  changeThemeMutation.mutate({
-                    groupId: selectedGroup?.id ?? "",
-                    newTheme: selectedGroup?.theme,
-                  });
-                }}
-                disableAlpha
-              ></Colorful>
+              <ThemePropertyColorEditor
+                propertyName={propertyName}
+                propertyValue={propertyValue}
+              ></ThemePropertyColorEditor>
             );
           } else if (themeTypeProperty.type === "Double") {
             themePropertyUi = (
-              <Box p={4} pt={6} width={"100%"}>
-                <Slider
-                  aria-label="slider-ex-6"
-                  onChange={(val) => {
-                    writeProperty(selectedGroup?.theme, propertyName, val);
-                    refresh(!refreshBool);
-                  }}
-                  onChangeEnd={() =>
-                    changeThemeMutation.mutate({
-                      groupId: selectedGroup?.id ?? "",
-                      newTheme: selectedGroup?.theme,
-                    })
-                  }
-                  defaultValue={propertyValue}
-                  min={0}
-                  max={300}
-                >
-                  <SliderMark
-                    value={propertyValue}
-                    textAlign="center"
-                    bg="blue.500"
-                    color="white"
-                    mt="-10"
-                    ml="-5"
-                    w="12"
-                    borderRadius={"6px"}
-                  >
-                    {propertyValue}
-                  </SliderMark>
-                  <SliderTrack>
-                    <SliderFilledTrack />
-                  </SliderTrack>
-                  <SliderThumb />
-                </Slider>
-              </Box>
+              <ThemePropertyDoubleEditor
+                propertyName={propertyName}
+                propertyValue={propertyValue}
+              ></ThemePropertyDoubleEditor>
             );
           } else {
             themePropertyUi = (
-              <HStack justifyContent={"center"}>
-                <Text>{themeTypeProperty.name}:</Text>
-                <Text>{themeTypeProperty.type} input field</Text>
-              </HStack>
+              <Text>{themeTypeProperty.type} input field is undefined!</Text>
             );
           }
 
           return (
-            <HStack width={"100%"} key={propertyName}>
-              <Text>{themeTypeProperty.name}:</Text>
+            <HStack width={"100%"} key={propertyName} padding={3}>
+              <Text padding={2}>{themeTypeProperty.name}:</Text>
               {themePropertyUi}
             </HStack>
           );
