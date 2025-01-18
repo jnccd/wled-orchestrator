@@ -65,7 +65,12 @@ const ThemePropertiesEditor = () => {
           }
 
           return (
-            <HStack width={"100%"} key={propertyName} padding={5}>
+            <HStack
+              width={"100%"}
+              key={propertyName}
+              padding={5}
+              justifyContent={"center"}
+            >
               <Text padding={2}>{themeTypeProperty.name}:</Text>
               {themePropertyUi}
             </HStack>
