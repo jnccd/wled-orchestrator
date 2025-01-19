@@ -19,7 +19,7 @@ public static class RegisterTypeInfoEndpoints
         var ledThemeTypeAttrs = ledThemeType.GetCustomAttributes<JsonDerivedTypeAttribute>();
         var themeTypesInfo = ledThemeTypeAttrs
             .Select(x => new TypeInfo(
-                x.DerivedType.Name,
+                x.DerivedType.Name.Replace("LedTheme", ""),
                 x.TypeDiscriminator as string,
                 x.DerivedType.GetProperties()
                     .Where(y => y.DeclaringType == x.DerivedType)

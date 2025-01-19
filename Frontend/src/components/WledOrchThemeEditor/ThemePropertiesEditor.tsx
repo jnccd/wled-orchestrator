@@ -8,6 +8,7 @@ import { Text, HStack, Heading } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import ThemePropertyColorEditor from "./ThemePropertyColorEditor";
 import ThemePropertyDoubleEditor from "./ThemePropertyDoubleEditor";
+import { readProperty } from "../../utils/untypedPropertyAccess";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -37,7 +38,9 @@ const ThemePropertiesEditor = () => {
       </Heading>
       {themeTypesQuery.data?.themes
         ?.filter(
-          (themeTypes) => themeTypes.name === selectedGroup?.theme?.typeName
+          (themeTypes) =>
+            themeTypes.typeDiscriminator ===
+            readProperty(selectedGroup?.theme, "$type")
         )[0]
         .properties?.map((themeTypeProperty) => {
           const propertyName = firstCharToLowerCase(themeTypeProperty.name);
