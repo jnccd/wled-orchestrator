@@ -4,11 +4,10 @@ import {
   wledOrchStateQueryKey,
   getWledOrchState,
   LedSegment,
-  renameSegment,
 } from "../../hooks/useWledOrchApi";
 import Draggable from "../Draggable";
-import EditNameButton from "../EditNameButton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import EditSegmentButton from "./EditSegmentButton";
 
 const serverButtonIdPrefix = "server-button";
 
@@ -28,12 +27,6 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
   });
   const moveSegmentMutation = useMutation({
     mutationFn: moveSegment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
-    },
-  });
-  const renameSegmentMutation = useMutation({
-    mutationFn: renameSegment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
     },
@@ -67,19 +60,7 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
     >
       <HStack>
         <Text>{displayText}</Text>
-        <EditNameButton
-          defaultValue={displayText}
-          onSubmit={(newName) => {
-            if (!segment || !segment.readonlyId) {
-              console.log("segment null??");
-              return;
-            }
-            renameSegmentMutation.mutate({
-              segmentId: segment.readonlyId,
-              newName: newName,
-            });
-          }}
-        ></EditNameButton>
+        <EditSegmentButton segment={segment}></EditSegmentButton>
       </HStack>
     </Draggable>
   );

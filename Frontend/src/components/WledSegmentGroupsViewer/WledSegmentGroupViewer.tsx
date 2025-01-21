@@ -1,13 +1,8 @@
 import { Box, HStack, Text } from "@chakra-ui/react";
-import EditNameButton from "../EditNameButton";
 import WledSegmentViewer from "./WledSegmentViewer";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
-import {
-  LedSegmentGroup,
-  renameGroup,
-  wledOrchStateQueryKey,
-} from "../../hooks/useWledOrchApi";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LedSegmentGroup } from "../../hooks/useWledOrchApi";
+import EditGroupButton from "./EditGroupButton";
 
 const ledSegmentClassName = "led-segment-group";
 
@@ -17,15 +12,6 @@ interface Props {
 
 const WledSegmentGroupViewer = ({ group: g }: Props) => {
   const selectedGroupStore = useSelectedGroupStore();
-
-  // React Query setup
-  const queryClient = useQueryClient();
-  const renameGroupMutation = useMutation({
-    mutationFn: renameGroup,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
-    },
-  });
 
   return (
     <Box
@@ -50,19 +36,7 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
         >
           {g.name}
         </Text>
-        <EditNameButton
-          defaultValue={g.name ?? ""}
-          onSubmit={(newName) => {
-            if (!g || !g.id) {
-              console.log("group null??");
-              return;
-            }
-            renameGroupMutation.mutate({
-              groupId: g.id,
-              newName: newName,
-            });
-          }}
-        ></EditNameButton>
+        <EditGroupButton group={g}></EditGroupButton>
       </HStack>
       <HStack gap={0}>
         {g.ledSegments &&
