@@ -3,6 +3,7 @@ import {
   Button,
   Divider,
   FormLabel,
+  HStack,
   Input,
   useToast,
   VStack,
@@ -40,6 +41,19 @@ const EditGroupButton = ({ group }: Props) => {
     },
   });
 
+  const inputSubmit = (newName: string, onClose: () => void) => {
+    if (!group || !group.id) {
+      console.log("group null??");
+      return;
+    }
+    renameGroupMutation.mutate({
+      groupId: group.id,
+      newName: newName,
+    });
+
+    onClose();
+  };
+
   return (
     <EditButton
       children={(_a, _b, onClose, firstFieldRef) => {
@@ -48,26 +62,29 @@ const EditGroupButton = ({ group }: Props) => {
             <FormLabel textAlign={"left"} htmlFor={inputId}>
               Name:
             </FormLabel>
-            <Input
-              id={inputId}
-              ref={firstFieldRef}
-              defaultValue={group.name ?? ""}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key == "Enter") {
-                  const newName = (e.target as HTMLInputElement).value;
-                  if (!group || !group.id) {
-                    console.log("group null??");
-                    return;
+            <HStack>
+              <Input
+                id={inputId}
+                ref={firstFieldRef}
+                defaultValue={group.name ?? ""}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key == "Enter") {
+                    const newName = (e.target as HTMLInputElement).value;
+                    inputSubmit(newName, onClose);
                   }
-                  renameGroupMutation.mutate({
-                    groupId: group.id,
-                    newName: newName,
-                  });
-
-                  onClose();
-                }
-              }}
-            />
+                }}
+              />
+              <Button
+                onClick={() => {
+                  const newName = (
+                    document.getElementById(inputId) as HTMLInputElement
+                  ).value;
+                  inputSubmit(newName, onClose);
+                }}
+              >
+                Submit
+              </Button>
+            </HStack>
             <Divider marginY={2} width="90%" marginX="auto" opacity={1} />
             <Button
               colorScheme="red"
