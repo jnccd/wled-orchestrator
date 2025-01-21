@@ -58,6 +58,8 @@ public static class RegisterEndpoints
         {
             lock (dataStore.lockject)
             {
+                if (dataStore.Data.Groups.Count == 1)
+                    return Results.BadRequest("This is the last group!");
                 var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
                 if (group == null)
                     return Results.NotFound("The GroupId was not found in any groups!");
