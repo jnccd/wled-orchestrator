@@ -51,6 +51,15 @@ export const renameGroup = (args: {groupId: string, newName: string}) =>
     })
     .then((res) => res.data);
 
+export const deleteGroup = (args: {groupId: string}) => 
+  apiClient
+    .delete("/state/group", {
+      params: {
+        groupId: args.groupId
+      }
+    })
+    .then((res) => res.data);
+
 export const setGroupTheme = (args: {groupId: string, newTheme: any}) => 
   apiClient
     .put("/state/group/theme", args.newTheme, {

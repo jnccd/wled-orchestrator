@@ -34,7 +34,6 @@ const EditSegmentButton = ({ segment }: Props) => {
               id={"name-input"}
               ref={firstFieldRef}
               defaultValue={segment.name ?? ""}
-              //id={popoverInputId}
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key == "Enter") {
                   const newName = (e.target as HTMLInputElement).value;
