@@ -51,6 +51,19 @@ export interface paths {
       };
     };
   };
+  "/state/group": {
+    delete: {
+      parameters: {
+        query: {
+          groupId: string;
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
   "/state/segment/move": {
     put: {
       parameters: {
@@ -172,6 +185,7 @@ export interface components {
     TypePropertyInfo: {
       name?: string | null;
       type?: string | null;
+      defaultValue?: unknown | null;
     };
   };
 }

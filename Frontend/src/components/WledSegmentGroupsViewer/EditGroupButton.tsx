@@ -1,8 +1,9 @@
 import EditButton from "../EditButton";
-import { FormLabel, Input } from "@chakra-ui/react";
+import { Button, Divider, FormLabel, Input, VStack } from "@chakra-ui/react";
 import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  deleteGroup,
   LedSegmentGroup,
   renameGroup,
   wledOrchStateQueryKey,
@@ -23,18 +24,25 @@ const EditGroupButton = ({ group }: Props) => {
       queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
     },
   });
+  const deleteGroupMutation = useMutation({
+    mutationFn: deleteGroup,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
+    },
+  });
 
   return (
     <EditButton
       children={(_a, _b, onClose, firstFieldRef) => {
         return (
-          <>
-            <FormLabel htmlFor={inputId}>Name:</FormLabel>
+          <VStack alignItems={"left"}>
+            <FormLabel textAlign={"left"} htmlFor={inputId}>
+              Name:
+            </FormLabel>
             <Input
               id={inputId}
               ref={firstFieldRef}
               defaultValue={group.name ?? ""}
-              //id={popoverInputId}
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key == "Enter") {
                   const newName = (e.target as HTMLInputElement).value;
@@ -51,7 +59,18 @@ const EditGroupButton = ({ group }: Props) => {
                 }
               }}
             />
-          </>
+            <Divider marginY={2} width="90%" marginX="auto" opacity={1} />
+            <Button
+              colorScheme="red"
+              onClick={() =>
+                deleteGroupMutation.mutate({
+                  groupId: group.id ?? "",
+                })
+              }
+            >
+              Delete
+            </Button>
+          </VStack>
         );
       }}
     ></EditButton>
