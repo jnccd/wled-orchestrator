@@ -1,5 +1,12 @@
 import EditButton from "../EditButton";
-import { Button, Divider, FormLabel, Input, VStack } from "@chakra-ui/react";
+import {
+  Button,
+  Divider,
+  FormLabel,
+  Input,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
 import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -8,6 +15,7 @@ import {
   renameGroup,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
+import { AxiosError } from "axios";
 
 interface Props {
   group: LedSegmentGroup;
@@ -15,6 +23,7 @@ interface Props {
 
 const EditGroupButton = ({ group }: Props) => {
   const inputId = "name-input";
+  const toast = useToast();
 
   // React Query setup
   const queryClient = useQueryClient();
@@ -63,9 +72,25 @@ const EditGroupButton = ({ group }: Props) => {
             <Button
               colorScheme="red"
               onClick={() =>
-                deleteGroupMutation.mutate({
-                  groupId: group.id ?? "",
-                })
+                deleteGroupMutation.mutate(
+                  {
+                    groupId: group.id ?? "",
+                  },
+                  {
+                    onError: (error) => {
+                      toast.closeAll();
+                      toast({
+                        title:
+                          ((error as AxiosError).response?.data as string) ??
+                          "Error!",
+                        status: "error",
+                        position: "top",
+                        variant: "left-accent",
+                        isClosable: true,
+                      });
+                    },
+                  }
+                )
               }
             >
               Delete
