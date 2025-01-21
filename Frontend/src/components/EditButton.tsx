@@ -1,9 +1,7 @@
 import { EditIcon } from "@chakra-ui/icons";
 import {
   FocusLock,
-  FormLabel,
   IconButton,
-  Input,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -12,17 +10,20 @@ import {
   PopoverTrigger,
   useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { ReactNode } from "react";
 
 interface Props {
-  defaultValue?: string;
-  onSubmit?: (newName: string) => void;
+  children: (
+    isOpen: boolean,
+    onOpen: () => void,
+    onClose: () => void,
+    firstFieldRef: React.MutableRefObject<null>
+  ) => ReactNode;
 }
 
-const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
+const EditButton = ({ children }: Props) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const firstFieldRef = React.useRef(null);
-  const inputId = "name-input";
 
   return (
     <Popover
@@ -46,20 +47,7 @@ const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
               <PopoverArrow />
               <PopoverCloseButton />
               <PopoverBody>
-                <FormLabel htmlFor={inputId}>Name:</FormLabel>
-                <Input
-                  id={inputId}
-                  ref={firstFieldRef}
-                  defaultValue={defaultValue}
-                  //id={popoverInputId}
-                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                    if (e.key == "Enter") {
-                      const inputVal = (e.target as HTMLInputElement).value;
-                      if (onSubmit) onSubmit(inputVal);
-                      onClose();
-                    }
-                  }}
-                />
+                {children(isOpen, onOpen, onClose, firstFieldRef)}
               </PopoverBody>
             </FocusLock>
           </PopoverContent>
@@ -69,4 +57,4 @@ const EditNameButton = ({ onSubmit, defaultValue }: Props) => {
   );
 };
 
-export default EditNameButton;
+export default EditButton;
