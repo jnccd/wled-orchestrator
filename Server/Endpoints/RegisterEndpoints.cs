@@ -52,6 +52,26 @@ public static class RegisterEndpoints
             return Results.Accepted();
         });
 
+        app.MapDelete("/state/group", (
+            [FromServices] DataStoreService dataStore,
+            [Required] string groupId) =>
+        {
+            lock (dataStore.lockject)
+            {
+                var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
+                if (group == null)
+                    return Results.NotFound("The GroupId was not found in any groups!");
+                if (group.LedSegments.Count > 0)
+                    return Results.BadRequest("The group is not empty!");
+
+                dataStore.Data.Groups.Remove(group);
+
+                dataStore.Save();
+            }
+
+            return Results.NoContent();
+        });
+
         app.MapPut("/state/segment/move", (
             [FromServices] DataStoreService dataStore,
             [Required] string segmentId,
