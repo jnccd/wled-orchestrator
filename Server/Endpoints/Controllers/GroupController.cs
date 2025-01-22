@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Services.DataStore;
 using Server.Services.LedTheme;
 
+namespace Server.Endpoints.Controllers;
+
 [ApiController]
 [Route("/state/group")]
 public class GroupController : ControllerBase

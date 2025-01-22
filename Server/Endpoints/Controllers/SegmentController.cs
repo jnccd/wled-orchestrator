@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Services.DataStore;
 using Server.Services.DataStore.Types;
 
+namespace Server.Endpoints.Controllers;
+
 [ApiController]
 [Route("/state/segment")]
 public class SegmentController : ControllerBase
