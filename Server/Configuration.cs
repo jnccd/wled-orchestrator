@@ -17,12 +17,12 @@ public static class Configuration
 {
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
+        // Local Assembly Services
         Type[] serviceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                from declaringType in domainAssembly.GetTypes()
                                where declaringType.Module == typeof(Configuration).Module
                                    && declaringType.CustomAttributes.Any(x => x.AttributeType == typeof(RegisterImplementation))
                                select declaringType).ToArray();
-
         foreach (var declaringType in serviceTypes)
         {
             var attr = declaringType.GetCustomAttribute<RegisterImplementation>();
@@ -35,8 +35,12 @@ public static class Configuration
                 builder.Services.AddTransient(declaringType, attr.serviceType);
         }
 
+        // Swagger
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c => c.UseOneOfForPolymorphism());
+
+        // Controller
+        builder.Services.AddControllers();
     }
 
     public static void ConfigureWebApp(this WebApplication app)
@@ -62,7 +66,7 @@ public static class Configuration
             await next.Invoke();
         });
     }
-    public static async Task<string> GetRequestBody(HttpRequest request)
+    private static async Task<string> GetRequestBody(HttpRequest request)
     {
         if (!request.Body.CanSeek)
             request.EnableBuffering();
