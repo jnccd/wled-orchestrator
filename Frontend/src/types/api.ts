@@ -60,10 +60,10 @@ export interface paths {
       };
     };
   };
-  "/state/group/theme-preview": {
+  "/state/group/{groupId}/theme-preview": {
     get: {
       parameters: {
-        query: {
+        path: {
           groupId: string;
         };
       };

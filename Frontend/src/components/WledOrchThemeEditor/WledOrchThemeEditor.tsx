@@ -53,11 +53,15 @@ const WledOrchThemeEditor = () => {
           <Box display="flex" flexDirection="column">
             <ThemePropertiesEditor></ThemePropertiesEditor>
           </Box>
-          <Box border={"red solid 3px"} width={"300px"}>
+          <Box width={"300px"}>
             <Heading fontSize={30} padding={4}>
               Preview:
             </Heading>
-            <Image minHeight={300} src={base64Image as string}></Image>
+            <Image
+              borderRadius={"8px"}
+              minHeight={300}
+              src={base64Image ?? ""}
+            ></Image>
           </Box>
         </SimpleGrid>
       )}
