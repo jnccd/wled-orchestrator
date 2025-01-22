@@ -1,4 +1,3 @@
-import { group } from "console";
 import { components } from "../types/api";
 import axios from "axios";
 
