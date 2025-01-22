@@ -4,7 +4,7 @@ using Server.Services.DataStore.Types;
 using Server.Services.LedTheme.Themes;
 namespace Server.Services.LedTheme;
 
-public record LedGroupState(Color[] Colors, int Brightness);
+public record LedGroupState(Color[] Colors, int Brightness = 255);
 
 [RegisterImplementation(ServiceRegisterType.Singleton, typeof(LedThemeProviderService))]
 public class LedThemeProviderService(DataStoreService dataStore)
