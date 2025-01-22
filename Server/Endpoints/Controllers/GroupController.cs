@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Services.DataStore;
 using Server.Services.LedTheme;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace Server.Endpoints.Controllers;
@@ -77,11 +78,11 @@ public class GroupController : ControllerBase
         return Results.Accepted();
     }
 
-    [HttpGet("theme-preview")]
-    [ProducesResponseType(typeof(IResult), 200, "image/png")]
+    [HttpGet("{groupId}/theme-preview")]
+    [ProducesResponseType(typeof(string), 200, "image/png")]
     public IResult GetThemePreview(
         [FromServices] DataStoreService dataStore,
-        [Required] string groupId)
+        string groupId)
     {
         Image<Rgba32> image;
 
@@ -121,10 +122,6 @@ public class GroupController : ControllerBase
             });
         }
 
-        Stream imageStream = new MemoryStream(image.Width * image.Height * image.PixelType.BitsPerPixel / 8);
-        image.SaveAsPng(imageStream);
-        imageStream.Position = 0;
-
-        return Results.File(imageStream, "image/png", "theme-preview");
+        return Results.Ok(image.ToBase64String(PngFormat.Instance));
     }
 }

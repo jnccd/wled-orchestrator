@@ -71,7 +71,7 @@ export interface paths {
         /** OK */
         200: {
           content: {
-            "image/png": components["schemas"]["IResult"];
+            "image/png": string;
           };
         };
       };
@@ -158,7 +158,6 @@ export interface components {
       activated?: boolean;
       groups?: components["schemas"]["LedSegmentGroup"][] | null;
     };
-    IResult: { [key: string]: unknown };
     LedSegment: {
       wledServerAddress?: string | null;
       /** Format: int32 */
