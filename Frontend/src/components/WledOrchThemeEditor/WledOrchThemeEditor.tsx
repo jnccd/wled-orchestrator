@@ -28,23 +28,26 @@ const WledOrchThemeEditor = () => {
     (x) => x.id == selectedGroupStore.selectedGroup
   )[0];
 
-  const fetchFolder = async (groupId: string) => {
-    const res = await apiClient.get(`/state/group/${groupId}/theme-preview`);
-    return res.data;
+  const url = baseUrl + `/state/group/${selectedGroup?.id}/theme-preview`;
+  const fetchImageAsBase64 = async (url: string) => {
+    const response = await fetch(url, {
+      headers: {
+        Accept: "image/png",
+      },
+    });
+    const blob = await response.text();
+    console.log(blob);
+    return blob;
   };
-  const { data, isLoading, error } = useQuery({
-    queryKey: [wledOrchStateQueryKey],
-    queryFn: () => fetchFolder(selectedGroup?.id ?? ""),
-  });
 
-  const queryy = getThemePreviewImage(selectedGroup?.id ?? "");
-  const themePreviewQuery = useQuery({
-    queryKey: [wledOrchStateQueryKey],
-    queryFn: queryy,
-  });
-  console.log("data");
-  console.log(data);
-
+  const useFetchImage = (url: string) => {
+    return useQuery({
+      queryKey: [wledOrchStateQueryKey, url],
+      queryFn: () => fetchImageAsBase64(url),
+    });
+  };
+  const { data: base64Image, isLoading, error } = useFetchImage(url);
+  console.log(base64Image);
   return (
     <Box paddingTop={2}>
       <ThemePicker></ThemePicker>
@@ -59,7 +62,7 @@ const WledOrchThemeEditor = () => {
             <Heading fontSize={30} padding={4}>
               Preview:
             </Heading>
-            <Image minHeight={300} src={data ?? ""}></Image>
+            <Image minHeight={300} src={base64Image as string}></Image>
           </Box>
         </SimpleGrid>
       )}

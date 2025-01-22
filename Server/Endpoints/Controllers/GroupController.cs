@@ -80,25 +80,28 @@ public class GroupController : ControllerBase
 
     [HttpGet("{groupId}/theme-preview")]
     [ProducesResponseType(typeof(string), 200, "image/png")]
-    public IResult GetThemePreview(
+    public IActionResult GetThemePreview(
         [FromServices] DataStoreService dataStore,
-        string groupId)
+        [Required] string groupId)
     {
         Image<Rgba32> image;
 
         lock (dataStore.lockject)
         {
-            var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
+            if (!Guid.TryParse(groupId, out Guid groupGuid))
+                return BadRequest("Wrong Guid!");
+
+            var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == groupGuid);
             if (group == null)
-                return Results.NotFound("The GroupId was not found in any groups!");
+                return NotFound("The GroupId was not found in any groups!");
 
             if (group.Theme == null)
-                return Results.NotFound("The group does not have a theme!");
+                return NotFound("The group does not have a theme!");
 
             var testState = group.Theme.GetNewState(new(new(2000, 1, 1, 0, 0, 0)));
 
             if (testState == null)
-                return Results.NotFound("Cant get state from theme!");
+                return NotFound("Cant get state from theme!");
 
             image = new(testState.Colors.Length, testState.Colors.Length * 16 / 9);
             image.ProcessPixelRows(accessor =>
@@ -122,6 +125,6 @@ public class GroupController : ControllerBase
             });
         }
 
-        return Results.Ok(image.ToBase64String(PngFormat.Instance));
+        return Ok(image.ToBase64String(PngFormat.Instance));
     }
 }
