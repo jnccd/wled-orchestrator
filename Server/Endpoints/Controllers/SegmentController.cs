@@ -7,13 +7,12 @@ using Server.Services.DataStore.Types;
 [Route("/state/segment")]
 public class SegmentController : ControllerBase
 {
-
     [HttpPut]
     [Route("move")]
     public IResult Move(
-            [FromServices] DataStoreService dataStore,
-            [Required] string segmentId,
-            string? targetGroupId)
+        [FromServices] DataStoreService dataStore,
+        [Required] string segmentId,
+        string? targetGroupId)
     {
         lock (dataStore.lockject)
         {
@@ -45,9 +44,9 @@ public class SegmentController : ControllerBase
     [HttpPut]
     [Route("name")]
     public IResult Rename(
-            [FromServices] DataStoreService dataStore,
-            [Required] string segmentId,
-            [Required] string newName)
+        [FromServices] DataStoreService dataStore,
+        [Required] string segmentId,
+        [Required] string newName)
     {
         lock (dataStore.lockject)
         {
