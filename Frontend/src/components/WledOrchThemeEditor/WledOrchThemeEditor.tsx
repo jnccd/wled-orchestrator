@@ -8,11 +8,11 @@ import { Box, SimpleGrid, Heading } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import ThemePicker from "./ThemePicker";
 import ThemePropertiesEditor from "./ThemePropertiesEditor";
-import { usePageWidth } from "../../hooks/usePageWidth";
+import { usePageWidthThreshold } from "../../hooks/usePageWidthThreshold";
 import { Image } from "@chakra-ui/react";
 
 const WledOrchThemeEditor = () => {
-  const pageWidth = usePageWidth();
+  const gridPageWidthThreshold = usePageWidthThreshold(780);
 
   // React Query setup
   const wledOrchStateQuery = useQuery({
@@ -27,11 +27,7 @@ const WledOrchThemeEditor = () => {
 
   const themePreviewUrl =
     baseUrl + `/state/group/${selectedGroup?.id}/theme-preview`;
-  const {
-    data: base64Image,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: themePreviewImage } = useQuery({
     queryKey: [wledOrchStateQueryKey, themePreviewUrl],
     queryFn: async () => {
       const response = await fetch(themePreviewUrl, {
@@ -49,7 +45,11 @@ const WledOrchThemeEditor = () => {
       {!selectedGroup?.theme ? (
         <></>
       ) : (
-        <SimpleGrid columns={pageWidth > 780 ? 2 : 1} gap={8} padding={6}>
+        <SimpleGrid
+          columns={gridPageWidthThreshold ? 2 : 1}
+          gap={8}
+          padding={6}
+        >
           <Box display="flex" flexDirection="column">
             <ThemePropertiesEditor></ThemePropertiesEditor>
           </Box>
@@ -60,7 +60,7 @@ const WledOrchThemeEditor = () => {
             <Image
               borderRadius={"8px"}
               minHeight={300}
-              src={base64Image ?? ""}
+              src={themePreviewImage ?? ""}
             ></Image>
           </Box>
         </SimpleGrid>
