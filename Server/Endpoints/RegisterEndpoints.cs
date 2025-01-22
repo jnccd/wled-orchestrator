@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Server.Services.DataStore;
-using Server.Services.DataStore.Types;
-using Server.Services.LedTheme;
 
 namespace Server.Endpoints;
 
