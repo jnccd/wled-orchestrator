@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  apiClient,
   baseUrl,
-  getThemePreviewImage,
   getWledOrchState,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
@@ -12,7 +10,6 @@ import ThemePicker from "./ThemePicker";
 import ThemePropertiesEditor from "./ThemePropertiesEditor";
 import { usePageWidth } from "../../hooks/usePageWidth";
 import { Image } from "@chakra-ui/react";
-import axios from "axios";
 
 const WledOrchThemeEditor = () => {
   const pageWidth = usePageWidth();
@@ -28,26 +25,24 @@ const WledOrchThemeEditor = () => {
     (x) => x.id == selectedGroupStore.selectedGroup
   )[0];
 
-  const url = baseUrl + `/state/group/${selectedGroup?.id}/theme-preview`;
-  const fetchImageAsBase64 = async (url: string) => {
-    const response = await fetch(url, {
-      headers: {
-        Accept: "image/png",
-      },
-    });
-    const blob = await response.text();
-    console.log(blob);
-    return blob;
-  };
+  const themePreviewUrl =
+    baseUrl + `/state/group/${selectedGroup?.id}/theme-preview`;
+  const {
+    data: base64Image,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: [wledOrchStateQueryKey, themePreviewUrl],
+    queryFn: async () => {
+      const response = await fetch(themePreviewUrl, {
+        headers: {
+          Accept: "image/png",
+        },
+      });
+      return await response.text();
+    },
+  });
 
-  const useFetchImage = (url: string) => {
-    return useQuery({
-      queryKey: [wledOrchStateQueryKey, url],
-      queryFn: () => fetchImageAsBase64(url),
-    });
-  };
-  const { data: base64Image, isLoading, error } = useFetchImage(url);
-  console.log(base64Image);
   return (
     <Box paddingTop={2}>
       <ThemePicker></ThemePicker>

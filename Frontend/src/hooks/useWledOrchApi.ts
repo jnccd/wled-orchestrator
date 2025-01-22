@@ -70,17 +70,6 @@ export const setGroupTheme = (args: {groupId: string, newTheme: any}) =>
       },
     })
     .then((res) => res.data);
-
-export const getThemePreviewImage = (groupId: string) => 
-{
-  console.log(groupId)
-  return () => 
-    {
-      return apiClient
-        .get<string>("/state/group/"+groupId+"/theme-preview")
-        .then((res) => res.data);
-    }
-}
       
 export const setActivated = (args: {newActivated: boolean}) => 
   apiClient
