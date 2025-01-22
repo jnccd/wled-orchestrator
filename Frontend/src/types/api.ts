@@ -4,19 +4,20 @@
  */
 
 export interface paths {
-  "/state": {
-    get: {
+  "/state/group": {
+    delete: {
+      parameters: {
+        query: {
+          groupId: string;
+        };
+      };
       responses: {
         /** OK */
-        200: {
-          content: {
-            "application/json": components["schemas"]["DataStoreRoot"];
-          };
-        };
+        200: unknown;
       };
     };
   };
-  "/state/group/rename": {
+  "/state/group/name": {
     put: {
       parameters: {
         query: {
@@ -47,12 +48,20 @@ export interface paths {
             | components["schemas"]["LedTheme"]
             | components["schemas"]["LedThemeDaylight"]
             | components["schemas"]["LedThemeSingleColor"];
+          "text/json":
+            | components["schemas"]["LedTheme"]
+            | components["schemas"]["LedThemeDaylight"]
+            | components["schemas"]["LedThemeSingleColor"];
+          "application/*+json":
+            | components["schemas"]["LedTheme"]
+            | components["schemas"]["LedThemeDaylight"]
+            | components["schemas"]["LedThemeSingleColor"];
         };
       };
     };
   };
-  "/state/group": {
-    delete: {
+  "/state/group/theme-preview": {
+    get: {
       parameters: {
         query: {
           groupId: string;
@@ -60,7 +69,11 @@ export interface paths {
       };
       responses: {
         /** OK */
-        200: unknown;
+        200: {
+          content: {
+            "image/png": components["schemas"]["IResult"];
+          };
+        };
       };
     };
   };
@@ -78,7 +91,7 @@ export interface paths {
       };
     };
   };
-  "/state/segment/rename": {
+  "/state/segment/name": {
     put: {
       parameters: {
         query: {
@@ -89,6 +102,18 @@ export interface paths {
       responses: {
         /** OK */
         200: unknown;
+      };
+    };
+  };
+  "/state": {
+    get: {
+      responses: {
+        /** OK */
+        200: {
+          content: {
+            "application/json": components["schemas"]["DataStoreRoot"];
+          };
+        };
       };
     };
   };
@@ -133,6 +158,7 @@ export interface components {
       activated?: boolean;
       groups?: components["schemas"]["LedSegmentGroup"][] | null;
     };
+    IResult: { [key: string]: unknown };
     LedSegment: {
       wledServerAddress?: string | null;
       /** Format: int32 */
