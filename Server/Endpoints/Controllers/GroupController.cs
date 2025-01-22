@@ -32,7 +32,7 @@ public class GroupController : ControllerBase
     }
 
     [HttpPut]
-    [Route("rename")]
+    [Route("name")]
     public IResult Rename(
             [FromServices] DataStoreService dataStore,
             [Required] string groupId,
