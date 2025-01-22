@@ -2,13 +2,13 @@ import { Box, HStack, Text, useColorMode } from "@chakra-ui/react";
 import ColorModeSwitch from "./ColorModeSwitch";
 import WledOrchActivationSwitch from "./WledOrchActivationSwitch";
 import { useMaxPageWidthStore } from "../hooks/useLocalStore";
-import { usePageWidth } from "../hooks/usePageWidth";
+import { usePageWidthThreshold } from "../hooks/usePageWidthThreshold";
 
 const NavBar = () => {
   const height = "100px";
   const navbarId = "navbar-container";
   const maxPageWidthStore = useMaxPageWidthStore();
-  const pageWidth = usePageWidth();
+  const textPageWidthThreshold = usePageWidthThreshold(440);
 
   const { colorMode } = useColorMode();
   const color =
@@ -38,7 +38,9 @@ const NavBar = () => {
           maxWidth={maxPageWidthStore.maxPageWidth}
           justifyContent={"space-between"}
         >
-          <Text fontSize={pageWidth > 440 ? 20 : 16}>Wled Orchestrator</Text>
+          <Text fontSize={textPageWidthThreshold ? 20 : 16}>
+            Wled Orchestrator
+          </Text>
           <HStack gap={5}>
             <ColorModeSwitch></ColorModeSwitch>
             <WledOrchActivationSwitch></WledOrchActivationSwitch>
