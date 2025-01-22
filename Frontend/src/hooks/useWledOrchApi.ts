@@ -1,3 +1,4 @@
+import { group } from "console";
 import { components } from "../types/api";
 import axios from "axios";
 
@@ -11,7 +12,7 @@ export type LedThemeTypeInfo = components["schemas"]["TypeInfo"];
 export type LedThemeTypePropertyInfo = components["schemas"]["TypePropertyInfo"];
 
 export const baseUrl = import.meta.env.VITE_DEV_BACKEND_ADDRESS ? import.meta.env.VITE_DEV_BACKEND_ADDRESS : window.location.href;
-const apiClient = axios.create({
+export const apiClient = axios.create({
     baseURL: baseUrl,
     withCredentials: false,
 })
@@ -69,6 +70,17 @@ export const setGroupTheme = (args: {groupId: string, newTheme: any}) =>
       },
     })
     .then((res) => res.data);
+
+export const getThemePreviewImage = (groupId: string) => 
+{
+  console.log(groupId)
+  return () => 
+    {
+      return apiClient
+        .get<string>("/state/group/"+groupId+"/theme-preview")
+        .then((res) => res.data);
+    }
+}
       
 export const setActivated = (args: {newActivated: boolean}) => 
   apiClient
