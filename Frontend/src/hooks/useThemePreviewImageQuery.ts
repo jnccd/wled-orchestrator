@@ -7,12 +7,12 @@ export const useThemePreviewImageQuery = (groupId: string) => {
     return useQuery({
         queryKey: [wledOrchStateQueryKey, themePreviewUrl],
         queryFn: async () => {
-        const response = await fetch(themePreviewUrl, {
-            headers: {
-            Accept: "image/png",
-            },
-        });
-        return await response.text();
+            const response = await fetch(themePreviewUrl, {
+                headers: {
+                Accept: "image/png",
+                },
+            });
+            return await response.text();
         },
     });
 }
