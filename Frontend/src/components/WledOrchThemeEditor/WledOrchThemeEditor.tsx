@@ -9,7 +9,7 @@ import ThemePicker from "./ThemePicker";
 import ThemePropertiesEditor from "./ThemePropertiesEditor";
 import { usePageWidthThreshold } from "../../hooks/usePageWidthThreshold";
 import { Image } from "@chakra-ui/react";
-import { useThemePreviewImage } from "../../hooks/useThemePreviewImage";
+import { useThemePreviewImageQuery } from "../../hooks/useThemePreviewImageQuery";
 
 const WledOrchThemeEditor = () => {
   const gridPageWidthThreshold = usePageWidthThreshold(780);
@@ -25,7 +25,7 @@ const WledOrchThemeEditor = () => {
     (x) => x.id == selectedGroupStore.selectedGroup
   )[0];
 
-  const { data: themePreviewImage } = useThemePreviewImage(
+  const { data: themePreviewImage } = useThemePreviewImageQuery(
     selectedGroup?.id ?? ""
   );
 

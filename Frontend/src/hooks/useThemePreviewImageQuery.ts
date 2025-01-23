@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { baseUrl, wledOrchStateQueryKey } from "./useWledOrchApi";
 
-export const useThemePreviewImage = (groupId: string) => {
+export const useThemePreviewImageQuery = (groupId: string) => {
     const themePreviewUrl =
         baseUrl + `/state/group/${groupId}/theme-preview`;
     return useQuery({
