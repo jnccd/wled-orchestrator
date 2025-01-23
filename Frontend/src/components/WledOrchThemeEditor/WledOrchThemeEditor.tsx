@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  baseUrl,
   getWledOrchState,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
