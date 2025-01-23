@@ -10,6 +10,7 @@ import ThemePicker from "./ThemePicker";
 import ThemePropertiesEditor from "./ThemePropertiesEditor";
 import { usePageWidthThreshold } from "../../hooks/usePageWidthThreshold";
 import { Image } from "@chakra-ui/react";
+import { useThemePreviewImage } from "../../hooks/useThemePreviewImage";
 
 const WledOrchThemeEditor = () => {
   const gridPageWidthThreshold = usePageWidthThreshold(780);
@@ -25,19 +26,9 @@ const WledOrchThemeEditor = () => {
     (x) => x.id == selectedGroupStore.selectedGroup
   )[0];
 
-  const themePreviewUrl =
-    baseUrl + `/state/group/${selectedGroup?.id}/theme-preview`;
-  const { data: themePreviewImage } = useQuery({
-    queryKey: [wledOrchStateQueryKey, themePreviewUrl],
-    queryFn: async () => {
-      const response = await fetch(themePreviewUrl, {
-        headers: {
-          Accept: "image/png",
-        },
-      });
-      return await response.text();
-    },
-  });
+  const { data: themePreviewImage } = useThemePreviewImage(
+    selectedGroup?.id ?? ""
+  );
 
   return (
     <Box paddingTop={2}>
