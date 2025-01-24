@@ -4,10 +4,10 @@
  */
 
 export interface paths {
-  "/state/group": {
+  "/state/groups/{groupId}": {
     delete: {
       parameters: {
-        query: {
+        path: {
           groupId: string;
         };
       };
@@ -17,11 +17,13 @@ export interface paths {
       };
     };
   };
-  "/state/group/name": {
+  "/state/groups/{groupId}/name": {
     put: {
       parameters: {
-        query: {
+        path: {
           groupId: string;
+        };
+        query: {
           newName: string;
         };
       };
@@ -31,10 +33,10 @@ export interface paths {
       };
     };
   };
-  "/state/group/theme": {
+  "/state/groups/{groupId}/theme": {
     put: {
       parameters: {
-        query: {
+        path: {
           groupId: string;
         };
       };
@@ -60,7 +62,7 @@ export interface paths {
       };
     };
   };
-  "/state/group/{groupId}/theme-preview": {
+  "/state/groups/{groupId}/theme-preview": {
     get: {
       parameters: {
         path: {
@@ -77,11 +79,13 @@ export interface paths {
       };
     };
   };
-  "/state/segment/move": {
+  "/state/segments/{segmentId}/move": {
     put: {
       parameters: {
-        query: {
+        path: {
           segmentId: string;
+        };
+        query: {
           targetGroupId?: string;
         };
       };
@@ -91,11 +95,13 @@ export interface paths {
       };
     };
   };
-  "/state/segment/name": {
+  "/state/segments/{segmentId}/name": {
     put: {
       parameters: {
-        query: {
+        path: {
           segmentId: string;
+        };
+        query: {
           newName: string;
         };
       };
@@ -195,8 +201,6 @@ export interface components {
     LedThemeModifier: { [key: string]: unknown };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["Color"];
-      /** Format: int32 */
-      brightness?: number;
     };
     LedThemeTypes: {
       themes?: components["schemas"]["TypeInfo"][] | null;

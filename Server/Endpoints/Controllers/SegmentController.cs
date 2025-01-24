@@ -6,11 +6,10 @@ using Server.Services.DataStore.Types;
 namespace Server.Endpoints.Controllers;
 
 [ApiController]
-[Route("/state/segment")]
+[Route("/state/segments")]
 public class SegmentController : ControllerBase
 {
-    [HttpPut]
-    [Route("move")]
+    [HttpPut("{segmentId}/move")]
     public IResult Move(
         [FromServices] DataStoreService dataStore,
         [Required] string segmentId,
@@ -43,8 +42,7 @@ public class SegmentController : ControllerBase
         return Results.Accepted();
     }
 
-    [HttpPut]
-    [Route("name")]
+    [HttpPut("{segmentId}/name")]
     public IResult Rename(
         [FromServices] DataStoreService dataStore,
         [Required] string segmentId,

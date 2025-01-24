@@ -3,7 +3,7 @@ import { baseUrl, wledOrchStateQueryKey } from "./useWledOrchApi";
 
 export const useThemePreviewImageQuery = (groupId: string) => {
     const themePreviewUrl =
-        baseUrl + `/state/group/${groupId}/theme-preview`;
+        baseUrl + `/state/groups/${groupId}/theme-preview`;
     return useQuery({
         queryKey: [wledOrchStateQueryKey, themePreviewUrl],
         queryFn: async () => {
