@@ -9,11 +9,10 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace Server.Endpoints.Controllers;
 
 [ApiController]
-[Route("/state/group")]
+[Route("/state/groups")]
 public class GroupController : ControllerBase
 {
-    [HttpDelete]
-    [Route("")]
+    [HttpDelete("{groupId}")]
     public IResult DeleteGroup(
         [FromServices] DataStoreService dataStore,
         [Required] string groupId)
@@ -36,8 +35,7 @@ public class GroupController : ControllerBase
         return Results.NoContent();
     }
 
-    [HttpPut]
-    [Route("name")]
+    [HttpPut("{groupId}/name")]
     public IResult Rename(
             [FromServices] DataStoreService dataStore,
             [Required] string groupId,
@@ -57,8 +55,7 @@ public class GroupController : ControllerBase
         return Results.Accepted();
     }
 
-    [HttpPut]
-    [Route("theme")]
+    [HttpPut("{groupId}/theme")]
     public IResult PutTheme(
         [FromServices] DataStoreService dataStore,
         [Required] string groupId,

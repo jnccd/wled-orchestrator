@@ -19,14 +19,13 @@ export const apiClient = axios.create({
 export const wledOrchStateQueryKey = "wledOrchState"
 export const getWledOrchState = () => 
   apiClient
-    .get<LedSegmentGroups>("/state")
+    .get<LedSegmentGroups>(`/state`)
     .then((res) => res.data);
 
 export const moveSegment = (args: {segmentId: string, targetGroupId: string | null}) => 
   apiClient
-    .put("/state/segment/move", null, {
+    .put(`/state/segments/${args.segmentId}/move`, null, {
       params: {
-        segmentId: args.segmentId,
         targetGroupId: args.targetGroupId,
       },
     })
@@ -34,9 +33,8 @@ export const moveSegment = (args: {segmentId: string, targetGroupId: string | nu
 
 export const renameSegment = (args: {segmentId: string, newName: string}) => 
   apiClient
-    .put("/state/segment/rename", null, {
+    .put(`/state/segments/${args.segmentId}/rename`, null, {
       params: {
-        segmentId: args.segmentId,
         newName: args.newName,
       },
     })
@@ -44,9 +42,8 @@ export const renameSegment = (args: {segmentId: string, newName: string}) =>
 
 export const renameGroup = (args: {groupId: string, newName: string}) => 
   apiClient
-    .put("/state/group/rename", null, {
+    .put(`/state/groups/${args.groupId}/rename`, null, {
       params: {
-        groupId: args.groupId,
         newName: args.newName,
       },
     })
@@ -54,25 +51,17 @@ export const renameGroup = (args: {groupId: string, newName: string}) =>
 
 export const deleteGroup = (args: {groupId: string}) => 
   apiClient
-    .delete("/state/group", {
-      params: {
-        groupId: args.groupId
-      }
-    })
+    .delete(`/state/groups/${args.groupId}`)
     .then((res) => res.data);
 
 export const setGroupTheme = (args: {groupId: string, newTheme: any}) => 
   apiClient
-    .put("/state/group/theme", args.newTheme, {
-      params: {
-        groupId: args.groupId,
-      },
-    })
+    .put(`/state/groups/${args.groupId}/theme`, args.newTheme)
     .then((res) => res.data);
       
 export const setActivated = (args: {newActivated: boolean}) => 
   apiClient
-    .put("/state/activated", null, {
+    .put(`/state/activated`, null, {
       params: {
         newACtivated: args.newActivated,
       },
@@ -81,5 +70,5 @@ export const setActivated = (args: {newActivated: boolean}) =>
 
 export const getThemeTypes = () => 
   apiClient
-    .get<LedThemeTypes>("/theme-types")
+    .get<LedThemeTypes>(`/theme-types`)
     .then((res) => res.data);
