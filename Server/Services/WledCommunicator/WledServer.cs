@@ -9,7 +9,7 @@ public record WledServer(string Address, WledServerState State)
     {
         get
         {
-            return State.Seg.WithIndex().Select((x, i) => new LedSegment(Address, i)).ToArray();
+            return [.. State.Seg.WithIndex().Select((x, i) => new LedSegment(Address, i))];
         }
     }
 }
