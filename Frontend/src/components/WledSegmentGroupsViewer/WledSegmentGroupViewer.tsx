@@ -44,7 +44,7 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
             <WledSegmentViewer
               ledSegmentClassName={ledSegmentClassName}
               segment={s}
-              key={s.readonlyId}
+              key={s.id}
             ></WledSegmentViewer>
           ))}
       </HStack>
