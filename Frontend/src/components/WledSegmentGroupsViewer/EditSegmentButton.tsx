@@ -37,12 +37,12 @@ const EditSegmentButton = ({ segment }: Props) => {
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key == "Enter") {
                   const newName = (e.target as HTMLInputElement).value;
-                  if (!segment || !segment.readonlyId) {
+                  if (!segment || !segment.id) {
                     console.log("segment null??");
                     return;
                   }
                   renameSegmentMutation.mutate({
-                    segmentId: segment.readonlyId,
+                    segmentId: segment.id,
                     newName: newName,
                   });
 

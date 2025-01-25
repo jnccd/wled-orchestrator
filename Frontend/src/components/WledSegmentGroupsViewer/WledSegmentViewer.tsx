@@ -52,8 +52,8 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
 
   return (
     <Draggable
-      key={segment.readonlyId}
-      className={segment.readonlyId ?? "error-id-less-segment"}
+      key={segment.id}
+      className={segment.id ?? "error-id-less-segment"}
       id={serverButtonIdPrefix + "-" + lastAddressByte}
       backgroundColor={colorMode === "dark" ? "#2C313D" : "#f5f9fb"}
       onDragEnd={onDragEnd}

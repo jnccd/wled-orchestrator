@@ -18,7 +18,7 @@ public class SegmentController : ControllerBase
         lock (dataStore.lockject)
         {
             (var segmentGroup, var segment) = dataStore.Data.Groups
-                .Select(g => (g, g.LedSegments.FirstOrDefault(x => x.ReadonlyId == segmentId)))
+                .Select(g => (g, g.LedSegments.FirstOrDefault(x => x.Id == segmentId)))
                 .Where(x => x.Item2 != null)
                 .FirstOrDefault();
             if (segmentGroup == null || segment == null)
@@ -50,7 +50,7 @@ public class SegmentController : ControllerBase
     {
         lock (dataStore.lockject)
         {
-            var segment = dataStore.Data.Groups.SelectMany(x => x.LedSegments).FirstOrDefault(x => x.ReadonlyId == segmentId);
+            var segment = dataStore.Data.Groups.SelectMany(x => x.LedSegments).FirstOrDefault(x => x.Id == segmentId);
             if (segment == null)
                 return Results.NotFound("The SegmentId was not found in any groups");
 
