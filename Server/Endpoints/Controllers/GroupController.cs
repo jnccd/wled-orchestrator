@@ -126,4 +126,79 @@ public class GroupController : ControllerBase
 
         return Ok(image.ToBase64String(PngFormat.Instance));
     }
+
+    [HttpPost("{groupId}/theme/modifiers")]
+    public IResult PostThemeModifier(
+        [FromServices] DataStoreService dataStore,
+        [Required] string groupId,
+        [Required] LedThemeModifier newModifier)
+    {
+        lock (dataStore.lockject)
+        {
+            var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
+            if (group == null)
+                return Results.NotFound("The GroupId was not found in any groups!");
+            if (group.Theme == null)
+                return Results.NotFound("The groups theme is not set!");
+
+            group.Theme.Modifiers.Add(newModifier);
+
+            dataStore.Save();
+        }
+
+        return Results.Accepted();
+    }
+
+    [HttpPut("{groupId}/theme/modifiers/{modifierId}")]
+    public IResult PutThemeModifier(
+        [FromServices] DataStoreService dataStore,
+        [Required] string groupId,
+        [Required] string modifierId,
+        [Required] LedThemeModifier newModifier)
+    {
+        lock (dataStore.lockject)
+        {
+            var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
+            if (group == null)
+                return Results.NotFound("The GroupId was not found in any groups!");
+            if (group.Theme == null)
+                return Results.NotFound("The groups theme is not set!");
+
+            var (modifier, modifierIndex) = group.Theme.Modifiers.WithIndex().FirstOrDefault(x => x.item.Id == Guid.Parse(modifierId));
+            if (modifier == null)
+                return Results.NotFound("The ModifierId was not found in the modifier list!");
+
+            group.Theme.Modifiers[modifierIndex] = newModifier;
+
+            dataStore.Save();
+        }
+
+        return Results.Accepted();
+    }
+
+    [HttpDelete("{groupId}/theme/modifiers/{modifierId}")]
+    public IResult DeleteThemeModifier(
+        [FromServices] DataStoreService dataStore,
+        [Required] string groupId,
+        [Required] string modifierId)
+    {
+        lock (dataStore.lockject)
+        {
+            var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
+            if (group == null)
+                return Results.NotFound("The GroupId was not found in any groups!");
+            if (group.Theme == null)
+                return Results.NotFound("The groups theme is not set!");
+
+            var (modifier, modifierIndex) = group.Theme.Modifiers.WithIndex().FirstOrDefault(x => x.item.Id == Guid.Parse(modifierId));
+            if (modifier == null)
+                return Results.NotFound("The ModifierId was not found in the modifier list!");
+
+            group.Theme.Modifiers.RemoveAt(modifierIndex);
+
+            dataStore.Save();
+        }
+
+        return Results.Accepted();
+    }
 }
