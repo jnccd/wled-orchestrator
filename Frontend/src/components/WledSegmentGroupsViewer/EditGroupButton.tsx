@@ -68,7 +68,7 @@ const EditGroupButton = ({ group }: Props) => {
                 ref={firstFieldRef}
                 defaultValue={group.name ?? ""}
                 onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key == "Enter") {
+                  if (e.key === "Enter") {
                     const newName = (e.target as HTMLInputElement).value;
                     inputSubmit(newName, onClose);
                   }

@@ -38,7 +38,7 @@ const ThemePropertyColorEditor = ({ propertyName }: Props) => {
 
   const selectedGroupStore = useSelectedGroupStore();
   const selectedGroup = wledOrchStateQuery.data?.groups?.filter(
-    (x) => x.id == selectedGroupStore.selectedGroup
+    (x) => x.id === selectedGroupStore.selectedGroup
   )[0];
 
   const propertyValue = readProperty(selectedGroup?.theme, propertyName);
