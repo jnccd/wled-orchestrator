@@ -28,6 +28,7 @@ public class LedTheme
     }
 }
 
+[JsonDerivedType(typeof(WakeupModifier), typeDiscriminator: "wakeupModifier")]
 public abstract class LedThemeModifier
 {
     public abstract LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input);
