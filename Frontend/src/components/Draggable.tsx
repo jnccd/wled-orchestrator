@@ -28,7 +28,7 @@ const Draggable = ({
     if (debuggingLogs) console.log("dragMouseDown");
     if (e.button !== 0) return;
 
-    var thisInDocument = document.getElementById(id);
+    let thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
       if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
       return;
@@ -66,7 +66,7 @@ const Draggable = ({
 
     e.preventDefault();
 
-    var thisInDocument = document.getElementById(id);
+    let thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
       if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
       return;
@@ -83,7 +83,7 @@ const Draggable = ({
 
   const dragMouseUp = () => {
     if (debuggingLogs) console.log("dragMouseUp");
-    var thisInDocument = document.getElementById(id);
+    let thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
       if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
       return;

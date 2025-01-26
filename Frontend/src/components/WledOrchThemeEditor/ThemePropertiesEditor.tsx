@@ -48,7 +48,7 @@ const ThemePropertiesEditor = () => {
             return <Text>Invalid property name!</Text>;
           }
 
-          var themePropertyUi: JSX.Element = <></>;
+          let themePropertyUi: JSX.Element = <></>;
           if (themeTypeProperty.type === "Color") {
             themePropertyUi = (
               <ThemePropertyColorEditor
