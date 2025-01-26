@@ -6,7 +6,7 @@ public class LedThemeDaylight : LedTheme
     public override LedGroupState? GetNewState(LedThemeInput input)
     {
         var dayTimePercent = input.Time.TimeOfDay.TotalDays;
-        return new(GetColors(dayTimePercent), GetBrightness(dayTimePercent));
+        return new(GetColors(dayTimePercent));
     }
 
     public ColorHsv SkyColor { get; set; } = new ColorRgb(142, 215, 253).RgbToHSV();
@@ -24,15 +24,6 @@ public class LedThemeDaylight : LedTheme
 
     public double InvertedSunSize { get; set; } = 150;
 
-    public byte GetBrightness(double curDayTimePercent)
-    {
-        // Set Brightness
-        var funOut = DayLightFunction(curDayTimePercent);
-        var bri = funOut * 255 + 0;
-
-        return (byte)bri;
-    }
-
     public ColorHsv[] GetColors(double curDayTimePercent)
     {
         // Create Color Array
@@ -44,6 +35,8 @@ public class LedThemeDaylight : LedTheme
             var x = i / (double)ColorArrayResolution - sunRiseDayTime;
             var gaussianSun = Math.Exp(-(x * x) * InvertedSunSize);
             colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
+            var funOut = DayLightFunction(curDayTimePercent);
+            colors[i] = new ColorHsv(colors[i].H, colors[i].S, colors[i].V * funOut);
         }
 
         return colors;
