@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Server.Helper;
 using Server.Services.DataStore;
 using Server.Services.LedTheme;
 using SixLabors.ImageSharp;
@@ -109,13 +110,14 @@ public class GroupController : ControllerBase
 
                     var hour = 24 / (float)accessor.Height * y;
                     var state = group.Theme.GetNewState(new(new(2000, 1, 1, (int)hour, (int)(hour % 1 * 60), 0)));
+                    var colors = state!.Colors.Select(x => x.HsvToRgb()).ToArray();
 
                     for (int x = 0; x < pixelRow.Length; x++)
                     {
                         ref Rgba32 pixel = ref pixelRow[x];
-                        pixel.R = state!.Colors[x].R;
-                        pixel.G = state!.Colors[x].G;
-                        pixel.B = state!.Colors[x].B;
+                        pixel.R = (byte)colors[x].R;
+                        pixel.G = (byte)colors[x].G;
+                        pixel.B = (byte)colors[x].B;
                         pixel.A = 255;
                     }
                 }

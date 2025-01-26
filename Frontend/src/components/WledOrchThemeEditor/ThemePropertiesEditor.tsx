@@ -49,7 +49,7 @@ const ThemePropertiesEditor = () => {
           }
 
           let themePropertyUi: JSX.Element = <></>;
-          if (themeTypeProperty.type === "Color") {
+          if (themeTypeProperty.type === "ColorHsv") {
             themePropertyUi = (
               <ThemePropertyColorEditor
                 propertyName={propertyName}

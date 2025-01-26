@@ -86,7 +86,7 @@ public class WledCommunicatorService(
     }
     void FillNewSegmentsIntoDatastore()
     {
-        var defaultGroup = dataStore.Data.Groups.FirstOrDefault(x => x.Name == "Default");
+        var defaultGroup = dataStore.Data.Groups.FirstOrDefault();
         if (defaultGroup == null)
         {
             logger.WriteLine("Creating new Default LedSegmentGroup!", LogLevel.Warn);
@@ -126,7 +126,7 @@ public class WledCommunicatorService(
     }
 
     // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
-    public bool SetLedColorsGlobally(Color[] colors)
+    public bool SetLedColorsGlobally(ColorRgb[] colors)
     {
         foreach (var led in Leds)
             foreach (var (seg, i) in led.State.Seg.WithIndex())
@@ -134,7 +134,7 @@ public class WledCommunicatorService(
                     return false;
         return true;
     }
-    public bool SetLedColorsOnWledSegment(Color[] colors, LedSegment segment)
+    public bool SetLedColorsOnWledSegment(ColorRgb[] colors, LedSegment segment)
     {
         var secs = (DateTime.Now - LastColHTTPReq.GetValueOrDefault(segment)).TotalSeconds;
         if (secs < HttpReqCooldownSecs)

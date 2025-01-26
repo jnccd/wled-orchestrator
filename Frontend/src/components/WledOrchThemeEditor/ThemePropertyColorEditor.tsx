@@ -38,14 +38,14 @@ const ThemePropertyColorEditor = ({ propertyName }: Props) => {
 
   return (
     <Colorful
-      color={rgbaToHsva({
-        r: propertyValue.r,
-        g: propertyValue.g,
-        b: propertyValue.b,
+      color={{
+        h: propertyValue.h,
+        s: propertyValue.s,
+        v: propertyValue.v,
         a: 1,
-      })}
+      }}
       onChange={(colorRes: ColorResult) => {
-        writeProperty(selectedGroup?.theme, propertyName, colorRes.rgb);
+        writeProperty(selectedGroup?.theme, propertyName, colorRes.hsv);
         refresh(!refreshBool);
       }}
       onMouseUp={() => {
