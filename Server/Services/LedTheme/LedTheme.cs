@@ -31,6 +31,7 @@ public class LedTheme
 [JsonDerivedType(typeof(WakeupModifier), typeDiscriminator: "wakeupModifier")]
 public abstract class LedThemeModifier
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public abstract LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input);
 }
 
