@@ -5,7 +5,7 @@ import {
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
-import { Colorful, ColorResult, rgbaToHsva } from "@uiw/react-color";
+import { Colorful, ColorResult } from "@uiw/react-color";
 import { useState } from "react";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
 
