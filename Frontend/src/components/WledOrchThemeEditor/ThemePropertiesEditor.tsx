@@ -28,7 +28,7 @@ const ThemePropertiesEditor = () => {
 
   const selectedGroupStore = useSelectedGroupStore();
   const selectedGroup = wledOrchStateQuery.data?.groups?.filter(
-    (x) => x.id == selectedGroupStore.selectedGroup
+    (x) => x.id === selectedGroupStore.selectedGroup
   )[0];
 
   return (

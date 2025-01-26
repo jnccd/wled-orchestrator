@@ -12,7 +12,7 @@ const NavBar = () => {
 
   const { colorMode } = useColorMode();
   const color =
-    colorMode == "light" ? "rgba(255,255,255,.8)" : "rgba(24, 30, 41,.8)";
+    colorMode === "light" ? "rgba(255,255,255,.8)" : "rgba(24, 30, 41,.8)";
 
   return (
     <>
