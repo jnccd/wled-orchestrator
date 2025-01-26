@@ -23,13 +23,13 @@ public class LedTheme
     {
         var state = GetNewState(input);
         foreach (var modifier in Modifiers)
-            state = modifier.ModifyState(state);
+            state = modifier.ModifyState(state, input);
         return state;
     }
 }
 
 public abstract class LedThemeModifier
 {
-    public abstract LedGroupState? ModifyState(LedGroupState? input);
+    public abstract LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input);
 }
 

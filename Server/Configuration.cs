@@ -62,8 +62,15 @@ public static class Configuration
         var logger = app.Services.GetService(typeof(LoggerService)) as LoggerService;
         app.Use(async (context, next) =>
         {
-            logger?.WriteLine($"{context.Request.Method} {context.Request.Path}{context.Request.QueryString} - ORIGIN: {context.Request.Headers.Origin} - {{{GetRequestBody(context.Request).Result}}}");
-            await next.Invoke();
+            try
+            {
+                logger?.WriteLine($"{context.Request.Method} {context.Request.Path}{context.Request.QueryString} - ORIGIN: {context.Request.Headers.Origin} - {{{GetRequestBody(context.Request).Result}}}");
+                await next.Invoke();
+            }
+            catch (Exception e)
+            {
+                logger?.WriteLine(e);
+            }
         });
     }
     private static async Task<string> GetRequestBody(HttpRequest request)

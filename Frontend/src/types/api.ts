@@ -152,7 +152,15 @@ export interface paths {
 
 export interface components {
   schemas: {
-    Color: {
+    ColorHsv: {
+      /** Format: int32 */
+      h?: number;
+      /** Format: int32 */
+      s?: number;
+      /** Format: int32 */
+      v?: number;
+    };
+    ColorRgb: {
       /** Format: int32 */
       r?: number;
       /** Format: int32 */
@@ -183,24 +191,24 @@ export interface components {
             | components["schemas"]["LedThemeSingleColor"]
           )
         | null;
-      displayColor?: components["schemas"]["Color"];
+      displayColor?: components["schemas"]["ColorRgb"];
       isEdited?: boolean;
     };
     LedTheme: {
       typeName?: string | null;
       /** Format: uuid */
       id?: string;
-      modifiers?: components["schemas"]["LedThemeModifier"][] | null;
+      modifiers?: components["schemas"]["WakeupModifier"][] | null;
     };
     LedThemeDaylight: components["schemas"]["LedTheme"] & {
-      skyColor?: components["schemas"]["Color"];
-      sunColor?: components["schemas"]["Color"];
+      skyColor?: components["schemas"]["ColorHsv"];
+      sunColor?: components["schemas"]["ColorHsv"];
       /** Format: double */
       invertedSunSize?: number;
     };
     LedThemeModifier: { [key: string]: unknown };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
-      color?: components["schemas"]["Color"];
+      color?: components["schemas"]["ColorHsv"];
     };
     LedThemeTypes: {
       themes?: components["schemas"]["TypeInfo"][] | null;
@@ -215,6 +223,12 @@ export interface components {
       name?: string | null;
       type?: string | null;
       defaultValue?: unknown | null;
+    };
+    WakeupModifier: components["schemas"]["LedThemeModifier"] & {
+      /** Format: double */
+      fadeTimeMinutes?: number;
+      /** Format: date-span */
+      wakeUpDayTime?: string;
     };
   };
 }

@@ -2,9 +2,9 @@ using Server.Helper;
 
 namespace Server.Services.LedTheme.Themes;
 
-public class LedThemeSingleColor(Color? color = null) : LedTheme
+public class LedThemeSingleColor(ColorHsv? color = null) : LedTheme
 {
-    public Color Color { get; set; } = color ?? new(0, 255, 255);
+    public ColorHsv Color { get; set; } = color ?? new ColorRgb(0, 255, 255).RgbToHSV();
 
     public override LedGroupState? GetNewState(LedThemeInput input) => new([Color], 255);
 }
