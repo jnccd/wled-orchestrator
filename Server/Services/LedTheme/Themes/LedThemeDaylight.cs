@@ -1,3 +1,4 @@
+using Server.Endpoints;
 using Server.Helper;
 namespace Server.Services.LedTheme.Themes;
 
@@ -9,7 +10,10 @@ public class LedThemeDaylight : LedTheme
         return new(GetColors(dayTimePercent));
     }
 
+    [GenerateFrontendForm]
     public ColorHsv SkyColor { get; set; } = new ColorRgb(142, 215, 253).RgbToHSV();
+
+    [GenerateFrontendForm]
     public ColorHsv SunColor { get; set; } = new ColorRgb(252, 200, 20).RgbToHSV();
     readonly int ColorArrayResolution = 300;
     static readonly double sunRise = 0.3;
@@ -19,9 +23,10 @@ public class LedThemeDaylight : LedTheme
     static readonly double sunTop = sunRise + halfSunTime;
     static readonly double sunSet = sunRise + sunTime;
 
-    static readonly double dayLightFunMult = -Math.Log2(0.05) / (halfSunTime * halfSunTime);
+    static readonly double dayLightFunMult = -Math.Log2(0.4) / (halfSunTime * halfSunTime);
     readonly Func<double, double> DayLightFunction = (x) => Math.Pow(2, -((x - sunTop) * (x - sunTop)) * dayLightFunMult);
 
+    [GenerateFrontendForm]
     public double InvertedSunSize { get; set; } = 150;
 
     public ColorHsv[] GetColors(double curDayTimePercent)
