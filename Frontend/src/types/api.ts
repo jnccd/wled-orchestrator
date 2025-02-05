@@ -79,6 +79,59 @@ export interface paths {
       };
     };
   };
+  "/state/groups/{groupId}/theme/modifiers": {
+    post: {
+      parameters: {
+        path: {
+          groupId: string;
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["WakeupModifier"];
+          "text/json": components["schemas"]["WakeupModifier"];
+          "application/*+json": components["schemas"]["WakeupModifier"];
+        };
+      };
+    };
+  };
+  "/state/groups/{groupId}/theme/modifiers/{modifierId}": {
+    put: {
+      parameters: {
+        path: {
+          groupId: string;
+          modifierId: string;
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["WakeupModifier"];
+          "text/json": components["schemas"]["WakeupModifier"];
+          "application/*+json": components["schemas"]["WakeupModifier"];
+        };
+      };
+    };
+    delete: {
+      parameters: {
+        path: {
+          groupId: string;
+          modifierId: string;
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
   "/state/segments/{segmentId}/move": {
     put: {
       parameters: {
@@ -153,11 +206,11 @@ export interface paths {
 export interface components {
   schemas: {
     ColorHsv: {
-      /** Format: int32 */
+      /** Format: double */
       h?: number;
-      /** Format: int32 */
+      /** Format: double */
       s?: number;
-      /** Format: int32 */
+      /** Format: double */
       v?: number;
     };
     ColorRgb: {
@@ -206,7 +259,10 @@ export interface components {
       /** Format: double */
       invertedSunSize?: number;
     };
-    LedThemeModifier: { [key: string]: unknown };
+    LedThemeModifier: {
+      /** Format: uuid */
+      id?: string;
+    };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["ColorHsv"];
     };
@@ -222,7 +278,13 @@ export interface components {
     TypePropertyInfo: {
       name?: string | null;
       type?: string | null;
-      defaultValue?: unknown | null;
+      settings?: components["schemas"]["TypePropertySettings"];
+    };
+    TypePropertySettings: {
+      /** Format: double */
+      minValue?: number | null;
+      /** Format: double */
+      maxValue?: number | null;
     };
     WakeupModifier: components["schemas"]["LedThemeModifier"] & {
       /** Format: double */
