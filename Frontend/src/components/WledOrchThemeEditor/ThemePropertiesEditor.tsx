@@ -1,14 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getThemeTypes,
   getWledOrchState,
+  setGroupTheme,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
 import { Text, HStack, Heading } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
-import ThemePropertyColorEditor from "./ThemePropertyColorEditor";
-import ThemePropertyDoubleEditor from "./ThemePropertyDoubleEditor";
 import { readProperty } from "../../utils/untypedPropertyAccess";
+import ColorEditor from "../GenericEditors/ColorEditor";
+import DoubleEditor from "../GenericEditors/DoubleEditor";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -17,6 +18,7 @@ const firstCharToLowerCase = (
 
 const ThemePropertiesEditor = () => {
   // React Query setup
+  const queryClient = useQueryClient();
   const themeTypesQuery = useQuery({
     queryKey: [],
     queryFn: getThemeTypes,
@@ -24,6 +26,12 @@ const ThemePropertiesEditor = () => {
   const wledOrchStateQuery = useQuery({
     queryKey: [wledOrchStateQueryKey],
     queryFn: getWledOrchState,
+  });
+  const changeThemeMutation = useMutation({
+    mutationFn: setGroupTheme,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
+    },
   });
 
   const selectedGroupStore = useSelectedGroupStore();
@@ -51,15 +59,29 @@ const ThemePropertiesEditor = () => {
           let themePropertyUi: JSX.Element = <></>;
           if (themeTypeProperty.type === "ColorHsv") {
             themePropertyUi = (
-              <ThemePropertyColorEditor
+              <ColorEditor
+                editingObject={selectedGroup?.theme ?? {}}
                 propertyName={propertyName}
-              ></ThemePropertyColorEditor>
+                onChange={(object: any) =>
+                  changeThemeMutation.mutate({
+                    groupId: selectedGroup?.id ?? "",
+                    newTheme: object,
+                  })
+                }
+              ></ColorEditor>
             );
           } else if (themeTypeProperty.type === "Double") {
             themePropertyUi = (
-              <ThemePropertyDoubleEditor
+              <DoubleEditor
+                editingObject={selectedGroup?.theme ?? {}}
                 propertyName={propertyName}
-              ></ThemePropertyDoubleEditor>
+                onChange={(object: any) =>
+                  changeThemeMutation.mutate({
+                    groupId: selectedGroup?.id ?? "",
+                    newTheme: object,
+                  })
+                }
+              ></DoubleEditor>
             );
           } else {
             themePropertyUi = (
