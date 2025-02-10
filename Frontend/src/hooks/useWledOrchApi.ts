@@ -34,7 +34,7 @@ export const moveSegment = (args: {segmentId: string, targetGroupId: string | nu
 
 export const renameSegment = (args: {segmentId: string, newName: string}) => 
   apiClient
-    .put(`/state/segments/${args.segmentId}/rename`, null, {
+    .put(`/state/segments/${args.segmentId}/name`, null, {
       params: {
         newName: args.newName,
       },
@@ -43,7 +43,7 @@ export const renameSegment = (args: {segmentId: string, newName: string}) =>
 
 export const renameGroup = (args: {groupId: string, newName: string}) => 
   apiClient
-    .put(`/state/groups/${args.groupId}/rename`, null, {
+    .put(`/state/groups/${args.groupId}/name`, null, {
       params: {
         newName: args.newName,
       },
@@ -60,9 +60,18 @@ export const setGroupTheme = (args: {groupId: string, newTheme: any}) =>
     .put(`/state/groups/${args.groupId}/theme`, args.newTheme)
     .then((res) => res.data);
 
-export const addThemeModifier = (args: {groupId: string, newModifier: any}) => 
+export const addThemeModifier = (args: {groupId: string, newModifier: any, index: number | null}) => 
   apiClient
-    .post(`/state/groups/${args.groupId}/theme/modifiers`, args.newModifier)
+    .post(`/state/groups/${args.groupId}/theme/modifiers`, args.newModifier, { 
+      params: {
+        index: args.index
+      }
+    })
+    .then((res) => res.data);
+
+export const deleteThemeModifier = (args: {groupId: string, modifierId: string}) => 
+  apiClient
+    .delete(`/state/groups/${args.groupId}/theme/modifiers/${args.modifierId}`)
     .then((res) => res.data);
 
 export const setThemeModifier = (args: {groupId: string, modifierId: string, newModifier: any}) => 
