@@ -13,6 +13,6 @@ public class LedSegmentGroup(string Name, List<LedSegment> LedSegments, LedTheme
 
     public bool IsEdited => DisplayColor != null || Theme != null;
 
-    public static LedSegmentGroup DefaultGroup { get => new("Default", [], null, null); }
-    public static LedSegmentGroup NewGroup { get => new("New Group", [], null, null); }
+    public static LedSegmentGroup DefaultGroup => new("Default", [], null, null);
+    public static LedSegmentGroup NewGroup => new("New Group", [], null, null);
 }
