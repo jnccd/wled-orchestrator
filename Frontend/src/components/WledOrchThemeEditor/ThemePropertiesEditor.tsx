@@ -5,7 +5,7 @@ import {
   setGroupTheme,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
-import { Text, HStack, Heading } from "@chakra-ui/react";
+import { Text, HStack, Heading, Box } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import { readProperty } from "../../utils/untypedPropertyAccess";
 import ColorEditor from "../GenericEditors/ColorEditor";
@@ -40,7 +40,7 @@ const ThemePropertiesEditor = () => {
   )[0];
 
   return (
-    <>
+    <Box display="flex" flexDirection="column">
       <Heading padding={4} fontSize={30}>
         Theme Properties:
       </Heading>
@@ -101,7 +101,7 @@ const ThemePropertiesEditor = () => {
             </HStack>
           );
         })}
-    </>
+    </Box>
   );
 };
 

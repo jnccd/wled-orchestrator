@@ -5,6 +5,7 @@ export type LedSegmentGroups = components["schemas"]["DataStoreRoot"];
 export type LedSegmentGroup = components["schemas"]["LedSegmentGroup"];
 export type LedSegment = components["schemas"]["LedSegment"];
 export type LedTheme = components["schemas"]["LedTheme"];
+export type LedThemeModifier = components["schemas"]["LedThemeModifier"];
 
 export type LedThemeTypes = components["schemas"]["LedThemeTypes"];
 export type LedThemeTypeInfo = components["schemas"]["TypeInfo"];
@@ -57,6 +58,16 @@ export const deleteGroup = (args: {groupId: string}) =>
 export const setGroupTheme = (args: {groupId: string, newTheme: any}) => 
   apiClient
     .put(`/state/groups/${args.groupId}/theme`, args.newTheme)
+    .then((res) => res.data);
+
+export const addThemeModifier = (args: {groupId: string, newModifier: any}) => 
+  apiClient
+    .post(`/state/groups/${args.groupId}/theme/modifiers`, args.newModifier)
+    .then((res) => res.data);
+
+export const setThemeModifier = (args: {groupId: string, modifierId: string, newModifier: any}) => 
+  apiClient
+    .put(`/state/groups/${args.groupId}/theme/modifiers/${args.modifierId}`, args.newModifier)
     .then((res) => res.data);
       
 export const setActivated = (args: {newActivated: boolean}) => 

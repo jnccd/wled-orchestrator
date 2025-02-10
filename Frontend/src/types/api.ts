@@ -92,9 +92,18 @@ export interface paths {
       };
       requestBody: {
         content: {
-          "application/json": components["schemas"]["WakeupModifier"];
-          "text/json": components["schemas"]["WakeupModifier"];
-          "application/*+json": components["schemas"]["WakeupModifier"];
+          "application/json":
+            | components["schemas"]["LedThemeModifier"]
+            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["WakeupModifier"];
+          "text/json":
+            | components["schemas"]["LedThemeModifier"]
+            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["WakeupModifier"];
+          "application/*+json":
+            | components["schemas"]["LedThemeModifier"]
+            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["WakeupModifier"];
         };
       };
     };
@@ -113,9 +122,18 @@ export interface paths {
       };
       requestBody: {
         content: {
-          "application/json": components["schemas"]["WakeupModifier"];
-          "text/json": components["schemas"]["WakeupModifier"];
-          "application/*+json": components["schemas"]["WakeupModifier"];
+          "application/json":
+            | components["schemas"]["LedThemeModifier"]
+            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["WakeupModifier"];
+          "text/json":
+            | components["schemas"]["LedThemeModifier"]
+            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["WakeupModifier"];
+          "application/*+json":
+            | components["schemas"]["LedThemeModifier"]
+            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["WakeupModifier"];
         };
       };
     };
@@ -225,6 +243,7 @@ export interface components {
       activated?: boolean;
       groups?: components["schemas"]["LedSegmentGroup"][] | null;
     };
+    GenerateFrontendFormData: { [key: string]: unknown };
     LedSegment: {
       wledServerAddress?: string | null;
       /** Format: int32 */
@@ -248,10 +267,16 @@ export interface components {
       isEdited?: boolean;
     };
     LedTheme: {
-      typeName?: string | null;
       /** Format: uuid */
       id?: string;
-      modifiers?: components["schemas"]["WakeupModifier"][] | null;
+      typeName?: string | null;
+      modifiers?:
+        | (
+            | components["schemas"]["LedThemeModifier"]
+            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["WakeupModifier"]
+          )[]
+        | null;
     };
     LedThemeDaylight: components["schemas"]["LedTheme"] & {
       skyColor?: components["schemas"]["ColorHsv"];
@@ -262,6 +287,7 @@ export interface components {
     LedThemeModifier: {
       /** Format: uuid */
       id?: string;
+      typeName?: string | null;
     };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["ColorHsv"];
@@ -270,6 +296,7 @@ export interface components {
       themes?: components["schemas"]["TypeInfo"][] | null;
       modifiers?: components["schemas"]["TypeInfo"][] | null;
     };
+    NothingModifier: components["schemas"]["LedThemeModifier"];
     TypeInfo: {
       name?: string | null;
       typeDiscriminator?: string | null;
@@ -278,13 +305,7 @@ export interface components {
     TypePropertyInfo: {
       name?: string | null;
       type?: string | null;
-      settings?: components["schemas"]["TypePropertySettings"];
-    };
-    TypePropertySettings: {
-      /** Format: double */
-      minValue?: number | null;
-      /** Format: double */
-      maxValue?: number | null;
+      settings?: components["schemas"]["GenerateFrontendFormData"];
     };
     WakeupModifier: components["schemas"]["LedThemeModifier"] & {
       /** Format: double */
