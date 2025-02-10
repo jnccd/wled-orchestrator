@@ -40,15 +40,17 @@ const ThemePicker = () => {
     (x) => x.id === selectedGroupStore.selectedGroup
   )[0];
 
+  const fontSize = 20;
+
   return (
     <HStack justifyContent={"center"} flexWrap={"wrap"}>
-      <Text as="b" fontSize={20}>
+      <Text as="b" fontSize={fontSize}>
         The theme of group '{selectedGroup?.name}' is{" "}
       </Text>
       <Menu>
         <MenuButton
           as={Button}
-          fontSize={20}
+          fontSize={fontSize}
           paddingY={6}
           rightIcon={<ChevronDownIcon />}
         >
@@ -72,7 +74,7 @@ const ThemePicker = () => {
           ))}
         </MenuList>
       </Menu>
-      <Text as="b" fontSize={20}>
+      <Text as="b" fontSize={fontSize}>
         .
       </Text>
     </HStack>
