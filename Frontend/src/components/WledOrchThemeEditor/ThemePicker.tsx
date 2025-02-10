@@ -72,7 +72,9 @@ const ThemePicker = () => {
           ))}
         </MenuList>
       </Menu>
-      <Text as="b">.</Text>
+      <Text as="b" fontSize={20}>
+        .
+      </Text>
     </HStack>
   );
 };
