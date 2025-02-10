@@ -98,7 +98,7 @@ const Draggable = ({
     );
     if (filteredElems[0] !== thisInDocument) return;
 
-    thisInDocument.style.transition = "left 0.4s";
+    thisInDocument.style.transition = "top 0.4s, left 0.4s";
     thisInDocument.style.zIndex = "1";
     setPos(thisInDocument, 0, 0);
     if (onDragEnd && dragging) onDragEnd(thisInDocument, draggingLastPos);
