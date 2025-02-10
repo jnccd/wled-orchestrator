@@ -14,7 +14,7 @@ public class LedTheme
     public Guid Id { get; set; } = Guid.NewGuid();
     public string TypeName => GetType().Name.Replace("LedTheme", "");
 
-    public List<LedThemeModifier> Modifiers { get; } = [];
+    public List<LedThemeModifier> Modifiers { get; set; } = [];
 
     public virtual LedGroupState? GetNewState(LedThemeInput input) => null;
 
