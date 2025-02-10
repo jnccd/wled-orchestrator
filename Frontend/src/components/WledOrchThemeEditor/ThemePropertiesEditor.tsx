@@ -10,6 +10,7 @@ import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import { readProperty } from "../../utils/untypedPropertyAccess";
 import ColorEditor from "../GenericEditors/ColorEditor";
 import DoubleEditor from "../GenericEditors/DoubleEditor";
+import ThemePaneHeader from "./ThemePaneHeader";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -41,9 +42,7 @@ const ThemePropertiesEditor = () => {
 
   return (
     <Box display="flex" flexDirection="column">
-      <Heading padding={4} fontSize={30}>
-        Theme Properties:
-      </Heading>
+      <ThemePaneHeader>Properties</ThemePaneHeader>
       {themeTypesQuery.data?.themes
         ?.filter(
           (themeTypes) =>

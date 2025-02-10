@@ -23,6 +23,7 @@ import Draggable from "../Draggable";
 import { readProperty } from "../../utils/untypedPropertyAccess";
 import ColorEditor from "../GenericEditors/ColorEditor";
 import DoubleEditor from "../GenericEditors/DoubleEditor";
+import ThemePaneHeader from "./ThemePaneHeader";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -60,9 +61,7 @@ const ThemeModifiersEditor = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
-      <Heading padding={4} fontSize={30}>
-        Theme Modifiers:
-      </Heading>
+      <ThemePaneHeader>Modifiers</ThemePaneHeader>
       <Menu>
         <MenuButton
           as={Button}
