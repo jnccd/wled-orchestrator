@@ -38,6 +38,7 @@ const WledOrchThemeEditor = () => {
       ) : (
         <SimpleGrid
           columns={gridPageWidthThreshold ? 3 : 1}
+          justifyItems="center"
           gap={8}
           padding={6}
         >
