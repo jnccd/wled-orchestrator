@@ -131,7 +131,8 @@ public class GroupController : ControllerBase
     public IResult PostThemeModifier(
         [FromServices] DataStoreService dataStore,
         [Required] string groupId,
-        [Required] LedThemeModifier newModifier)
+        [Required] LedThemeModifier newModifier,
+        int? index)
     {
         lock (dataStore.lockject)
         {
@@ -141,7 +142,10 @@ public class GroupController : ControllerBase
             if (group.Theme == null)
                 return Results.NotFound("The groups theme is not set!");
 
-            group.Theme.Modifiers.Add(newModifier);
+            if (index == null)
+                group.Theme.Modifiers.Add(newModifier);
+            else
+                group.Theme.Modifiers.Insert(Math.Clamp(index.Value, 0, group.Theme.Modifiers.Count), newModifier);
 
             dataStore.Save();
         }

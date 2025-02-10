@@ -85,6 +85,9 @@ export interface paths {
         path: {
           groupId: string;
         };
+        query: {
+          index?: number;
+        };
       };
       responses: {
         /** OK */
