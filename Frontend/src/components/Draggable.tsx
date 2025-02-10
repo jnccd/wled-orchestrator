@@ -8,7 +8,7 @@ interface Props {
   className: string;
   children: ReactNode;
   backgroundColor?: string;
-  onDragEnd?: (elem: HTMLElement, mousePos: number[]) => void;
+  onDragEnd?: (dragged: HTMLElement, mousePos: number[]) => void;
 }
 
 const Draggable = ({

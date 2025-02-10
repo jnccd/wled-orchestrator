@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addThemeModifier,
+  deleteThemeModifier,
   getThemeTypes,
   getWledOrchState,
   setThemeModifier,
@@ -31,6 +32,8 @@ const firstCharToLowerCase = (
   !text || text === "" ? undefined : text[0]?.toLowerCase() + text.slice(1);
 
 const ThemeModifiersEditor = () => {
+  const draggableClassName = "theme-modifier-draggable";
+
   // React Query setup
   const queryClient = useQueryClient();
   const themeTypesQuery = useQuery({
@@ -43,6 +46,12 @@ const ThemeModifiersEditor = () => {
   });
   const addModifierMutation = useMutation({
     mutationFn: addThemeModifier,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
+    },
+  });
+  const deleteModifierMutation = useMutation({
+    mutationFn: deleteThemeModifier,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
     },
@@ -78,6 +87,7 @@ const ThemeModifiersEditor = () => {
                 addModifierMutation.mutate({
                   groupId: selectedGroup?.id ?? "",
                   newModifier: { $type: x.typeDiscriminator },
+                  index: null,
                 })
               }
             >
@@ -90,16 +100,35 @@ const ThemeModifiersEditor = () => {
         return (
           <Draggable
             id={modifier.id ?? ""}
-            className={`modifier${modifier.id}`}
+            className={`${draggableClassName} ${modifier.id}`}
+            onDragEnd={(_, mousePos) => {
+              const draggables =
+                document.getElementsByClassName(draggableClassName);
+              const draggablesOverMousePos = [...draggables]
+                .map((elem, index) => [elem, index])
+                .filter((x) => {
+                  const bounds = (x[0] as Element).getBoundingClientRect();
+                  return bounds.top + bounds.height / 2 < mousePos[1];
+                });
+              deleteModifierMutation.mutate({
+                groupId: selectedGroup?.id ?? "",
+                modifierId: modifier?.id ?? "",
+              });
+              addModifierMutation.mutate({
+                groupId: selectedGroup?.id ?? "",
+                newModifier: modifier,
+                index: draggablesOverMousePos.length,
+              });
+            }}
             children={
               <>
-                <Text>{modifier.typeName}</Text>
+                <Text key={modifier.id + "text"}>{modifier.typeName}</Text>
                 {themeTypesQuery.data?.modifiers
                   ?.filter(
                     (x) =>
                       x.typeDiscriminator === readProperty(modifier, "$type")
                   )[0]
-                  .properties?.map((modifierProperty) => {
+                  .properties?.map((modifierProperty, index) => {
                     const propertyName = firstCharToLowerCase(
                       modifierProperty.name
                     );
@@ -111,7 +140,8 @@ const ThemeModifiersEditor = () => {
                     if (modifierProperty.type === "ColorHsv") {
                       themePropertyUi = (
                         <ColorEditor
-                          editingObject={selectedGroup?.theme ?? {}}
+                          key={modifier.id + "editor" + index}
+                          editingObject={modifier}
                           propertyName={propertyName}
                           onChange={(object: any) =>
                             changeModifierMutation.mutate({
@@ -125,7 +155,8 @@ const ThemeModifiersEditor = () => {
                     } else if (modifierProperty.type === "Double") {
                       themePropertyUi = (
                         <DoubleEditor
-                          editingObject={selectedGroup?.theme ?? {}}
+                          key={modifier.id + "editor" + index}
+                          editingObject={modifier}
                           propertyName={propertyName}
                           onChange={(object: any) =>
                             changeModifierMutation.mutate({
