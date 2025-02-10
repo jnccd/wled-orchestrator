@@ -11,9 +11,8 @@ public class LedTheme
 {
     public LedTheme() { }
 
-    public string TypeName => GetType().Name.Replace("LedTheme", "");
-
     public Guid Id { get; set; } = Guid.NewGuid();
+    public string TypeName => GetType().Name.Replace("LedTheme", "");
 
     public List<LedThemeModifier> Modifiers { get; } = [];
 
@@ -27,11 +26,3 @@ public class LedTheme
         return state;
     }
 }
-
-[JsonDerivedType(typeof(WakeupModifier), typeDiscriminator: "wakeupModifier")]
-public abstract class LedThemeModifier
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public abstract LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input);
-}
-

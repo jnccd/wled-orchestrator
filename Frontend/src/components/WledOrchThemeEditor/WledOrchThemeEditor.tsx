@@ -10,6 +10,7 @@ import ThemePropertiesEditor from "./ThemePropertiesEditor";
 import { usePageWidthThreshold } from "../../hooks/usePageWidthThreshold";
 import { Image } from "@chakra-ui/react";
 import { useThemePreviewImageQuery } from "../../hooks/useThemePreviewImageQuery";
+import ThemeModifiersEditor from "./ThemeModifiersEditor";
 
 const WledOrchThemeEditor = () => {
   const gridPageWidthThreshold = usePageWidthThreshold(780);
@@ -36,13 +37,12 @@ const WledOrchThemeEditor = () => {
         <></>
       ) : (
         <SimpleGrid
-          columns={gridPageWidthThreshold ? 2 : 1}
+          columns={gridPageWidthThreshold ? 3 : 1}
           gap={8}
           padding={6}
         >
-          <Box display="flex" flexDirection="column">
-            <ThemePropertiesEditor></ThemePropertiesEditor>
-          </Box>
+          <ThemePropertiesEditor></ThemePropertiesEditor>
+          <ThemeModifiersEditor></ThemeModifiersEditor>
           <Box width={"300px"}>
             <Heading fontSize={30} padding={4}>
               Preview:

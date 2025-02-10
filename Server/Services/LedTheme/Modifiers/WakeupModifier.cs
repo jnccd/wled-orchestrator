@@ -1,9 +1,12 @@
+using Server.Endpoints;
 using Server.Helper;
 using Server.Services.LedTheme;
 
 class WakeupModifier : LedThemeModifier
 {
+    [GenerateFrontendForm]
     public double FadeTimeMinutes { get; set; } = 20;
+    [GenerateFrontendForm]
     public TimeSpan WakeUpDayTime { get; set; } = TimeSpan.FromHours(8);
 
     public override LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input)
