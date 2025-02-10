@@ -64,7 +64,11 @@ const ThemeModifiersEditor = () => {
         Theme Modifiers:
       </Heading>
       <Menu>
-        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+        <MenuButton
+          as={Button}
+          rightIcon={<ChevronDownIcon />}
+          marginBottom={5}
+        >
           Add Modifier
         </MenuButton>
         <MenuList>
