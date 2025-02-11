@@ -1,4 +1,4 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";

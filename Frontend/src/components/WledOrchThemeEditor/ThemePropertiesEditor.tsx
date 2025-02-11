@@ -5,7 +5,7 @@ import {
   setGroupTheme,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
-import { Text, HStack, Heading, Box } from "@chakra-ui/react";
+import { Text, HStack, Box } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import { readProperty } from "../../utils/untypedPropertyAccess";
 import ColorEditor from "../GenericEditors/ColorEditor";
