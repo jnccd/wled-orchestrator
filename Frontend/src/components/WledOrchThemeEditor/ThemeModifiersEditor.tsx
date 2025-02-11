@@ -9,7 +9,6 @@ import {
 } from "../../hooks/useWledOrchApi";
 import {
   Text,
-  Heading,
   Box,
   Menu,
   MenuButton,
