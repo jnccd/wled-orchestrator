@@ -70,13 +70,13 @@ public class LoggerService
             (logToConsole ? @"
                 <appender name=""ConsoleAppender"" type=""log4net.Appender.ConsoleAppender"">
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level%logger - %message%newline"" />
+                        <conversionPattern value=""%date %-5level%logger - %message%newline"" />
                     </layout>
                 </appender>" : "") +
             (logToDebug ? @"
                 <appender name=""DebugAppender"" type=""log4net.Appender.DebugAppender"">
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level%logger - %message%newline"" />
+                        <conversionPattern value=""%date %-5level%logger - %message%newline"" />
                     </layout>
                 </appender>" : "") +
             (logToFile ? @"
@@ -89,7 +89,7 @@ public class LoggerService
                     <maximumFileSize value=""500KB"" />
                     <staticLogFileName value=""true"" />
                     <layout type=""log4net.Layout.PatternLayout"">
-                        <conversionPattern value=""%date [%thread] %-5level%logger - %message%newline"" />
+                        <conversionPattern value=""%date %-5level%logger - %message%newline"" />
                     </layout>
                     <threshold value=""INFO""/>
                 </appender>" : "");
