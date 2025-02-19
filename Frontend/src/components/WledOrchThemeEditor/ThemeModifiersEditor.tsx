@@ -24,6 +24,7 @@ import { readProperty } from "../../utils/untypedPropertyAccess";
 import ColorEditor from "../GenericEditors/ColorEditor";
 import DoubleEditor from "../GenericEditors/DoubleEditor";
 import ThemePaneHeader from "./ThemePaneHeader";
+import TimeEditor from "../GenericEditors/TimeEditor";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -166,6 +167,21 @@ const ThemeModifiersEditor = () => {
                           }
                         ></DoubleEditor>
                       );
+                    } else if (modifierProperty.type === "TimeSpan") {
+                      themePropertyUi = (
+                        <TimeEditor
+                          key={modifier.id + "editor" + index}
+                          editingObject={modifier}
+                          propertyName={propertyName}
+                          onChange={(object: any) =>
+                            changeModifierMutation.mutate({
+                              groupId: selectedGroup?.id ?? "",
+                              modifierId: modifier.id ?? "",
+                              newModifier: object,
+                            })
+                          }
+                        ></TimeEditor>
+                      );
                     } else {
                       themePropertyUi = (
                         <Text>
@@ -178,7 +194,7 @@ const ThemeModifiersEditor = () => {
                       <HStack
                         width={"100%"}
                         key={propertyName}
-                        padding={5}
+                        paddingY={5}
                         justifyContent={"center"}
                       >
                         <Text padding={2}>{modifierProperty.name}:</Text>
