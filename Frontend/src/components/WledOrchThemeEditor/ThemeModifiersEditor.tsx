@@ -186,6 +186,19 @@ const ThemeModifiersEditor = () => {
                       </HStack>
                     );
                   })}
+                <Button
+                  colorScheme="red"
+                  marginTop={3}
+                  marginBottom={1}
+                  onClick={() => {
+                    deleteModifierMutation.mutate({
+                      groupId: selectedGroup.id ?? "",
+                      modifierId: modifier.id ?? "",
+                    });
+                  }}
+                >
+                  Delete
+                </Button>
               </>
             }
           ></Draggable>
