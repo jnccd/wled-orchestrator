@@ -194,7 +194,7 @@ const ThemeModifiersEditor = () => {
                       <HStack
                         width={"100%"}
                         key={propertyName}
-                        paddingY={5}
+                        paddingTop={3}
                         justifyContent={"center"}
                       >
                         <Text padding={2}>{modifierProperty.name}:</Text>
@@ -204,7 +204,7 @@ const ThemeModifiersEditor = () => {
                   })}
                 <Button
                   colorScheme="red"
-                  marginTop={3}
+                  marginTop={5}
                   marginBottom={1}
                   onClick={() => {
                     deleteModifierMutation.mutate({
