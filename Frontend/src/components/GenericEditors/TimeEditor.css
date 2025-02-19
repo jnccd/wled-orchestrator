@@ -1,0 +1,14 @@
+div.flex {
+    display: flex;
+    gap: 0.2em;
+    justify-content: center;
+    /* font-size: large; */
+}
+
+div.w-full {
+    width: 100%;
+}
+
+div.h-full {
+    height: 100%;
+}
