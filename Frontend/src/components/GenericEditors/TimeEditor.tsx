@@ -1,4 +1,4 @@
-import { Box, HStack, VStack } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 import { useState } from "react";
 import "./TimeEditor.css";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
