@@ -20,9 +20,9 @@ const TimeEditor = ({ editingObject, propertyName, onChange }: Props) => {
     <HStack
       p={2}
       px={3}
-      backgroundColor={"#3182CE"}
+      backgroundColor="#3182CE"
       borderRadius="10px"
-      cursor={"default"}
+      cursor="default"
     >
       <TimeInput
         fullWidth={true}
