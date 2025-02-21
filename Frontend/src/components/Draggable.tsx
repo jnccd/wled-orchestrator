@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, useColorMode } from "@chakra-ui/react";
 import React, { ReactNode, useState } from "react";
 
 const debuggingLogs = false;
@@ -16,8 +16,9 @@ const Draggable = ({
   children,
   onDragEnd,
   className,
-  backgroundColor = "#2C313D",
+  backgroundColor = "",
 }: Props) => {
+  const { colorMode } = useColorMode();
   const [dragging, setDragging] = useState(false);
   const [draggingStartPos, setDraggingStartPos] = useState([0, 0]);
   const [draggingLastPos, setDraggingLastPos] = useState([0, 0]);
@@ -134,7 +135,13 @@ const Draggable = ({
       className={className + " consumes-click wledServerButton"}
       margin={2}
       paddingX={4}
-      backgroundColor={backgroundColor}
+      backgroundColor={
+        backgroundColor !== ""
+          ? backgroundColor
+          : colorMode === "dark"
+          ? "#2C313D"
+          : "#f5f9fb"
+      }
       borderRadius={8}
       paddingY={2}
       cursor="move"

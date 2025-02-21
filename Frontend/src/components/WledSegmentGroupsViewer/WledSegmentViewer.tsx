@@ -55,7 +55,6 @@ const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
       key={segment.id}
       className={segment.id ?? "error-id-less-segment"}
       id={serverButtonIdPrefix + "-" + lastAddressByte}
-      backgroundColor={colorMode === "dark" ? "#2C313D" : "#f5f9fb"}
       onDragEnd={onDragEnd}
     >
       <HStack>
