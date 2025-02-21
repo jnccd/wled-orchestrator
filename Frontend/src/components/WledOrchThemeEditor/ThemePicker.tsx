@@ -40,7 +40,7 @@ const ThemePicker = () => {
     (x) => x.id === selectedGroupStore.selectedGroup
   )[0];
 
-  const fontSize = 20;
+  const fontSize = "1.2rem";
 
   return (
     <HStack justifyContent={"center"} flexWrap={"wrap"}>

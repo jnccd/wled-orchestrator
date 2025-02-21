@@ -122,7 +122,9 @@ const ThemeModifiersEditor = () => {
             }}
             children={
               <>
-                <Text key={modifier.id + "text"}>{modifier.typeName}</Text>
+                <Text key={modifier.id + "text"} as={"b"}>
+                  {modifier.typeName} Modifier
+                </Text>
                 {themeTypesQuery.data?.modifiers
                   ?.filter(
                     (x) =>
@@ -205,7 +207,7 @@ const ThemeModifiersEditor = () => {
                 <Button
                   colorScheme="red"
                   marginTop={5}
-                  marginBottom={1}
+                  marginBottom={2}
                   onClick={() => {
                     deleteModifierMutation.mutate({
                       groupId: selectedGroup.id ?? "",
