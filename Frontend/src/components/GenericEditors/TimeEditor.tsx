@@ -21,7 +21,7 @@ const TimeEditor = ({ editingObject, propertyName, onChange }: Props) => {
       p={2}
       px={3}
       backgroundColor="#3182CE"
-      borderRadius="10px"
+      borderRadius="var(--chakra-radii-md)"
       cursor="default"
     >
       <TimeInput

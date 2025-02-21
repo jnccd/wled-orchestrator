@@ -131,6 +131,7 @@ const Draggable = ({
   return (
     <Box
       id={id}
+      key={id}
       position="relative"
       className={className + " consumes-click wledServerButton"}
       margin={2}
@@ -139,9 +140,12 @@ const Draggable = ({
         backgroundColor !== ""
           ? backgroundColor
           : colorMode === "dark"
-          ? "#2C313D"
+          ? "#293042a3"
           : "#f5f9fb"
       }
+      backdropFilter={"auto"}
+      backdropBlur={"4px"}
+      boxShadow={"rgb(49 110 140 / 64%) 0px 0px 6px -2px"}
       borderRadius={8}
       paddingY={2}
       cursor="move"
