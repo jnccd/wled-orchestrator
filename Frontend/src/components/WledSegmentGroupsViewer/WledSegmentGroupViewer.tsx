@@ -17,12 +17,14 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
     <Box
       key={g.id}
       className={ledSegmentClassName + " " + (g.id ?? "error-id-less-group")}
-      borderWidth={selectedGroupStore.selectedGroup === g.id ? "3px" : "1px"}
+      outline={`solid ${
+        selectedGroupStore.selectedGroup === g.id ? "3px" : "1px"
+      } #3F444E`}
       borderRadius="lg"
-      margin={2}
+      margin="5px"
       padding="2px"
       width={"fit-content"}
-      transition="border .1s"
+      transition="outline .1s"
       onClick={() => {
         if (g.id) selectedGroupStore.selectNew(g.id);
       }}

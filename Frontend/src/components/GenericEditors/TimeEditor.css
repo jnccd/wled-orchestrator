@@ -13,6 +13,10 @@ div.h-full {
     height: 100%;
 }
 
+div.font-normal {
+    color: white;
+}
+
 div[data-slot="inner-wrapper"] {
     cursor: pointer;
 }
