@@ -115,9 +115,9 @@ public class GroupController : ControllerBase
                     for (int x = 0; x < pixelRow.Length; x++)
                     {
                         ref Rgba32 pixel = ref pixelRow[x];
-                        pixel.R = (byte)colors[x].R;
-                        pixel.G = (byte)colors[x].G;
-                        pixel.B = (byte)colors[x].B;
+                        pixel.R = colors[x].R;
+                        pixel.G = colors[x].G;
+                        pixel.B = colors[x].B;
                         pixel.A = 255;
                     }
                 }
