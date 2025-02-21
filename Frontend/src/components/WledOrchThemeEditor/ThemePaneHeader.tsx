@@ -7,7 +7,7 @@ interface Props {
 
 const ThemePaneHeader = ({ children }: Props) => {
   return (
-    <Heading fontSize={24} padding={4} paddingBottom={6}>
+    <Heading fontSize={"1.5rem"} padding={4} paddingBottom={6}>
       {children}
     </Heading>
   );

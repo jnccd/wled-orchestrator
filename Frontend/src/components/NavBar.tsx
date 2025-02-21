@@ -38,7 +38,7 @@ const NavBar = () => {
           maxWidth={maxPageWidthStore.maxPageWidth}
           justifyContent={"space-between"}
         >
-          <Text fontSize={textPageWidthThreshold ? 20 : 16}>
+          <Text fontSize={textPageWidthThreshold ? "1.333rem" : "1.067rem"}>
             Wled Orchestrator
           </Text>
           <HStack gap={5}>

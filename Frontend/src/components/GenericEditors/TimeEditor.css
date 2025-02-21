@@ -12,3 +12,7 @@ div.w-full {
 div.h-full {
     height: 100%;
 }
+
+div[data-slot="inner-wrapper"] {
+    cursor: pointer;
+}
