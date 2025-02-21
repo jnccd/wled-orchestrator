@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Server.Services.LedTheme;
 
-[JsonDerivedType(typeof(NothingModifier), typeDiscriminator: "nothingModifier")]
+[JsonDerivedType(typeof(RotateColorsModifier), typeDiscriminator: "rotateColorsModifier")]
 [JsonDerivedType(typeof(WakeupModifier), typeDiscriminator: "wakeupModifier")]
 public class LedThemeModifier
 {
