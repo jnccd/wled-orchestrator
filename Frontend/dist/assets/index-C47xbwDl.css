@@ -1,0 +1,1 @@
+#root{text-align:center}div.flex{display:flex;gap:.2em;justify-content:center}div.w-full{width:100%}div.h-full{height:100%}div[data-slot=inner-wrapper]{cursor:pointer}
