@@ -40,8 +40,9 @@ const ThemePicker = () => {
     (x) => x.id === selectedGroupStore.selectedGroup
   )[0];
 
-  const fontSize = "1.2rem";
+  if (!wledOrchStateQuery.isSuccess) return <></>;
 
+  const fontSize = "1.2rem";
   return (
     <HStack justifyContent={"center"} flexWrap={"wrap"}>
       <Text as="b" fontSize={fontSize}>
