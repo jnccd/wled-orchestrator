@@ -120,106 +120,102 @@ const ThemeModifiersEditor = () => {
                 index: draggablesOverMousePos.length,
               });
             }}
-            children={
-              <>
-                <Text key={modifier.id + "text"} as={"b"}>
-                  {modifier.typeName} Modifier
-                </Text>
-                {themeTypesQuery.data?.modifiers
-                  ?.filter(
-                    (x) =>
-                      x.typeDiscriminator === readProperty(modifier, "$type")
-                  )[0]
-                  .properties?.map((modifierProperty, index) => {
-                    const propertyName = firstCharToLowerCase(
-                      modifierProperty.name
-                    );
-                    if (!propertyName) {
-                      return <Text>Invalid property name!</Text>;
-                    }
+          >
+            <Text key={modifier.id + "text"} as={"b"}>
+              {modifier.typeName} Modifier
+            </Text>
+            {themeTypesQuery.data?.modifiers
+              ?.filter(
+                (x) => x.typeDiscriminator === readProperty(modifier, "$type")
+              )[0]
+              .properties?.map((modifierProperty, index) => {
+                const propertyName = firstCharToLowerCase(
+                  modifierProperty.name
+                );
+                if (!propertyName) {
+                  return <Text>Invalid property name!</Text>;
+                }
 
-                    let themePropertyUi: JSX.Element = <></>;
-                    if (modifierProperty.type === "ColorHsv") {
-                      themePropertyUi = (
-                        <ColorEditor
-                          key={modifier.id + "editor" + index}
-                          editingObject={modifier}
-                          propertyName={propertyName}
-                          onChange={(object: any) =>
-                            changeModifierMutation.mutate({
-                              groupId: selectedGroup?.id ?? "",
-                              modifierId: modifier.id ?? "",
-                              newModifier: object,
-                            })
-                          }
-                        ></ColorEditor>
-                      );
-                    } else if (modifierProperty.type === "Double") {
-                      themePropertyUi = (
-                        <DoubleEditor
-                          key={modifier.id + "editor" + index}
-                          editingObject={modifier}
-                          propertyName={propertyName}
-                          onChange={(object: any) =>
-                            changeModifierMutation.mutate({
-                              groupId: selectedGroup?.id ?? "",
-                              modifierId: modifier.id ?? "",
-                              newModifier: object,
-                            })
-                          }
-                        ></DoubleEditor>
-                      );
-                    } else if (modifierProperty.type === "TimeSpan") {
-                      themePropertyUi = (
-                        <TimeEditor
-                          key={modifier.id + "editor" + index}
-                          editingObject={modifier}
-                          propertyName={propertyName}
-                          onChange={(object: any) =>
-                            changeModifierMutation.mutate({
-                              groupId: selectedGroup?.id ?? "",
-                              modifierId: modifier.id ?? "",
-                              newModifier: object,
-                            })
-                          }
-                        ></TimeEditor>
-                      );
-                    } else {
-                      themePropertyUi = (
-                        <Text>
-                          {modifierProperty.type} input field is undefined!
-                        </Text>
-                      );
-                    }
+                let themePropertyUi: JSX.Element = <></>;
+                if (modifierProperty.type === "ColorHsv") {
+                  themePropertyUi = (
+                    <ColorEditor
+                      key={modifier.id + "editor" + index}
+                      editingObject={modifier}
+                      propertyName={propertyName}
+                      onChange={(object: any) =>
+                        changeModifierMutation.mutate({
+                          groupId: selectedGroup?.id ?? "",
+                          modifierId: modifier.id ?? "",
+                          newModifier: object,
+                        })
+                      }
+                    ></ColorEditor>
+                  );
+                } else if (modifierProperty.type === "Double") {
+                  themePropertyUi = (
+                    <DoubleEditor
+                      key={modifier.id + "editor" + index}
+                      editingObject={modifier}
+                      propertyName={propertyName}
+                      onChange={(object: any) =>
+                        changeModifierMutation.mutate({
+                          groupId: selectedGroup?.id ?? "",
+                          modifierId: modifier.id ?? "",
+                          newModifier: object,
+                        })
+                      }
+                    ></DoubleEditor>
+                  );
+                } else if (modifierProperty.type === "TimeSpan") {
+                  themePropertyUi = (
+                    <TimeEditor
+                      key={modifier.id + "editor" + index}
+                      editingObject={modifier}
+                      propertyName={propertyName}
+                      onChange={(object: any) =>
+                        changeModifierMutation.mutate({
+                          groupId: selectedGroup?.id ?? "",
+                          modifierId: modifier.id ?? "",
+                          newModifier: object,
+                        })
+                      }
+                    ></TimeEditor>
+                  );
+                } else {
+                  themePropertyUi = (
+                    <Text>
+                      {modifierProperty.type} input field is undefined!
+                    </Text>
+                  );
+                }
 
-                    return (
-                      <HStack
-                        width={"100%"}
-                        key={propertyName}
-                        paddingTop={3}
-                        justifyContent={"center"}
-                      >
-                        <Text padding={2}>{modifierProperty.name}:</Text>
-                        {themePropertyUi}
-                      </HStack>
-                    );
-                  })}
-                <Button
-                  colorScheme="red"
-                  marginTop={5}
-                  marginBottom={2}
-                  onClick={() => {
-                    deleteModifierMutation.mutate({
-                      groupId: selectedGroup.id ?? "",
-                      modifierId: modifier.id ?? "",
-                    });
-                  }}
-                >
-                  Delete
-                </Button>
-              </>
-            }
-          ></Draggable>
+                return (
+                  <HStack
+                    width={"100%"}
+                    key={propertyName}
+                    paddingTop={3}
+                    justifyContent={"center"}
+                  >
+                    <Text padding={2}>{modifierProperty.name}:</Text>
+                    {themePropertyUi}
+                  </HStack>
+                );
+              })}
+            <Button
+              colorScheme="red"
+              marginTop={5}
+              marginBottom={2}
+              onClick={() => {
+                deleteModifierMutation.mutate({
+                  groupId: selectedGroup.id ?? "",
+                  modifierId: modifier.id ?? "",
+                });
+              }}
+            >
+              Delete
+            </Button>
+          </Draggable>
         );
       })}
     </Box>
