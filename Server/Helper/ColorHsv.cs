@@ -6,7 +6,23 @@ namespace Server.Helper;
 /// <param name="H">Hue in [0, 360]</param>
 /// <param name="S">Saturation in [0, 100]</param>
 /// <param name="V">Value/Brightness in [0, 100]</param>
-public record ColorHsv(double H, double S, double V);
+public class ColorHsv(double H, double S, double V)
+{
+    /// <summary>
+    /// Hue in [0, 360]
+    /// </summary>
+    public double H { get; set; } = H;
+
+    /// <summary>
+    /// Saturation in [0, 100]
+    /// </summary>
+    public double S { get; set; } = S;
+
+    /// <summary>
+    /// Value/Brightness in [0, 100]
+    /// </summary>
+    public double V { get; set; } = V;
+}
 
 public static class ColorHsvExtensions
 {
