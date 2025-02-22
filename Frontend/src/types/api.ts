@@ -97,15 +97,15 @@ export interface paths {
         content: {
           "application/json":
             | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["RotateColorsModifier"]
             | components["schemas"]["WakeupModifier"];
           "text/json":
             | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["RotateColorsModifier"]
             | components["schemas"]["WakeupModifier"];
           "application/*+json":
             | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["RotateColorsModifier"]
             | components["schemas"]["WakeupModifier"];
         };
       };
@@ -127,15 +127,15 @@ export interface paths {
         content: {
           "application/json":
             | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["RotateColorsModifier"]
             | components["schemas"]["WakeupModifier"];
           "text/json":
             | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["RotateColorsModifier"]
             | components["schemas"]["WakeupModifier"];
           "application/*+json":
             | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["RotateColorsModifier"]
             | components["schemas"]["WakeupModifier"];
         };
       };
@@ -276,7 +276,7 @@ export interface components {
       modifiers?:
         | (
             | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["NothingModifier"]
+            | components["schemas"]["RotateColorsModifier"]
             | components["schemas"]["WakeupModifier"]
           )[]
         | null;
@@ -299,7 +299,10 @@ export interface components {
       themes?: components["schemas"]["TypeInfo"][] | null;
       modifiers?: components["schemas"]["TypeInfo"][] | null;
     };
-    NothingModifier: components["schemas"]["LedThemeModifier"];
+    RotateColorsModifier: components["schemas"]["LedThemeModifier"] & {
+      /** Format: double */
+      amount?: number;
+    };
     TypeInfo: {
       name?: string | null;
       typeDiscriminator?: string | null;
@@ -307,10 +310,13 @@ export interface components {
     };
     TypePropertyInfo: {
       name?: string | null;
+      displayName?: string | null;
       type?: string | null;
       settings?: components["schemas"]["GenerateFrontendFormData"];
     };
     WakeupModifier: components["schemas"]["LedThemeModifier"] & {
+      /** Format: double */
+      sleepTimeMinutes?: number;
       /** Format: double */
       fadeTimeMinutes?: number;
       /** Format: date-span */
