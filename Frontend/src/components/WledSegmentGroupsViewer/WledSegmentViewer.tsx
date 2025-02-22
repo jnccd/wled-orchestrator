@@ -1,4 +1,4 @@
-import { HStack, Text, useColorMode } from "@chakra-ui/react";
+import { HStack, Text } from "@chakra-ui/react";
 import {
   moveSegment,
   wledOrchStateQueryKey,
@@ -17,8 +17,6 @@ interface Props {
 }
 
 const WledSegmentViewer = ({ segment, ledSegmentClassName }: Props) => {
-  const { colorMode } = useColorMode();
-
   // React Query setup
   const queryClient = useQueryClient();
   const wledOrchStateQuery = useQuery({
