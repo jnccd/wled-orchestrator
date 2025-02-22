@@ -25,7 +25,7 @@ const Draggable = ({
   const [dragArea, setDragArea] = useState([0, document.body.clientWidth]);
   const dragY = true;
 
-  const dragMouseDown = (e: React.MouseEvent) => {
+  const dragPointerDown = (e: React.PointerEvent) => {
     if (debuggingLogs) console.log("dragMouseDown");
     if (e.button !== 0) return;
 
@@ -41,7 +41,17 @@ const Draggable = ({
     );
     if (filteredElems[0] !== thisInDocument) return;
 
-    e.preventDefault();
+    // Otherwise the drag becomes a scroll
+    elemsAtPoint.forEach((element) => {
+      (element as HTMLElement).style.setProperty("touch-action", "none");
+    });
+    e.stopPropagation();
+
+    dragDown(e.clientX, e.clientY, thisInDocument);
+  };
+
+  const dragDown = (x: number, y: number, thisInDocument: HTMLElement) => {
+    if (debuggingLogs) console.log("dragDown");
 
     const parentBounds =
       thisInDocument.parentElement?.parentElement?.parentElement?.getBoundingClientRect(); // TODO: Add prop for number of jumps to bounds giving parent elem
@@ -50,8 +60,8 @@ const Draggable = ({
     }
 
     setDraggingStartPos([
-      e.clientX - (parseInt(thisInDocument.style.left.split("p")[0]) || 0),
-      e.clientY - (parseInt(thisInDocument.style.top.split("p")[0]) || 0),
+      x - (parseInt(thisInDocument.style.left.split("p")[0]) || 0),
+      y - (parseInt(thisInDocument.style.top.split("p")[0]) || 0),
     ]);
     thisInDocument.style.transition = "";
     thisInDocument.style.zIndex = "10";
@@ -59,30 +69,32 @@ const Draggable = ({
     setDragging(true);
   };
 
-  const dragMouseMove = (e: MouseEvent) => {
+  const dragPointerMove = (e: PointerEvent) => {
     if (debuggingLogs) console.log("dragMouseMove, " + dragging + id);
     if (!dragging) {
       return;
     }
 
-    e.preventDefault();
+    e.stopPropagation();
+
+    dragMove(e.clientX, e.clientY);
+  };
+
+  const dragMove = (x: number, y: number) => {
+    if (debuggingLogs) console.log("dragMove, " + dragging + id);
 
     let thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
-      if (debuggingLogs) console.log("dragMouseMove, cant find thisInDocument");
+      if (debuggingLogs) console.log("dragMove, cant find thisInDocument");
       return;
     }
 
-    setPos(
-      thisInDocument,
-      e.clientX - draggingStartPos[0],
-      e.clientY - draggingStartPos[1]
-    );
+    setPos(thisInDocument, x - draggingStartPos[0], y - draggingStartPos[1]);
 
-    setDraggingLastPos([e.clientX, e.clientY]);
+    setDraggingLastPos([x, y]);
   };
 
-  const dragMouseUp = () => {
+  const dragUp = () => {
     if (debuggingLogs) console.log("dragMouseUp");
     let thisInDocument = document.getElementById(id);
     if (thisInDocument === null) {
@@ -98,6 +110,10 @@ const Draggable = ({
       x.classList.contains("consumes-click")
     );
     if (filteredElems[0] !== thisInDocument) return;
+
+    elemsAtPoint.forEach((element) => {
+      (element as HTMLElement).style.removeProperty("touch-action");
+    });
 
     thisInDocument.style.transition = "top 0.4s, left 0.4s";
     thisInDocument.style.zIndex = "1";
@@ -125,8 +141,8 @@ const Draggable = ({
     }
   };
 
-  document.onmousemove = dragMouseMove;
-  document.onmouseup = dragMouseUp;
+  document.onpointermove = dragPointerMove;
+  document.onpointerup = dragUp;
 
   return (
     <Box
@@ -149,7 +165,7 @@ const Draggable = ({
       borderRadius={8}
       paddingY={2}
       cursor="move"
-      onMouseDown={dragMouseDown} // TODO: Add touch event
+      onPointerDown={dragPointerDown}
     >
       {children}
     </Box>
