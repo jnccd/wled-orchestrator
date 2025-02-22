@@ -1,4 +1,4 @@
-import { Box, HStack, Text } from "@chakra-ui/react";
+import { Box, HStack, Text, useColorMode } from "@chakra-ui/react";
 import WledSegmentViewer from "./WledSegmentViewer";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import { LedSegmentGroup } from "../../hooks/useWledOrchApi";
@@ -11,6 +11,7 @@ interface Props {
 }
 
 const WledSegmentGroupViewer = ({ group: g }: Props) => {
+  const { colorMode } = useColorMode();
   const selectedGroupStore = useSelectedGroupStore();
 
   return (
@@ -19,7 +20,7 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
       className={ledSegmentClassName + " " + (g.id ?? "error-id-less-group")}
       outline={`solid ${
         selectedGroupStore.selectedGroup === g.id ? "3px" : "1px"
-      } #3F444E`}
+      } ${colorMode === "dark" ? "#3F444E" : "#E2E8F0"}`}
       borderRadius="lg"
       margin="5px"
       padding="2px"
