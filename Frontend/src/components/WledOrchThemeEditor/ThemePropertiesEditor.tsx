@@ -97,7 +97,7 @@ const ThemePropertiesEditor = () => {
               paddingBottom={10}
               justifyContent={"center"}
             >
-              <Text padding={2}>{themeTypeProperty.name}:</Text>
+              <Text padding={2}>{themeTypeProperty.displayName}:</Text>
               {themePropertyUi}
             </HStack>
           );

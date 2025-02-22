@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
 using Server.Services.LedTheme;
 
@@ -7,7 +8,7 @@ namespace Server.Endpoints;
 
 record LedThemeTypes(IEnumerable<TypeInfo> Themes, IEnumerable<TypeInfo> Modifiers);
 record TypeInfo(string Name, string? TypeDiscriminator, IEnumerable<TypePropertyInfo> Properties);
-record TypePropertyInfo(string Name, string Type, GenerateFrontendFormData Settings);
+record TypePropertyInfo(string Name, string DisplayName, string Type, GenerateFrontendFormData Settings);
 class GenerateFrontendFormData(GenerateFrontendFormAttribute settings)
 {
     public readonly double MinValue = settings.MinValue;
@@ -25,6 +26,15 @@ public static class RegisterTypeInfoEndpoints
 {
     public static void RegisterLedThemeTypeInfoEndpoints(this WebApplication app)
     {
+        string propertyNameModifier(string name)
+        {
+            var nameBuilder = new StringBuilder(name);
+            for (int i = 1; i < nameBuilder.Length; i++)
+                if (char.IsUpper(nameBuilder[i]))
+                    nameBuilder.Insert(i++, " ");
+            return nameBuilder.ToString();
+        }
+
         Type ledThemeType = typeof(LedTheme);
         var ledThemeTypeAttrs = ledThemeType.GetCustomAttributes<JsonDerivedTypeAttribute>();
         var themeTypesInfo = ledThemeTypeAttrs
@@ -34,7 +44,7 @@ public static class RegisterTypeInfoEndpoints
                 typeAttr.DerivedType.GetProperties()
                     .Where(prop => prop.DeclaringType == typeAttr.DerivedType // Not from parent classes
                         && prop.GetCustomAttribute<GenerateFrontendFormAttribute>() != null)
-                    .Select(prop => new TypePropertyInfo(prop.Name, prop.PropertyType.Name, new GenerateFrontendFormData(prop.GetCustomAttribute<GenerateFrontendFormAttribute>() ?? new GenerateFrontendFormAttribute())))));
+                    .Select(prop => new TypePropertyInfo(prop.Name, propertyNameModifier(prop.Name), prop.PropertyType.Name, new GenerateFrontendFormData(prop.GetCustomAttribute<GenerateFrontendFormAttribute>() ?? new GenerateFrontendFormAttribute())))));
 
         Type ledThemeModifierType = typeof(LedThemeModifier);
         var ledThemeModifierTypeAttrs = ledThemeModifierType.GetCustomAttributes<JsonDerivedTypeAttribute>();
@@ -45,7 +55,7 @@ public static class RegisterTypeInfoEndpoints
                 typeAttr.DerivedType.GetProperties()
                     .Where(prop => prop.DeclaringType == typeAttr.DerivedType // Not from parent classes
                         && prop.GetCustomAttribute<GenerateFrontendFormAttribute>() != null)
-                    .Select(prop => new TypePropertyInfo(prop.Name, prop.PropertyType.Name, new GenerateFrontendFormData(prop.GetCustomAttribute<GenerateFrontendFormAttribute>() ?? new GenerateFrontendFormAttribute())))));
+                    .Select(prop => new TypePropertyInfo(prop.Name, propertyNameModifier(prop.Name), prop.PropertyType.Name, new GenerateFrontendFormData(prop.GetCustomAttribute<GenerateFrontendFormAttribute>() ?? new GenerateFrontendFormAttribute())))));
 
         app.MapGet("/theme-types", () => new LedThemeTypes(themeTypesInfo, themeModifierTypesInfo));
     }
