@@ -143,6 +143,7 @@ const ThemeModifiersEditor = () => {
                       key={modifier.id + "editor" + index}
                       editingObject={modifier}
                       propertyName={propertyName}
+                      settings={modifierProperty.settings ?? {}}
                       onChange={(object: any) =>
                         changeModifierMutation.mutate({
                           groupId: selectedGroup?.id ?? "",
@@ -158,6 +159,7 @@ const ThemeModifiersEditor = () => {
                       key={modifier.id + "editor" + index}
                       editingObject={modifier}
                       propertyName={propertyName}
+                      settings={modifierProperty.settings ?? {}}
                       onChange={(object: any) =>
                         changeModifierMutation.mutate({
                           groupId: selectedGroup?.id ?? "",
@@ -173,6 +175,7 @@ const ThemeModifiersEditor = () => {
                       key={modifier.id + "editor" + index}
                       editingObject={modifier}
                       propertyName={propertyName}
+                      settings={modifierProperty.settings ?? {}}
                       onChange={(object: any) =>
                         changeModifierMutation.mutate({
                           groupId: selectedGroup?.id ?? "",

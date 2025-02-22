@@ -246,7 +246,13 @@ export interface components {
       activated?: boolean;
       groups?: components["schemas"]["LedSegmentGroup"][] | null;
     };
-    GenerateFrontendFormData: { [key: string]: unknown };
+    GenerateFrontendFormData: {
+      inputType?: string | null;
+      /** Format: double */
+      minValue?: number;
+      /** Format: double */
+      maxValue?: number;
+    };
     LedSegment: {
       wledServerAddress?: string | null;
       /** Format: int32 */
@@ -315,8 +321,8 @@ export interface components {
       settings?: components["schemas"]["GenerateFrontendFormData"];
     };
     WakeupModifier: components["schemas"]["LedThemeModifier"] & {
-      /** Format: double */
-      sleepTimeMinutes?: number;
+      /** Format: date-span */
+      sleepTime?: string;
       /** Format: double */
       fadeTimeMinutes?: number;
       /** Format: date-span */

@@ -4,14 +4,21 @@ import "./TimeEditor.css";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
 import { TimeInput } from "@heroui/react";
 import { parseTime } from "@internationalized/date";
+import { GenerateFrontendFormData } from "../../hooks/useWledOrchApi";
 
 interface Props {
   editingObject: object;
   propertyName: string;
+  settings: GenerateFrontendFormData;
   onChange: (newEditingObject: object) => void;
 }
 
-const TimeEditor = ({ editingObject, propertyName, onChange }: Props) => {
+const TimeEditor = ({
+  editingObject,
+  propertyName,
+  settings,
+  onChange,
+}: Props) => {
   const [refreshBool, refresh] = useState(false);
 
   const propertyValue = readProperty(editingObject, propertyName);

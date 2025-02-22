@@ -1,14 +1,21 @@
 import { Colorful, ColorResult } from "@uiw/react-color";
 import { useState } from "react";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
+import { GenerateFrontendFormData } from "../../hooks/useWledOrchApi";
 
 interface Props {
   editingObject: object;
   propertyName: string;
+  settings: GenerateFrontendFormData;
   onChange: (newEditingObject: object) => void;
 }
 
-const ColorEditor = ({ editingObject, propertyName, onChange }: Props) => {
+const ColorEditor = ({
+  editingObject,
+  propertyName,
+  settings,
+  onChange,
+}: Props) => {
   const [refreshBool, refresh] = useState(false);
 
   const propertyValue = readProperty(editingObject, propertyName);

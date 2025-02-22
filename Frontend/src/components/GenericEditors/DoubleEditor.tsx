@@ -8,14 +8,21 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
+import { GenerateFrontendFormData } from "../../hooks/useWledOrchApi";
 
 interface Props {
   editingObject: object;
   propertyName: string;
+  settings: GenerateFrontendFormData;
   onChange: (newEditingObject: object) => void;
 }
 
-const DoubleEditor = ({ editingObject, propertyName, onChange }: Props) => {
+const DoubleEditor = ({
+  editingObject,
+  propertyName,
+  settings,
+  onChange,
+}: Props) => {
   const [refreshBool, refresh] = useState(false);
 
   const propertyValue = readProperty(editingObject, propertyName);
@@ -30,8 +37,8 @@ const DoubleEditor = ({ editingObject, propertyName, onChange }: Props) => {
         }}
         onChangeEnd={() => onChange(editingObject)}
         defaultValue={propertyValue}
-        min={0}
-        max={300}
+        min={settings?.minValue}
+        max={settings?.maxValue}
       >
         <SliderMark
           value={propertyValue}
