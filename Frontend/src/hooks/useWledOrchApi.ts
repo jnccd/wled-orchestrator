@@ -10,6 +10,7 @@ export type LedThemeModifier = components["schemas"]["LedThemeModifier"];
 export type LedThemeTypes = components["schemas"]["LedThemeTypes"];
 export type LedThemeTypeInfo = components["schemas"]["TypeInfo"];
 export type LedThemeTypePropertyInfo = components["schemas"]["TypePropertyInfo"];
+export type GenerateFrontendFormData = components["schemas"]["GenerateFrontendFormData"];
 
 export const baseUrl = import.meta.env.VITE_DEV_BACKEND_ADDRESS ? import.meta.env.VITE_DEV_BACKEND_ADDRESS : window.location.href;
 export const apiClient = axios.create({
