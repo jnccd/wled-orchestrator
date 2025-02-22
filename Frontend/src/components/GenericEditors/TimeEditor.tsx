@@ -13,12 +13,7 @@ interface Props {
   onChange: (newEditingObject: object) => void;
 }
 
-const TimeEditor = ({
-  editingObject,
-  propertyName,
-  settings,
-  onChange,
-}: Props) => {
+const TimeEditor = ({ editingObject, propertyName, onChange }: Props) => {
   const [refreshBool, refresh] = useState(false);
 
   const propertyValue = readProperty(editingObject, propertyName);
