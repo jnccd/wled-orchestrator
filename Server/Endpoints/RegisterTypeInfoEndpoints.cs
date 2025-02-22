@@ -11,13 +11,15 @@ record TypeInfo(string Name, string? TypeDiscriminator, IEnumerable<TypeProperty
 record TypePropertyInfo(string Name, string DisplayName, string Type, GenerateFrontendFormData Settings);
 class GenerateFrontendFormData(GenerateFrontendFormAttribute settings)
 {
-    public readonly double MinValue = settings.MinValue;
-    public readonly double MaxValue = settings.MaxValue;
+    public string InputType { get; init; } = settings.InputType;
+    public double MinValue { get; init; } = settings.MinValue;
+    public double MaxValue { get; init; } = settings.MaxValue;
 }
 
 [AttributeUsage(AttributeTargets.Property)]
-public class GenerateFrontendFormAttribute(double MinValue = 0, double MaxValue = 150) : Attribute
+public class GenerateFrontendFormAttribute(string InputType = "", double MinValue = 0, double MaxValue = 100) : Attribute
 {
+    public readonly string InputType = InputType;
     public readonly double MinValue = MinValue;
     public readonly double MaxValue = MaxValue;
 }

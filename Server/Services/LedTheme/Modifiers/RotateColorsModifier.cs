@@ -4,7 +4,7 @@ using Server.Services.LedTheme;
 
 class RotateColorsModifier : LedThemeModifier
 {
-    [GenerateFrontendForm]
+    [GenerateFrontendForm(MaxValue: 360)]
     public double Amount { get; set; } = 0;
 
     public override LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input)
