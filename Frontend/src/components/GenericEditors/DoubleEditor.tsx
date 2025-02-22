@@ -28,7 +28,7 @@ const DoubleEditor = ({
   const propertyValue = readProperty(editingObject, propertyName);
 
   return (
-    <Box p={4} pt={6} width={"100%"} minWidth={"100px"}>
+    <Box p={4} pt={9} pb={1} width={"100%"} minWidth={"100px"}>
       <Slider
         aria-label="slider-ex-6"
         onChange={(val) => {

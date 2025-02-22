@@ -10,12 +10,7 @@ interface Props {
   onChange: (newEditingObject: object) => void;
 }
 
-const ColorEditor = ({
-  editingObject,
-  propertyName,
-  settings,
-  onChange,
-}: Props) => {
+const ColorEditor = ({ editingObject, propertyName, onChange }: Props) => {
   const [refreshBool, refresh] = useState(false);
 
   const propertyValue = readProperty(editingObject, propertyName);
