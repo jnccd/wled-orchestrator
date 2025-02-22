@@ -6,13 +6,11 @@ class WakeupModifier : LedThemeModifier
 {
 
     [GenerateFrontendForm]
-    public double SleepTimeMinutes { get; set; } = 400;
-    [GenerateFrontendForm]
+    public TimeSpan SleepTime { get; set; } = TimeSpan.FromHours(8);
+    [GenerateFrontendForm(MaxValue: 45)]
     public double FadeTimeMinutes { get; set; } = 20;
     [GenerateFrontendForm]
     public TimeSpan WakeUpDayTime { get; set; } = TimeSpan.FromHours(8);
-
-    const int maxBrightness = 100;
 
     TimeSpan DoubleMinutesToTimeSpan(double min) => new(0, (int)min, (int)(min % 1 * 60));
 
@@ -30,27 +28,28 @@ class WakeupModifier : LedThemeModifier
         int stateMinBrightness = 0, stateMaxBrightness = 100;
 
         var wakeUpTimeDiff = DayInvariantTimeOfDayDiff(input.Time, WakeUpDayTime);
-        var wakeUpTimeDiffMins = wakeUpTimeDiff.TotalMinutes;
+        var wakeUpTimeDiffMinutes = wakeUpTimeDiff.TotalMinutes;
+        var sleepTimeMinutes = SleepTime.TotalMinutes;
 
-        if (wakeUpTimeDiffMins < -SleepTimeMinutes - FadeTimeMinutes * 2) { }
-        else if (wakeUpTimeDiffMins < -SleepTimeMinutes - FadeTimeMinutes)
+        if (wakeUpTimeDiffMinutes < -sleepTimeMinutes - FadeTimeMinutes * 2) { }
+        else if (wakeUpTimeDiffMinutes < -sleepTimeMinutes - FadeTimeMinutes)
         {
-            var timeScalar = (wakeUpTimeDiffMins - (-SleepTimeMinutes - FadeTimeMinutes * 2)) / FadeTimeMinutes;
+            var timeScalar = (wakeUpTimeDiffMinutes - (-sleepTimeMinutes - FadeTimeMinutes * 2)) / FadeTimeMinutes;
             stateMaxBrightness = (int)(100 - 100 * timeScalar);
         }
-        else if (wakeUpTimeDiffMins < -FadeTimeMinutes)
+        else if (wakeUpTimeDiffMinutes < -FadeTimeMinutes)
         {
             stateMaxBrightness = 0;
         }
-        else if (wakeUpTimeDiffMins < 0)
+        else if (wakeUpTimeDiffMinutes < 0)
         {
-            var timeScalar = (wakeUpTimeDiffMins - (-FadeTimeMinutes)) / FadeTimeMinutes;
+            var timeScalar = (wakeUpTimeDiffMinutes - (-FadeTimeMinutes)) / FadeTimeMinutes;
             stateMaxBrightness = (int)(100 * timeScalar);
             stateMinBrightness = (int)(100 * timeScalar);
         }
-        else if (wakeUpTimeDiffMins < FadeTimeMinutes)
+        else if (wakeUpTimeDiffMinutes < FadeTimeMinutes)
         {
-            var timeScalar = (wakeUpTimeDiffMins - 0) / FadeTimeMinutes;
+            var timeScalar = (wakeUpTimeDiffMinutes - 0) / FadeTimeMinutes;
             stateMinBrightness = (int)(100 - 100 * timeScalar);
         }
 
