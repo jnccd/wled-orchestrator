@@ -17,10 +17,10 @@ class WakeupModifier : LedThemeModifier
             return null;
 
         var minutesDiffToWakeUp = Math.Abs((input.Time.TimeOfDay - WakeUpDayTime).TotalMinutes);
-        var stateMinBrightness = maxBrightness - Math.Abs(minutesDiffToWakeUp) * maxBrightness / FadeTimeMinutes;
+        var stateMinBrightness = (int)(maxBrightness - Math.Abs(minutesDiffToWakeUp) * maxBrightness / FadeTimeMinutes);
 
         foreach (var color in state.Colors)
-            color.V = color.V < stateMinBrightness ? (int)stateMinBrightness : color.V;
+            color.V = color.V < stateMinBrightness ? stateMinBrightness : color.V;
 
         return state;
     }
