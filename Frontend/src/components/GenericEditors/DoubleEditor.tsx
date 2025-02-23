@@ -36,7 +36,7 @@ const DoubleEditor = ({
 
   if (!settings?.inputType || settings.inputType === "slider") {
     return (
-      <Box p={4} pt={9} pb={1} width={"100%"} minWidth={"100px"}>
+      <Box p={4} pt={8} pb={1} width={"100%"} minWidth={"100px"}>
         <Slider
           aria-label="slider-ex-6"
           onChange={(val) => {
