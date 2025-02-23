@@ -19,9 +19,10 @@ interface Props {
     onClose: () => void,
     firstFieldRef: React.MutableRefObject<null>
   ) => ReactNode;
+  style?: React.CSSProperties | undefined;
 }
 
-const EditButton = ({ children }: Props) => {
+const EditButton = ({ children, style = undefined }: Props) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const firstFieldRef = React.useRef(null);
 
@@ -42,7 +43,7 @@ const EditButton = ({ children }: Props) => {
               aria-label={""}
             />
           </PopoverTrigger>
-          <PopoverContent cursor={"default"} padding={1}>
+          <PopoverContent cursor={"default"} padding={1} style={style}>
             <FocusLock autoFocus={true} persistentFocus={true}>
               <PopoverArrow />
               <PopoverCloseButton />
