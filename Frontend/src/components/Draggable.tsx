@@ -9,6 +9,7 @@ interface Props {
   children: ReactNode;
   backgroundColor?: string;
   opacity?: number;
+  style?: React.CSSProperties | undefined;
   onDragEnd?: (dragged: HTMLElement, mousePos: number[]) => void;
 }
 
@@ -19,6 +20,7 @@ const Draggable = ({
   className,
   backgroundColor = "",
   opacity = 1,
+  style = undefined,
 }: Props) => {
   const { colorMode } = useColorMode();
   const [dragging, setDragging] = useState(false);
@@ -168,6 +170,7 @@ const Draggable = ({
       borderRadius={8}
       paddingY={2}
       cursor="move"
+      style={style}
       onPointerDown={dragPointerDown}
     >
       {children}

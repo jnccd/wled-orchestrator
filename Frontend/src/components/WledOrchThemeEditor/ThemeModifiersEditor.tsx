@@ -123,6 +123,7 @@ const ThemeModifiersEditor = () => {
               });
             }}
             opacity={modifier.enabled ? 1 : 0.7}
+            style={{ paddingBottom: "1rem" }}
           >
             <HStack justifyContent="center">
               <Text key={modifier.id + "text"} as={"b"}>
