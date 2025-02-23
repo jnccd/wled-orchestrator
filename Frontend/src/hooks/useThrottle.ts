@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 const useThrottle = () => {
   const throttleSeed = useRef(null as NodeJS.Timeout | null);
