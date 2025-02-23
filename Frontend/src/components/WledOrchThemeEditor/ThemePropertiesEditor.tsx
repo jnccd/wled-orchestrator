@@ -61,6 +61,7 @@ const ThemePropertiesEditor = () => {
               <ColorEditor
                 editingObject={selectedGroup?.theme ?? {}}
                 propertyName={propertyName}
+                settings={themeTypeProperty.settings ?? {}}
                 onChange={(object: any) =>
                   changeThemeMutation.mutate({
                     groupId: selectedGroup?.id ?? "",
@@ -74,6 +75,7 @@ const ThemePropertiesEditor = () => {
               <DoubleEditor
                 editingObject={selectedGroup?.theme ?? {}}
                 propertyName={propertyName}
+                settings={themeTypeProperty.settings ?? {}}
                 onChange={(object: any) =>
                   changeThemeMutation.mutate({
                     groupId: selectedGroup?.id ?? "",

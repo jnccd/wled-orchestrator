@@ -8,6 +8,7 @@ interface Props {
   className: string;
   children: ReactNode;
   backgroundColor?: string;
+  opacity?: number;
   onDragEnd?: (dragged: HTMLElement, mousePos: number[]) => void;
 }
 
@@ -17,6 +18,7 @@ const Draggable = ({
   onDragEnd,
   className,
   backgroundColor = "",
+  opacity = 1,
 }: Props) => {
   const { colorMode } = useColorMode();
   const [dragging, setDragging] = useState(false);
@@ -152,6 +154,7 @@ const Draggable = ({
       className={className + " consumes-click wledServerButton"}
       margin={2}
       paddingX={4}
+      opacity={opacity}
       backgroundColor={
         backgroundColor !== ""
           ? backgroundColor

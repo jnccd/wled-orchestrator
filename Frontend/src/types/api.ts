@@ -297,6 +297,7 @@ export interface components {
       /** Format: uuid */
       id?: string;
       typeName?: string | null;
+      enabled?: boolean;
     };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["ColorHsv"];
