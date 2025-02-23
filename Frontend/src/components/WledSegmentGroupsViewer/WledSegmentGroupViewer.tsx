@@ -25,6 +25,7 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
       margin="5px"
       padding="2px"
       width={"fit-content"}
+      cursor="pointer"
       transition="outline .1s"
       onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const elemsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
