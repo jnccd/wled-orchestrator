@@ -165,7 +165,7 @@ const Draggable = ({
           : "#f5f9fba3"
       }
       backdropFilter={"auto"}
-      backdropBlur={"2px"}
+      backdropBlur={"6px"}
       boxShadow={"rgb(49 110 140 / 64%) 0px 0px 6px -2px"}
       borderRadius={8}
       paddingY={2}
