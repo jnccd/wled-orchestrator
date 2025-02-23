@@ -130,6 +130,7 @@ const ThemeModifiersEditor = () => {
                 {modifier.typeName} Modifier
               </Text>
               <EditButton
+                style={{ width: "170px" }}
                 children={(_a, _b, _onClose, _firstFieldRef) => {
                   return (
                     <>
