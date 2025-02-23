@@ -56,6 +56,7 @@ const EditGroupButton = ({ group }: Props) => {
 
   return (
     <EditButton
+      buttonStyle={{ marginRight: "4px" }}
       children={(_a, _b, onClose, firstFieldRef) => {
         return (
           <VStack alignItems={"left"}>

@@ -19,10 +19,15 @@ interface Props {
     onClose: () => void,
     firstFieldRef: React.MutableRefObject<null>
   ) => ReactNode;
-  style?: React.CSSProperties | undefined;
+  popoverStyle?: React.CSSProperties | undefined;
+  buttonStyle?: React.CSSProperties | undefined;
 }
 
-const EditButton = ({ children, style = undefined }: Props) => {
+const EditButton = ({
+  children,
+  popoverStyle = undefined,
+  buttonStyle = undefined,
+}: Props) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const firstFieldRef = React.useRef(null);
 
@@ -41,9 +46,10 @@ const EditButton = ({ children, style = undefined }: Props) => {
               size="sm"
               icon={<EditIcon />}
               aria-label={""}
+              style={buttonStyle}
             />
           </PopoverTrigger>
-          <PopoverContent cursor={"default"} padding={1} style={style}>
+          <PopoverContent cursor={"default"} padding={1} style={popoverStyle}>
             <FocusLock autoFocus={true} persistentFocus={true}>
               <PopoverArrow />
               <PopoverCloseButton />
