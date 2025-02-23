@@ -26,7 +26,13 @@ const WledSegmentGroupViewer = ({ group: g }: Props) => {
       padding="2px"
       width={"fit-content"}
       transition="outline .1s"
-      onClick={() => {
+      onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const elemsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+        const filteredElems = elemsAtPoint.filter((x) =>
+          x.classList.contains("consumes-click")
+        );
+        if (filteredElems.length > 0) return;
+
         if (g.id) selectedGroupStore.selectNew(g.id);
       }}
     >
