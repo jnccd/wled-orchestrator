@@ -20,7 +20,7 @@ class WakeupModifier : LedThemeModifier
         return testDiffs.MinBy(x => x.Duration());
     }
 
-    public override LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input)
+    internal override LedGroupState? Modify(LedGroupState? state, LedThemeInput input)
     {
         if (state == null)
             return null;

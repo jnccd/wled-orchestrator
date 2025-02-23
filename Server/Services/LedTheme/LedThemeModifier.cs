@@ -10,6 +10,8 @@ public class LedThemeModifier
 
     public Guid Id { get; set; } = Guid.NewGuid();
     public string TypeName => GetType().Name.Replace("Modifier", "");
+    public bool Enabled { get; set; } = true;
 
-    public virtual LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input) => null;
+    public LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input) => Enabled ? Modify(state, input) : state;
+    internal virtual LedGroupState? Modify(LedGroupState? state, LedThemeInput input) => null;
 }

@@ -7,7 +7,7 @@ class RotateColorsModifier : LedThemeModifier
     [GenerateFrontendForm(MaxValue: 360)]
     public double Amount { get; set; } = 0;
 
-    public override LedGroupState? ModifyState(LedGroupState? state, LedThemeInput input)
+    internal override LedGroupState? Modify(LedGroupState? state, LedThemeInput input)
     {
         if (state == null)
             return null;
