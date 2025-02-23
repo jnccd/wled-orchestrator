@@ -1,14 +1,21 @@
 import {
+  Text,
   Box,
   Slider,
   SliderMark,
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
 import { GenerateFrontendFormData } from "../../hooks/useWledOrchApi";
+import useThrottle from "../../hooks/useThrottle";
 
 interface Props {
   editingObject: object;
@@ -27,38 +34,66 @@ const DoubleEditor = ({
 
   const propertyValue = readProperty(editingObject, propertyName);
 
-  return (
-    <Box p={4} pt={9} pb={1} width={"100%"} minWidth={"100px"}>
-      <Slider
-        aria-label="slider-ex-6"
-        onChange={(val) => {
-          writeProperty(editingObject, propertyName, val);
-          refresh(!refreshBool);
-        }}
-        onChangeEnd={() => onChange(editingObject)}
+  if (!settings?.inputType || settings.inputType === "slider") {
+    return (
+      <Box p={4} pt={9} pb={1} width={"100%"} minWidth={"100px"}>
+        <Slider
+          aria-label="slider-ex-6"
+          onChange={(val) => {
+            writeProperty(editingObject, propertyName, val);
+            refresh(!refreshBool);
+          }}
+          onChangeEnd={() => onChange(editingObject)}
+          defaultValue={propertyValue}
+          min={settings?.minValue}
+          max={settings?.maxValue}
+        >
+          <SliderMark
+            value={propertyValue}
+            textAlign="center"
+            bg="blue.500"
+            color="white"
+            mt="-10"
+            ml="-5"
+            w="12"
+            borderRadius={"6px"}
+          >
+            {propertyValue}
+          </SliderMark>
+          <SliderTrack>
+            <SliderFilledTrack />
+          </SliderTrack>
+          <SliderThumb />
+        </Slider>
+      </Box>
+    );
+  } else if (settings.inputType === "number-input") {
+    const throttle = useThrottle();
+
+    return (
+      <NumberInput
+        allowMouseWheel
         defaultValue={propertyValue}
         min={settings?.minValue}
         max={settings?.maxValue}
+        onChange={(_valString, valNum) => {
+          throttle(() => {
+            writeProperty(editingObject, propertyName, valNum);
+            refresh(!refreshBool);
+            onChange(editingObject);
+          }, 1500);
+        }}
       >
-        <SliderMark
-          value={propertyValue}
-          textAlign="center"
-          bg="blue.500"
-          color="white"
-          mt="-10"
-          ml="-5"
-          w="12"
-          borderRadius={"6px"}
-        >
-          {propertyValue}
-        </SliderMark>
-        <SliderTrack>
-          <SliderFilledTrack />
-        </SliderTrack>
-        <SliderThumb />
-      </Slider>
-    </Box>
-  );
+        <NumberInputField />
+        <NumberInputStepper>
+          <NumberIncrementStepper />
+          <NumberDecrementStepper />
+        </NumberInputStepper>
+      </NumberInput>
+    );
+  } else {
+    return <Text>Invalid number input type :/</Text>;
+  }
 };
 
 export default DoubleEditor;
