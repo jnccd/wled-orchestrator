@@ -26,7 +26,7 @@ public class LedThemeDaylight : LedTheme
     static readonly double dayLightFunMult = -Math.Log2(0.4) / (halfSunTime * halfSunTime);
     readonly Func<double, double> DayLightFunction = (x) => Math.Pow(2, -((x - sunTop) * (x - sunTop)) * dayLightFunMult);
 
-    [GenerateFrontendForm]
+    [GenerateFrontendForm(InputType: "number-input")]
     public double InvertedSunSize { get; set; } = 150;
 
     public ColorHsv[] GetColors(double curDayTimePercent)
