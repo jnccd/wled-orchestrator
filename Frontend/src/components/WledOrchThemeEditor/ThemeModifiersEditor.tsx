@@ -16,6 +16,7 @@ import {
   MenuItem,
   Button,
   HStack,
+  Checkbox,
 } from "@chakra-ui/react";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import { ChevronDownIcon } from "@chakra-ui/icons";
@@ -25,6 +26,7 @@ import ColorEditor from "../GenericEditors/ColorEditor";
 import DoubleEditor from "../GenericEditors/DoubleEditor";
 import ThemePaneHeader from "./ThemePaneHeader";
 import TimeEditor from "../GenericEditors/TimeEditor";
+import EditButton from "../EditButton";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -120,10 +122,48 @@ const ThemeModifiersEditor = () => {
                 index: draggablesOverMousePos.length,
               });
             }}
+            opacity={modifier.enabled ? 1 : 0.7}
           >
-            <Text key={modifier.id + "text"} as={"b"}>
-              {modifier.typeName} Modifier
-            </Text>
+            <HStack justifyContent="center">
+              <Text key={modifier.id + "text"} as={"b"}>
+                {modifier.typeName} Modifier
+              </Text>
+              <EditButton
+                children={(_a, _b, _onClose, _firstFieldRef) => {
+                  return (
+                    <>
+                      <HStack justifyContent="center">
+                        <Text>Enabled:</Text>
+                        <Checkbox
+                          defaultChecked={modifier.enabled}
+                          onChange={(_) => {
+                            modifier.enabled = !modifier.enabled;
+                            changeModifierMutation.mutate({
+                              groupId: selectedGroup?.id ?? "",
+                              modifierId: modifier.id ?? "",
+                              newModifier: modifier,
+                            });
+                          }}
+                        ></Checkbox>
+                      </HStack>
+                      <Button
+                        colorScheme="red"
+                        marginTop={5}
+                        marginBottom={2}
+                        onClick={() => {
+                          deleteModifierMutation.mutate({
+                            groupId: selectedGroup.id ?? "",
+                            modifierId: modifier.id ?? "",
+                          });
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  );
+                }}
+              ></EditButton>
+            </HStack>
             {themeTypesQuery.data?.modifiers
               ?.filter(
                 (x) => x.typeDiscriminator === readProperty(modifier, "$type")
@@ -205,19 +245,6 @@ const ThemeModifiersEditor = () => {
                   </HStack>
                 );
               })}
-            <Button
-              colorScheme="red"
-              marginTop={5}
-              marginBottom={2}
-              onClick={() => {
-                deleteModifierMutation.mutate({
-                  groupId: selectedGroup.id ?? "",
-                  modifierId: modifier.id ?? "",
-                });
-              }}
-            >
-              Delete
-            </Button>
           </Draggable>
         );
       })}
