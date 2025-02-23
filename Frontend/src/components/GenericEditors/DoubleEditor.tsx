@@ -83,6 +83,7 @@ const DoubleEditor = ({
             onChange(editingObject);
           }, 1500);
         }}
+        width="100px"
       >
         <NumberInputField />
         <NumberInputStepper>
