@@ -13,7 +13,9 @@ public class WledCommunicatorService(
     DataStoreService dataStore,
     LoggerService logger)
 {
-    public WledServer[] Leds { get; private set; } = [];
+    public record WledServer(string Address, WledServerState State);
+
+    public WledServer[] WledServers { get; private set; } = [];
     private const double HttpReqCooldownSecs = 0.1;
     private readonly Dictionary<string, DateTime> LastBriHTTPReq = [];
     private readonly Dictionary<LedSegment, DateTime> LastColHTTPReq = [];
@@ -29,7 +31,7 @@ public class WledCommunicatorService(
             return;
         }
 
-        var ledServers = new List<WledServer>();
+        var wledServers = new List<WledServer>();
         var tasks = new List<Task>();
         var fac = new TaskFactory();
         int done = 0;
@@ -54,7 +56,7 @@ public class WledCommunicatorService(
 
                 var ledState = JsonConvert.DeserializeObject<WledServerState>(responseText);
 
-                if (ledState != null) ledServers.Add(new(address, ledState));
+                if (ledState != null) wledServers.Add(new(address, ledState));
                 done++;
             }, i));
 
@@ -62,8 +64,8 @@ public class WledCommunicatorService(
         while (done < 240)
             Thread.Sleep(200);
 
-        logger.WriteLine("Found Wled Servers at: " + ledServers.Select(x => x.Address).Combine(", "));
-        Leds = [.. ledServers];
+        logger.WriteLine("Found Wled Servers at: " + wledServers.Select(x => x.Address).Combine(", "));
+        WledServers = [.. wledServers];
         FillNewSegmentsIntoDatastore();
     }
     static IPAddress? GetLocalIPAddress()
@@ -86,28 +88,56 @@ public class WledCommunicatorService(
     }
     void FillNewSegmentsIntoDatastore()
     {
-        var defaultGroup = dataStore.Data.Groups.FirstOrDefault();
-        if (defaultGroup == null)
+        lock (dataStore.lockject)
         {
-            logger.WriteLine("Creating new Default LedSegmentGroup!", LogLevel.Warn);
-            defaultGroup = LedSegmentGroup.DefaultGroup;
-            dataStore.Data.Groups.Add(defaultGroup);
+            var defaultGroup = dataStore.Data.Groups.FirstOrDefault();
+            if (defaultGroup == null)
+            {
+                logger.WriteLine("Creating new Default LedSegmentGroup!", LogLevel.Warn);
+                defaultGroup = LedSegmentGroup.DefaultGroup;
+                dataStore.Data.Groups.Add(defaultGroup);
+            }
+
+            var segments = WledServers.SelectMany(server => server.State.Seg.Select(seg => WledSegToNewLedSegment(server.Address, seg))).ToList();
+
+            foreach (var segment in segments)
+            {
+                var associatedGroup = dataStore.Data.Groups.FirstOrDefault(x => x.LedSegments.Contains(segment)) ?? defaultGroup;
+                if (!associatedGroup.LedSegments.Contains(segment))
+                    associatedGroup.LedSegments.Add(segment);
+                else
+                {
+                    // Set seg values in existing entry
+                    var segmentInGroup = associatedGroup.LedSegments.FirstOrDefault(x => x.Id == segment.Id);
+                    if (segmentInGroup == null)
+                    {
+                        logger.WriteLine("Segment is weird", LogLevel.Error);
+                        continue;
+                    }
+                    segmentInGroup.Start = segment.Start;
+                    segmentInGroup.Length = segment.Length;
+                }
+            }
+
+            dataStore.Save();
         }
+    }
 
-        var segments = Leds.SelectMany(x => x.Segments).ToList();
-
-        foreach (var segment in segments)
-        {
-            var associatedGroup = dataStore.Data.Groups.FirstOrDefault(x => x.LedSegments.Contains(segment)) ?? defaultGroup;
-            if (!associatedGroup.LedSegments.Contains(segment)) associatedGroup.LedSegments.Add(segment);
-        }
-
-        dataStore.Save();
+    LedSegment WledSegToNewLedSegment(string WledServerAddress, Seg wledSeg) =>
+        new LedSegment(WledServerAddress, (int)(wledSeg.Id ?? 0), (int)(wledSeg.Start ?? 0), (int)(wledSeg.Len ?? 0));
+    LedSegment WledSegToLedSegment(string WledServerAddress, Seg wledSeg)
+    {
+        var preliminaryLedSegment = WledSegToNewLedSegment(WledServerAddress, wledSeg);
+        var segmentInDatastore = LedSegment.FindInDatastore(preliminaryLedSegment.Id, dataStore);
+        if (segmentInDatastore != null)
+            return segmentInDatastore;
+        else
+            return preliminaryLedSegment;
     }
 
     public bool SetBrightnessGlobally(int bri)
     {
-        foreach (var led in Leds)
+        foreach (var led in WledServers)
             if (!SetBrightnessOnWledServer(bri, led.Address))
                 return false;
         return true;
@@ -128,9 +158,9 @@ public class WledCommunicatorService(
     // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
     public bool SetLedColorsGlobally(ColorRgb[] colors)
     {
-        foreach (var led in Leds)
-            foreach (var (seg, i) in led.State.Seg.WithIndex())
-                if (!SetLedColorsOnWledSegment(colors, new(led.Address, i)))
+        foreach (var wledServer in WledServers)
+            foreach (var segment in wledServer.State.Seg.Select(x => WledSegToLedSegment(wledServer.Address, x)))
+                if (!SetLedColorsOnWledSegment(colors, segment))
                     return false;
         return true;
     }
@@ -143,21 +173,14 @@ public class WledCommunicatorService(
 
         if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...", LogLevel.Debug);
 
-        var seg = Leds.FirstOrDefault(l => l.Address == segment.WledServerAddress)?.State.Seg[segment.SegmentIndex];
-        if (seg == null || seg.Start == null || seg.Len == null)
-        {
-            logger.WriteLine($"Segment {segment} does not exist!", LogLevel.Warn);
-            return false;
-        }
-
         var ledCols = new StringBuilder();
         ledCols.Append("{\"i\":[");
-        for (int i = 0; i < seg.Len; i++)
+        for (int i = 0; i < segment.Length; i++)
         {
-            var col = colors[(int)(i * (float)colors.Length / seg.Len)];
+            var col = colors[(int)(i * (float)colors.Length / segment.Length)];
             if (i > 0)
                 ledCols.Append(',');
-            ledCols.Append($"{seg.Start + i},'{col.ToHex()}'");
+            ledCols.Append($"{segment.Start + i},'{col.ToHex()}'");
         }
         ledCols.Append("]}");
 
