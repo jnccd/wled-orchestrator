@@ -50,7 +50,7 @@ public class SegmentController : ControllerBase
     {
         lock (dataStore.lockject)
         {
-            var segment = dataStore.Data.Groups.SelectMany(x => x.LedSegments).FirstOrDefault(x => x.Id == segmentId);
+            var segment = LedSegment.FindInDatastore(segmentId, dataStore);
             if (segment == null)
                 return Results.NotFound("The SegmentId was not found in any groups");
 

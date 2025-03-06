@@ -26,7 +26,7 @@ public class UpdaterService(
         cts = new CancellationTokenSource();
         updateTask = Task.Run(() =>
         {
-            communicatorService.FindLEDs();
+            Task.Run(communicatorService.FindLEDs);
 
             while (!cts.Token.IsCancellationRequested)
             {
@@ -46,26 +46,28 @@ public class UpdaterService(
 
     private void UpdateLedSegments()
     {
-        foreach (var led in communicatorService.Leds)
+        lock (dataStore.lockject)
         {
-            if (!dataStore.Data.Activated)
+            foreach (var ledServer in dataStore.Data.Groups.SelectMany(x => x.LedSegments).GroupBy(x => x.WledServerAddress))
             {
-                communicatorService.SetBrightnessOnWledServer(0, led.Address);
-                continue;
+                if (!dataStore.Data.Activated)
+                {
+                    communicatorService.SetBrightnessOnWledServer(0, ledServer.Key);
+                    continue;
+                }
+
+                var themeBrightnesses = new List<int>();
+
+                foreach (var (seg, i) in ledServer.WithIndex())
+                {
+                    var newLedState = ledThemeProvider.GetNewLedState(seg);
+                    if (newLedState == null) continue;
+                    communicatorService.SetLedColorsOnWledSegment([.. newLedState.Colors.Select(x => x.HsvToRgb())], seg);
+                    themeBrightnesses.Add(newLedState.Brightness);
+                }
+
+                communicatorService.SetBrightnessOnWledServer((int)themeBrightnesses.Average(), ledServer.Key);
             }
-
-            var themeBrightnesses = new List<int>();
-
-            foreach (var (seg, i) in led.State.Seg.WithIndex())
-            {
-                LedSegment segment = new(led.Address, i);
-                var newLedState = ledThemeProvider.GetNewLedState(segment);
-                if (newLedState == null) continue;
-                communicatorService.SetLedColorsOnWledSegment([.. newLedState.Colors.Select(x => x.HsvToRgb())], segment);
-                themeBrightnesses.Add(newLedState.Brightness);
-            }
-
-            communicatorService.SetBrightnessOnWledServer((int)themeBrightnesses.Average(), led.Address);
         }
     }
 }
