@@ -84,7 +84,7 @@ export const setActivated = (args: {newActivated: boolean}) =>
   apiClient
     .put(`/state/activated`, null, {
       params: {
-        newACtivated: args.newActivated,
+        newActivated: args.newActivated,
       },
     })
     .then((res) => res.data);
