@@ -1,4 +1,4 @@
-import { components } from "../types/api";
+import { components } from "../generated/api";
 import axios from "axios";
 
 export type LedSegmentGroups = components["schemas"]["DataStoreRoot"];
