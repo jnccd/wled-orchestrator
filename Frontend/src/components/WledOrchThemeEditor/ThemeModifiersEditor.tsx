@@ -1,12 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  addThemeModifier,
-  deleteThemeModifier,
-  getThemeTypes,
-  getWledOrchState,
-  setThemeModifier,
-  wledOrchStateQueryKey,
-} from "../../hooks/useWledOrchApi";
+import { zodiosHooks } from "../../hooks/useWledOrchApi";
 import {
   Text,
   Box,
@@ -37,38 +29,18 @@ const ThemeModifiersEditor = () => {
   const draggableClassName = "theme-modifier-draggable";
 
   // React Query setup
-  const queryClient = useQueryClient();
-  const themeTypesQuery = useQuery({
-    queryKey: [],
-    queryFn: getThemeTypes,
-  });
-  const wledOrchStateQuery = useQuery({
-    queryKey: [wledOrchStateQueryKey],
-    queryFn: getWledOrchState,
-  });
-  const addModifierMutation = useMutation({
-    mutationFn: addThemeModifier,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
-    },
-  });
-  const deleteModifierMutation = useMutation({
-    mutationFn: deleteThemeModifier,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
-    },
-  });
-  const changeModifierMutation = useMutation({
-    mutationFn: setThemeModifier,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [wledOrchStateQueryKey] });
-    },
-  });
+  const themeTypesQuery = zodiosHooks.useGetThemeTypes();
+  const wledOrchStateQuery = zodiosHooks.useGetState();
 
   const selectedGroupStore = useSelectedGroupStore();
   const selectedGroup = wledOrchStateQuery.data?.groups?.filter(
     (x) => x.id === selectedGroupStore.selectedGroup
   )[0];
+
+  const addModifierMutation =
+    zodiosHooks.usePostStategroupsGroupIdthememodifiers({
+      params: { groupId: selectedGroup?.id ?? "" },
+    });
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
@@ -99,6 +71,21 @@ const ThemeModifiersEditor = () => {
         </MenuList>
       </Menu>
       {selectedGroup?.theme?.modifiers?.map((modifier) => {
+        const deleteModifierMutation =
+          zodiosHooks.useDeleteStategroupsGroupIdthememodifiersModifierId({
+            params: {
+              groupId: selectedGroup?.id ?? "",
+              modifierId: modifier.id ?? "",
+            },
+          });
+        const changeModifierMutation =
+          zodiosHooks.usePutStategroupsGroupIdthememodifiersModifierId({
+            params: {
+              groupId: selectedGroup?.id ?? "",
+              modifierId: modifier.id ?? "",
+            },
+          });
+
         return (
           <Draggable
             id={modifier.id ?? ""}
@@ -112,10 +99,7 @@ const ThemeModifiersEditor = () => {
                   const bounds = (x[0] as Element).getBoundingClientRect();
                   return bounds.top + bounds.height / 2 < mousePos[1];
                 });
-              deleteModifierMutation.mutate({
-                groupId: selectedGroup?.id ?? "",
-                modifierId: modifier?.id ?? "",
-              });
+              deleteModifierMutation.mutate(undefined);
               addModifierMutation.mutate({
                 groupId: selectedGroup?.id ?? "",
                 newModifier: modifier,
