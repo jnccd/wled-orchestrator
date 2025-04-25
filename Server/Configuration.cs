@@ -45,16 +45,17 @@ public static class Configuration
 
     public static void ConfigureWebApp(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+        var logger = app.Services.GetService(typeof(LoggerService)) as LoggerService;
+#if DEBUG
+        logger!.WriteLine("Launching in development mode!");
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
-            app.UseCors(policy => policy
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
-        }
+        app.UseCors(policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+#endif
     }
 
     public static void AddRequestLoggingMiddleware(this WebApplication app)
@@ -101,7 +102,7 @@ public static class Configuration
             });
         });
 
-        builder.Services.AddCors(c => { });
+        builder.Services.AddCors();
     }
 
     // // Enable if HTTPS is needed
