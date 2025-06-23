@@ -75,7 +75,10 @@ export const deleteThemeModifier = (args: {groupId: string, modifierId: string})
     .delete(`/state/groups/${args.groupId}/theme/modifiers/${args.modifierId}`)
     .then((res) => res.data);
 
-export const setThemeModifier = (args: {groupId: string, modifierId: string, newModifier: any}) => 
+export const setThemeModifier = (args: {groupId: string, modifierId: string, newModifier: 
+  | components["schemas"]["LedThemeModifier"]
+  | components["schemas"]["RotateColorsModifier"]
+  | components["schemas"]["WakeupModifier"]}) => 
   apiClient
     .put(`/state/groups/${args.groupId}/theme/modifiers/${args.modifierId}`, args.newModifier)
     .then((res) => res.data);
