@@ -1,6 +1,7 @@
 using System.Net;
 using System.Reflection;
 using Server.Services;
+using NSwag;
 
 namespace Server;
 
@@ -37,7 +38,11 @@ public static class Configuration
 
         // Swagger
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c => c.UseOneOfForPolymorphism());
+        builder.Services.AddOpenApiDocument(config =>
+        {
+            config.Title = "WledOrch API";
+            config.Version = "v1";
+        });
 
         // Controller
         builder.Services.AddControllers();
@@ -48,8 +53,8 @@ public static class Configuration
         var logger = app.Services.GetService(typeof(LoggerService)) as LoggerService;
 #if DEBUG
         logger!.WriteLine("Launching in development mode!");
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseOpenApi();
+        app.UseSwaggerUi();
 
         app.UseCors(policy => policy
             .AllowAnyOrigin()
@@ -65,7 +70,7 @@ public static class Configuration
         {
             try
             {
-                logger?.WriteLine($"{context.Request.Method} {context.Request.Path}{context.Request.QueryString} - ORIGIN: {context.Request.Headers.Origin} - {{{GetRequestBody(context.Request).Result}}}");
+                logger?.WriteLine($"{context.Request.Method} {context.Request.Path}{context.Request.QueryString} - ORIGIN: {context.Request.Headers.Origin} - {{ {GetRequestBody(context.Request).Result} }}");
                 await next.Invoke();
             }
             catch (Exception e)
