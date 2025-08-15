@@ -9,6 +9,14 @@
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/Server/Server.csproj"
+        },
+        {
+            "name": "Launch - netcoredbg",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/Server/bin/Debug/net8.0/Server.dll",
+            "cwd": "${workspaceFolder}/Server",
+            "stopAtEntry": false
         }
     ]
 }
