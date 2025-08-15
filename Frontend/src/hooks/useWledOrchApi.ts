@@ -57,11 +57,13 @@ export const deleteGroup = (args: {groupId: string}) =>
     .delete(`/state/groups/${args.groupId}`)
     .then((res) => res.data);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setGroupTheme = (args: {groupId: string, newTheme: any}) => 
   apiClient
     .put(`/state/groups/${args.groupId}/theme`, args.newTheme)
     .then((res) => res.data);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const addThemeModifier = (args: {groupId: string, newModifier: any, index: number | null}) => 
   apiClient
     .post(`/state/groups/${args.groupId}/theme/modifiers`, args.newModifier, { 
