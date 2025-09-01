@@ -62,6 +62,7 @@ const ThemePropertiesEditor = () => {
                 editingObject={selectedGroup?.theme ?? {}}
                 propertyName={propertyName}
                 settings={themeTypeProperty.settings ?? {}}
+                compoundTypeInfo={themeTypeProperty.compoundTypeInfo ?? null}
                 onChange={(object: any) =>
                   changeThemeMutation.mutate({
                     groupId: selectedGroup?.id ?? "",
@@ -76,6 +77,7 @@ const ThemePropertiesEditor = () => {
                 editingObject={selectedGroup?.theme ?? {}}
                 propertyName={propertyName}
                 settings={themeTypeProperty.settings ?? {}}
+                compoundTypeInfo={themeTypeProperty.compoundTypeInfo ?? null}
                 onChange={(object: any) =>
                   changeThemeMutation.mutate({
                     groupId: selectedGroup?.id ?? "",

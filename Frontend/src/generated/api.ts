@@ -4,228 +4,109 @@
  */
 
 export interface paths {
-  "/state/groups/{groupId}": {
-    delete: {
-      parameters: {
-        path: {
-          groupId: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
-  "/state/groups/{groupId}/name": {
-    put: {
-      parameters: {
-        path: {
-          groupId: string;
-        };
-        query: {
-          newName: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
-  "/state/groups/{groupId}/theme": {
-    put: {
-      parameters: {
-        path: {
-          groupId: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-      requestBody: {
-        content: {
-          "application/json":
-            | components["schemas"]["LedTheme"]
-            | components["schemas"]["LedThemeDaylight"]
-            | components["schemas"]["LedThemeSingleColor"];
-          "text/json":
-            | components["schemas"]["LedTheme"]
-            | components["schemas"]["LedThemeDaylight"]
-            | components["schemas"]["LedThemeSingleColor"];
-          "application/*+json":
-            | components["schemas"]["LedTheme"]
-            | components["schemas"]["LedThemeDaylight"]
-            | components["schemas"]["LedThemeSingleColor"];
-        };
-      };
-    };
-  };
-  "/state/groups/{groupId}/theme-preview": {
-    get: {
-      parameters: {
-        path: {
-          groupId: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: {
-          content: {
-            "image/png": string;
-          };
-        };
-      };
-    };
-  };
-  "/state/groups/{groupId}/theme/modifiers": {
-    post: {
-      parameters: {
-        path: {
-          groupId: string;
-        };
-        query: {
-          index?: number;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-      requestBody: {
-        content: {
-          "application/json":
-            | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["RotateColorsModifier"]
-            | components["schemas"]["WakeupModifier"];
-          "text/json":
-            | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["RotateColorsModifier"]
-            | components["schemas"]["WakeupModifier"];
-          "application/*+json":
-            | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["RotateColorsModifier"]
-            | components["schemas"]["WakeupModifier"];
-        };
-      };
-    };
-  };
-  "/state/groups/{groupId}/theme/modifiers/{modifierId}": {
-    put: {
-      parameters: {
-        path: {
-          groupId: string;
-          modifierId: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-      requestBody: {
-        content: {
-          "application/json":
-            | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["RotateColorsModifier"]
-            | components["schemas"]["WakeupModifier"];
-          "text/json":
-            | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["RotateColorsModifier"]
-            | components["schemas"]["WakeupModifier"];
-          "application/*+json":
-            | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["RotateColorsModifier"]
-            | components["schemas"]["WakeupModifier"];
-        };
-      };
-    };
-    delete: {
-      parameters: {
-        path: {
-          groupId: string;
-          modifierId: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
-  "/state/segments/{segmentId}/move": {
-    put: {
-      parameters: {
-        path: {
-          segmentId: string;
-        };
-        query: {
-          targetGroupId?: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
-  "/state/segments/{segmentId}/name": {
-    put: {
-      parameters: {
-        path: {
-          segmentId: string;
-        };
-        query: {
-          newName: string;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
   "/state": {
-    get: {
-      responses: {
-        /** OK */
-        200: {
-          content: {
-            "application/json": components["schemas"]["DataStoreRoot"];
-          };
-        };
-      };
-    };
+    get: operations["GetState"];
   };
   "/state/activated": {
-    put: {
-      parameters: {
-        query: {
-          newActivated: boolean;
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
+    put: operations["PutStateActivated"];
   };
   "/theme-types": {
-    get: {
-      responses: {
-        /** OK */
-        200: {
-          content: {
-            "application/json": components["schemas"]["LedThemeTypes"];
-          };
-        };
-      };
-    };
+    get: operations["GetThemeTypes"];
+  };
+  "/state/groups/{groupId}": {
+    delete: operations["Group_DeleteGroup"];
+  };
+  "/state/groups/{groupId}/name": {
+    put: operations["Group_Rename"];
+  };
+  "/state/groups/{groupId}/theme": {
+    put: operations["Group_PutTheme"];
+  };
+  "/state/groups/{groupId}/theme-preview": {
+    get: operations["Group_GetThemePreview"];
+  };
+  "/state/groups/{groupId}/theme/modifiers": {
+    post: operations["Group_PostThemeModifier"];
+  };
+  "/state/groups/{groupId}/theme/modifiers/{modifierId}/copy": {
+    post: operations["Group_CopyThemeModifier"];
+  };
+  "/state/groups/{groupId}/theme/modifiers/{modifierId}": {
+    put: operations["Group_PutThemeModifier"];
+    delete: operations["Group_DeleteThemeModifier"];
+  };
+  "/state/segments/{segmentId}/move": {
+    put: operations["Segment_Move"];
+  };
+  "/state/segments/{segmentId}/name": {
+    put: operations["Segment_Rename"];
   };
 }
 
 export interface components {
   schemas: {
+    DataStoreRoot: {
+      activated?: boolean;
+      groups?: components["schemas"]["LedSegmentGroup"][];
+    };
+    LedSegmentGroup: {
+      /** Format: guid */
+      id?: string;
+      name?: string;
+      ledSegments?: components["schemas"]["LedSegment"][];
+      theme?: components["schemas"]["LedTheme"] | null;
+      displayColor?: components["schemas"]["ColorRgb"] | null;
+      isEdited?: boolean;
+    };
+    LedSegment: {
+      wledServerAddress?: string;
+      /** Format: int32 */
+      segmentIndex?: number;
+      name?: string | null;
+      /** Format: int32 */
+      start?: number;
+      /** Format: int32 */
+      length?: number;
+      id?: string;
+    };
+    LedTheme: {
+      /** Format: guid */
+      id?: string;
+      typeName?: string;
+      modifiers?: components["schemas"]["LedThemeModifier"][];
+      $type: string;
+    };
+    LedThemeModifier: {
+      /** Format: guid */
+      id?: string;
+      typeName?: string;
+      enabled?: boolean;
+      $type: string;
+    };
+    RotateColorsModifier: components["schemas"]["LedThemeModifier"] & {
+      /** Format: double */
+      amount?: number;
+    };
+    WakeupModifier: components["schemas"]["LedThemeModifier"] & {
+      /** Format: duration */
+      sleepTime?: string;
+      /** Format: double */
+      fadeTimeMinutes?: number;
+      /** Format: duration */
+      wakeUpDayTime?: string;
+    };
+    WeekdayModifier: components["schemas"]["LedThemeModifier"] & {
+      activeDays?: components["schemas"]["EnumSetOfDayOfWeek"];
+    };
+    EnumSetOfDayOfWeek: components["schemas"]["DayOfWeek"][];
+    /** @enum {integer} */
+    DayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    LedThemeDaylight: components["schemas"]["LedTheme"] & {
+      skyColor?: components["schemas"]["ColorHsv"];
+      sunColor?: components["schemas"]["ColorHsv"];
+      /** Format: double */
+      invertedSunSize?: number;
+    };
     ColorHsv: {
       /** Format: double */
       h?: number;
@@ -234,104 +115,245 @@ export interface components {
       /** Format: double */
       v?: number;
     };
+    LedThemeSingleColor: components["schemas"]["LedTheme"] & {
+      color?: components["schemas"]["ColorHsv"];
+    };
     ColorRgb: {
-      /** Format: int32 */
+      /** Format: byte */
       r?: number;
-      /** Format: int32 */
+      /** Format: byte */
       g?: number;
-      /** Format: int32 */
+      /** Format: byte */
       b?: number;
     };
-    DataStoreRoot: {
-      activated?: boolean;
-      groups?: components["schemas"]["LedSegmentGroup"][] | null;
+    LedThemeTypes: {
+      themes?: components["schemas"]["TypeInfo"][];
+      modifiers?: components["schemas"]["TypeInfo"][];
+    };
+    TypeInfo: {
+      name?: string;
+      typeDiscriminator?: string | null;
+      properties?: components["schemas"]["TypePropertyInfo"][];
+    };
+    TypePropertyInfo: {
+      name?: string;
+      displayName?: string;
+      type?: string;
+      settings?: components["schemas"]["GenerateFrontendFormData"];
+      compoundTypeInfo?: components["schemas"]["CompoundTypeInfo"] | null;
     };
     GenerateFrontendFormData: {
-      inputType?: string | null;
+      inputType?: string;
       /** Format: double */
       minValue?: number;
       /** Format: double */
       maxValue?: number;
     };
-    LedSegment: {
-      wledServerAddress?: string | null;
-      /** Format: int32 */
-      segmentIndex?: number;
-      name?: string | null;
-      id?: string | null;
-    };
-    LedSegmentGroup: {
-      /** Format: uuid */
-      id?: string;
-      name?: string | null;
-      ledSegments?: components["schemas"]["LedSegment"][] | null;
-      theme?:
-        | (
-            | components["schemas"]["LedTheme"]
-            | components["schemas"]["LedThemeDaylight"]
-            | components["schemas"]["LedThemeSingleColor"]
-          )
-        | null;
-      displayColor?: components["schemas"]["ColorRgb"];
-      isEdited?: boolean;
-    };
-    LedTheme: {
-      /** Format: uuid */
-      id?: string;
-      typeName?: string | null;
-      modifiers?:
-        | (
-            | components["schemas"]["LedThemeModifier"]
-            | components["schemas"]["RotateColorsModifier"]
-            | components["schemas"]["WakeupModifier"]
-          )[]
-        | null;
-    };
-    LedThemeDaylight: components["schemas"]["LedTheme"] & {
-      skyColor?: components["schemas"]["ColorHsv"];
-      sunColor?: components["schemas"]["ColorHsv"];
-      /** Format: double */
-      invertedSunSize?: number;
-    };
-    LedThemeModifier: {
-      /** Format: uuid */
-      id?: string;
-      typeName?: string | null;
-      enabled?: boolean;
-    };
-    LedThemeSingleColor: components["schemas"]["LedTheme"] & {
-      color?: components["schemas"]["ColorHsv"];
-    };
-    LedThemeTypes: {
-      themes?: components["schemas"]["TypeInfo"][] | null;
-      modifiers?: components["schemas"]["TypeInfo"][] | null;
-    };
-    RotateColorsModifier: components["schemas"]["LedThemeModifier"] & {
-      /** Format: double */
-      amount?: number;
-    };
-    TypeInfo: {
-      name?: string | null;
-      typeDiscriminator?: string | null;
-      properties?: components["schemas"]["TypePropertyInfo"][] | null;
-    };
-    TypePropertyInfo: {
-      name?: string | null;
-      displayName?: string | null;
-      type?: string | null;
-      settings?: components["schemas"]["GenerateFrontendFormData"];
-    };
-    WakeupModifier: components["schemas"]["LedThemeModifier"] & {
-      /** Format: date-span */
-      sleepTime?: string;
-      /** Format: double */
-      fadeTimeMinutes?: number;
-      /** Format: date-span */
-      wakeUpDayTime?: string;
+    CompoundTypeInfo: {
+      validEnumValues?: string[];
     };
   };
 }
 
-export interface operations {}
+export interface operations {
+  GetState: {
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["DataStoreRoot"];
+        };
+      };
+    };
+  };
+  PutStateActivated: {
+    parameters: {
+      query: {
+        newActivated: boolean;
+      };
+    };
+    responses: {
+      200: unknown;
+    };
+  };
+  GetThemeTypes: {
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["LedThemeTypes"];
+        };
+      };
+    };
+  };
+  Group_DeleteGroup: {
+    parameters: {
+      path: {
+        groupId: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+  };
+  Group_Rename: {
+    parameters: {
+      path: {
+        groupId: string;
+      };
+      query: {
+        newName?: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+  };
+  Group_PutTheme: {
+    parameters: {
+      path: {
+        groupId: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LedTheme"];
+      };
+    };
+  };
+  Group_GetThemePreview: {
+    parameters: {
+      path: {
+        groupId: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  Group_PostThemeModifier: {
+    parameters: {
+      path: {
+        groupId: string;
+      };
+      query: {
+        index?: number | null;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LedThemeModifier"];
+      };
+    };
+  };
+  Group_CopyThemeModifier: {
+    parameters: {
+      path: {
+        groupId: string;
+        modifierId: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+  };
+  Group_PutThemeModifier: {
+    parameters: {
+      path: {
+        groupId: string;
+        modifierId: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LedThemeModifier"];
+      };
+    };
+  };
+  Group_DeleteThemeModifier: {
+    parameters: {
+      path: {
+        groupId: string;
+        modifierId: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+  };
+  Segment_Move: {
+    parameters: {
+      path: {
+        segmentId: string;
+      };
+      query: {
+        targetGroupId?: string | null;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+  };
+  Segment_Rename: {
+    parameters: {
+      path: {
+        segmentId: string;
+      };
+      query: {
+        newName?: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+  };
+}
 
 export interface external {}

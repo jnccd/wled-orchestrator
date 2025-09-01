@@ -1,0 +1,1 @@
+public class EnumSet<T> : SortedSet<T> { }

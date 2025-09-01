@@ -2,6 +2,9 @@ using System.Net;
 using System.Reflection;
 using Server.Services;
 using NSwag;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http.Json;
 
 namespace Server;
 
@@ -45,7 +48,12 @@ public static class Configuration
         });
 
         // Controller
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.WriteIndented = true;
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
     }
 
     public static void ConfigureWebApp(this WebApplication app)

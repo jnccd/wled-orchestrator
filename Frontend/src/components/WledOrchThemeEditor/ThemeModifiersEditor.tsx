@@ -27,6 +27,7 @@ import DoubleEditor from "../GenericEditors/DoubleEditor";
 import ThemePaneHeader from "./ThemePaneHeader";
 import TimeEditor from "../GenericEditors/TimeEditor";
 import EditButton from "../EditButton";
+import EnumSetEditor from "../GenericEditors/EnumSetEditor";
 
 const firstCharToLowerCase = (
   text: string | null | undefined
@@ -186,6 +187,9 @@ const ThemeModifiersEditor = () => {
                       editingObject={modifier}
                       propertyName={propertyName}
                       settings={modifierProperty.settings ?? {}}
+                      compoundTypeInfo={
+                        modifierProperty.compoundTypeInfo ?? null
+                      }
                       onChange={(object: any) =>
                         changeModifierMutation.mutate({
                           groupId: selectedGroup?.id ?? "",
@@ -202,13 +206,18 @@ const ThemeModifiersEditor = () => {
                       editingObject={modifier}
                       propertyName={propertyName}
                       settings={modifierProperty.settings ?? {}}
-                      onChange={(object: any) =>
+                      compoundTypeInfo={
+                        modifierProperty.compoundTypeInfo ?? null
+                      }
+                      onChange={(object: any) => {
+                        console.log("yay");
+                        console.log(object);
                         changeModifierMutation.mutate({
                           groupId: selectedGroup?.id ?? "",
                           modifierId: modifier.id ?? "",
                           newModifier: object,
-                        })
-                      }
+                        });
+                      }}
                     ></DoubleEditor>
                   );
                 } else if (modifierProperty.type === "TimeSpan") {
@@ -218,6 +227,9 @@ const ThemeModifiersEditor = () => {
                       editingObject={modifier}
                       propertyName={propertyName}
                       settings={modifierProperty.settings ?? {}}
+                      compoundTypeInfo={
+                        modifierProperty.compoundTypeInfo ?? null
+                      }
                       onChange={(object: any) =>
                         changeModifierMutation.mutate({
                           groupId: selectedGroup?.id ?? "",
@@ -226,6 +238,27 @@ const ThemeModifiersEditor = () => {
                         })
                       }
                     ></TimeEditor>
+                  );
+                } else if (modifierProperty.type === "EnumSet`1") {
+                  themePropertyUi = (
+                    <EnumSetEditor
+                      key={modifier.id + "editor" + index}
+                      editingObject={modifier}
+                      propertyName={propertyName}
+                      settings={modifierProperty.settings ?? {}}
+                      compoundTypeInfo={
+                        modifierProperty.compoundTypeInfo ?? null
+                      }
+                      onChange={(object: any) => {
+                        console.log("yey");
+                        console.log(object);
+                        changeModifierMutation.mutate({
+                          groupId: selectedGroup?.id ?? "",
+                          modifierId: modifier.id ?? "",
+                          newModifier: object,
+                        });
+                      }}
+                    ></EnumSetEditor>
                   );
                 } else {
                   themePropertyUi = (
