@@ -11,6 +11,8 @@ class WakeupModifier : LedThemeModifier
     public double FadeTimeMinutes { get; set; } = 20;
     [GenerateFrontendForm]
     public TimeSpan WakeUpDayTime { get; set; } = TimeSpan.FromHours(8);
+    [GenerateFrontendForm]
+    public EnumSet<DayOfWeek> ActiveDays { get; set; } = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday];
 
     TimeSpan DoubleMinutesToTimeSpan(double min) => new(0, (int)min, (int)(min % 1 * 60));
 
@@ -24,6 +26,15 @@ class WakeupModifier : LedThemeModifier
     {
         if (state == null)
             return null;
+
+        if (!ActiveDays.Contains(input.Time.DayOfWeek))
+        {
+            foreach (var color in state.Colors)
+            {
+                color.V = 0;
+            }
+            return state;
+        }
 
         int stateMinBrightness = 0, stateMaxBrightness = 100;
 
