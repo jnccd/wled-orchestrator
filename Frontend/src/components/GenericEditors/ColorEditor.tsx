@@ -1,12 +1,16 @@
 import { Colorful, ColorResult } from "@uiw/react-color";
 import { useState } from "react";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
-import { GenerateFrontendFormData } from "../../hooks/useWledOrchApi";
+import {
+  CompoundTypeInfo,
+  GenerateFrontendFormData,
+} from "../../hooks/useWledOrchApi";
 
 interface Props {
   editingObject: object;
   propertyName: string;
   settings: GenerateFrontendFormData;
+  compoundTypeInfo: CompoundTypeInfo | null;
   onChange: (newEditingObject: object) => void;
 }
 

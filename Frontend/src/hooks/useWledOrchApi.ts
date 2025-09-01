@@ -9,23 +9,29 @@ export type LedThemeModifier = components["schemas"]["LedThemeModifier"];
 
 export type LedThemeTypes = components["schemas"]["LedThemeTypes"];
 export type LedThemeTypeInfo = components["schemas"]["TypeInfo"];
-export type LedThemeTypePropertyInfo = components["schemas"]["TypePropertyInfo"];
-export type GenerateFrontendFormData = components["schemas"]["GenerateFrontendFormData"];
+export type LedThemeTypePropertyInfo =
+  components["schemas"]["TypePropertyInfo"];
+export type GenerateFrontendFormData =
+  components["schemas"]["GenerateFrontendFormData"];
+export type CompoundTypeInfo = components["schemas"]["CompoundTypeInfo"];
 
-export const baseUrl = import.meta.env.VITE_DEV_BACKEND_ADDRESS ? import.meta.env.VITE_DEV_BACKEND_ADDRESS : window.location.href;
-console.log(`baseUrl ${baseUrl}`)
+export const baseUrl = import.meta.env.VITE_DEV_BACKEND_ADDRESS
+  ? import.meta.env.VITE_DEV_BACKEND_ADDRESS
+  : window.location.href;
+console.log(`baseUrl ${baseUrl}`);
 export const apiClient = axios.create({
-    baseURL: baseUrl,
-    withCredentials: false,
-})
+  baseURL: baseUrl,
+  withCredentials: false,
+});
 
-export const wledOrchStateQueryKey = "wledOrchState"
-export const getWledOrchState = () => 
-  apiClient
-    .get<LedSegmentGroups>(`/state`)
-    .then((res) => res.data);
+export const wledOrchStateQueryKey = "wledOrchState";
+export const getWledOrchState = () =>
+  apiClient.get<LedSegmentGroups>(`/state`).then((res) => res.data);
 
-export const moveSegment = (args: {segmentId: string, targetGroupId: string | null}) => 
+export const moveSegment = (args: {
+  segmentId: string;
+  targetGroupId: string | null;
+}) =>
   apiClient
     .put(`/state/segments/${args.segmentId}/move`, null, {
       params: {
@@ -34,7 +40,7 @@ export const moveSegment = (args: {segmentId: string, targetGroupId: string | nu
     })
     .then((res) => res.data);
 
-export const renameSegment = (args: {segmentId: string, newName: string}) => 
+export const renameSegment = (args: { segmentId: string; newName: string }) =>
   apiClient
     .put(`/state/segments/${args.segmentId}/name`, null, {
       params: {
@@ -43,7 +49,7 @@ export const renameSegment = (args: {segmentId: string, newName: string}) =>
     })
     .then((res) => res.data);
 
-export const renameGroup = (args: {groupId: string, newName: string}) => 
+export const renameGroup = (args: { groupId: string; newName: string }) =>
   apiClient
     .put(`/state/groups/${args.groupId}/name`, null, {
       params: {
@@ -52,41 +58,52 @@ export const renameGroup = (args: {groupId: string, newName: string}) =>
     })
     .then((res) => res.data);
 
-export const deleteGroup = (args: {groupId: string}) => 
-  apiClient
-    .delete(`/state/groups/${args.groupId}`)
-    .then((res) => res.data);
+export const deleteGroup = (args: { groupId: string }) =>
+  apiClient.delete(`/state/groups/${args.groupId}`).then((res) => res.data);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const setGroupTheme = (args: {groupId: string, newTheme: any}) => 
+export const setGroupTheme = (args: { groupId: string; newTheme: any }) =>
   apiClient
     .put(`/state/groups/${args.groupId}/theme`, args.newTheme)
     .then((res) => res.data);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const addThemeModifier = (args: {groupId: string, newModifier: any, index: number | null}) => 
+export const addThemeModifier = (args: {
+  groupId: string;
+  newModifier: any;
+  index: number | null;
+}) =>
   apiClient
-    .post(`/state/groups/${args.groupId}/theme/modifiers`, args.newModifier, { 
+    .post(`/state/groups/${args.groupId}/theme/modifiers`, args.newModifier, {
       params: {
-        index: args.index
-      }
+        index: args.index,
+      },
     })
     .then((res) => res.data);
 
-export const deleteThemeModifier = (args: {groupId: string, modifierId: string}) => 
+export const deleteThemeModifier = (args: {
+  groupId: string;
+  modifierId: string;
+}) =>
   apiClient
     .delete(`/state/groups/${args.groupId}/theme/modifiers/${args.modifierId}`)
     .then((res) => res.data);
 
-export const setThemeModifier = (args: {groupId: string, modifierId: string, newModifier: 
-  | components["schemas"]["LedThemeModifier"]
-  | components["schemas"]["RotateColorsModifier"]
-  | components["schemas"]["WakeupModifier"]}) => 
-  apiClient
-    .put(`/state/groups/${args.groupId}/theme/modifiers/${args.modifierId}`, args.newModifier)
+export const setThemeModifier = (args: {
+  groupId: string;
+  modifierId: string;
+  newModifier: LedThemeModifier;
+}) => {
+  console.log("new modifier", args.newModifier);
+  return apiClient
+    .put(
+      `/state/groups/${args.groupId}/theme/modifiers/${args.modifierId}`,
+      args.newModifier
+    )
     .then((res) => res.data);
-      
-export const setActivated = (args: {newActivated: boolean}) => 
+};
+
+export const setActivated = (args: { newActivated: boolean }) =>
   apiClient
     .put(`/state/activated`, null, {
       params: {
@@ -95,7 +112,5 @@ export const setActivated = (args: {newActivated: boolean}) =>
     })
     .then((res) => res.data);
 
-export const getThemeTypes = () => 
-  apiClient
-    .get<LedThemeTypes>(`/theme-types`)
-    .then((res) => res.data);
+export const getThemeTypes = () =>
+  apiClient.get<LedThemeTypes>(`/theme-types`).then((res) => res.data);
