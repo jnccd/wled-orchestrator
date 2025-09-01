@@ -1,20 +1,10 @@
-import { Colorful, ColorResult } from "@uiw/react-color";
 import { useState } from "react";
 import { readProperty, writeProperty } from "../../utils/untypedPropertyAccess";
 import {
   CompoundTypeInfo,
   GenerateFrontendFormData,
 } from "../../hooks/useWledOrchApi";
-import {
-  Checkbox,
-  CheckboxGroup,
-  HStack,
-  List,
-  ListIcon,
-  ListItem,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Checkbox, CheckboxGroup, HStack, VStack } from "@chakra-ui/react";
 
 interface Props {
   editingObject: object;
