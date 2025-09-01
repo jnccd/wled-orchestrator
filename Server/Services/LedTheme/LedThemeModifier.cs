@@ -4,7 +4,6 @@ namespace Server.Services.LedTheme;
 
 [JsonDerivedType(typeof(RotateColorsModifier), typeDiscriminator: "rotateColorsModifier")]
 [JsonDerivedType(typeof(WakeupModifier), typeDiscriminator: "wakeupModifier")]
-[JsonDerivedType(typeof(WeekdayModifier), typeDiscriminator: "weekdayModifier")]
 public class LedThemeModifier() : ICloneable
 {
     public Guid Id { get; set; } = Guid.NewGuid();
