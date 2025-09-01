@@ -109,7 +109,7 @@ public class GroupController : ControllerBase
                     Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
 
                     var hour = 24 / (float)accessor.Height * y;
-                    var state = group.Theme.GetNewModifiedState(new(new(2000, 1, 1, (int)hour, (int)(hour % 1 * 60), 0)));
+                    var state = group.Theme.GetNewModifiedState(new(new(DateOnly.FromDateTime(DateTime.Now), new((int)hour, (int)(hour % 1 * 60), 0))));
                     var colors = state!.Colors.Select(x => x.HsvToRgb()).ToArray();
 
                     for (int x = 0; x < pixelRow.Length; x++)
