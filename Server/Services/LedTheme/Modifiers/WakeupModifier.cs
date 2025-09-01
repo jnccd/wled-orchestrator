@@ -29,10 +29,6 @@ class WakeupModifier : LedThemeModifier
 
         if (!ActiveDays.Contains(input.Time.DayOfWeek))
         {
-            foreach (var color in state.Colors)
-            {
-                color.V = 0;
-            }
             return state;
         }
 
