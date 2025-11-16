@@ -1,6 +1,7 @@
 using Server;
 using Server.Endpoints;
 
+Console.WriteLine("Hewwo!");
 var builder = WebApplication.CreateBuilder(args);
 builder.ConfigureWebhost();
 builder.RegisterServices();
