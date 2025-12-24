@@ -26,6 +26,11 @@ public class ColorHsv(double H, double S, double V)
 
 public static class ColorHsvExtensions
 {
+    /// <summary>
+    /// Lerps
+    /// </summary>
+    /// <param name="x">In [0, 1]</param>
+    /// <returns></returns>
     public static ColorHsv Lerp(this ColorHsv c, ColorHsv b, double x) => c.HsvToRgb().Lerp(b.HsvToRgb(), x).RgbToHSV();
 
     public static ColorRgb HsvToRgb(this ColorHsv Hsv) // from https://stackoverflow.com/questions/1335426/is-there-a-built-in-c-net-system-api-for-hsv-to-rgb

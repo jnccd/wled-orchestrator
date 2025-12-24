@@ -40,8 +40,8 @@ public class LedThemeDaylight : LedTheme
             var x = i / (double)ColorArrayResolution - sunRiseDayTime;
             var gaussianSun = Math.Exp(-(x * x) * InvertedSunSize);
             colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
-            var funOut = DayLightFunction(curDayTimePercent);
-            colors[i] = new ColorHsv(colors[i].H, colors[i].S, colors[i].V * funOut);
+
+            colors[i].V *= DayLightFunction(curDayTimePercent);
         }
 
         return colors;
