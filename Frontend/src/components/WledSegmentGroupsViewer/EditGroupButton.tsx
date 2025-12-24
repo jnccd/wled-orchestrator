@@ -23,7 +23,7 @@ interface Props {
 }
 
 const EditGroupButton = ({ group }: Props) => {
-  const inputId = "name-input";
+  const inputId = "name-input-" + group.id;
   const toast = useToast();
 
   // React Query setup
