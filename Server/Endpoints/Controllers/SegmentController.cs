@@ -19,8 +19,7 @@ public class SegmentController : ControllerBase
         {
             (var segmentGroup, var segment) = dataStore.Data.Groups
                 .Select(g => (g, g.LedSegments.FirstOrDefault(x => x.Id == segmentId)))
-                .Where(x => x.Item2 != null)
-                .FirstOrDefault();
+                .FirstOrDefault(x => x.Item2 != null);
             if (segmentGroup == null || segment == null)
                 return Results.NotFound("The SegmentId was not found in any groups");
 

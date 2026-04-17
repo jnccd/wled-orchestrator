@@ -15,7 +15,7 @@ public class RegisterImplementation(ServiceRegisterType serviceRegisterType, Typ
     public readonly Type serviceType = serviceType;
 }
 
-public enum ServiceRegisterType { Singleton, Transient }
+public enum ServiceRegisterType { Singleton, Scoped, Transient }
 
 public static class Configuration
 {
@@ -35,6 +35,8 @@ public static class Configuration
 
             if (attr.serviceRegisterType == ServiceRegisterType.Singleton)
                 builder.Services.AddSingleton(declaringType, attr.serviceType);
+            else if (attr?.serviceRegisterType == ServiceRegisterType.Scoped)
+                builder.Services.AddScoped(declaringType, attr.serviceType);
             else if (attr?.serviceRegisterType == ServiceRegisterType.Transient)
                 builder.Services.AddTransient(declaringType, attr.serviceType);
         }
