@@ -66,6 +66,7 @@ public class UpdaterService(
                     themeBrightnesses.Add(newLedState.Brightness);
                 }
 
+                if (themeBrightnesses == null || themeBrightnesses.Count == 0) continue;
                 communicatorService.SetBrightnessOnWledServer((int)themeBrightnesses.Average(), ledServer.Key);
             }
         }
