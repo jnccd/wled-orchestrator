@@ -15,10 +15,25 @@ public class WledCommunicatorService(
 {
     public record WledServer(string Address, WledServerState State);
 
+    /// <summary>Last colors successfully sent for a segment, used to prune duplicate UDP frames.</summary>
+    class CachedSegmentColors(ColorRgb[] colors, DateTime sentAt)
+    {
+        public ColorRgb[] Colors { get; } = colors;
+        public DateTime SentAt { get; } = sentAt;
+    }
+
     public WledServer[] WledServers { get; private set; } = [];
     private const double HttpReqCooldownSecs = 0.1;
     private readonly Dictionary<string, DateTime> LastBriHTTPReq = [];
     private readonly Dictionary<LedSegment, DateTime> LastColReq = [];
+
+    // Cache of the last successfully sent colors per segment. Frames are UDP realtime with an
+    // infinite timeout byte (255), so an unchanged picture does not need re-sending every tick.
+    readonly Dictionary<LedSegment, CachedSegmentColors> lastSentColors = [];
+    // A static picture is re-sent after this interval even when unchanged: a WLED that rebooted or
+    // left live mode on its own has no way to tell us, and the resend re-syncs it cheaply.
+    static readonly TimeSpan ResendStaleColorsInterval = TimeSpan.FromSeconds(10);
+
     private bool frequentLogging = false;
 
     public void FindLEDs()
@@ -201,10 +216,18 @@ public class WledCommunicatorService(
         if (colors.Length == 0 || segment.Length == 0)
             return false;
 
-        // No cooldown here: at 20fps every segment needs a fresh realtime frame each tick (frames
-        // also keep WLEDs realtime mode alive). The cooldown below only guards the HTTP fallback.
+        // Sample the theme colors down to one color per physical LED (same mapping the old JSON
+        // transport used). This is also the value the duplicate check below compares against.
+        var sampled = SampleColorsToSegment(colors, segment);
 
-        if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length} via UDP...", LogLevel.Debug);
+        // No cooldown, but prune duplicate frames: because WLEDs realtime timeout byte is 255
+        // (stay in live mode indefinitely), a segment whose colors did not change since the last
+        // successful send does not need another frame. Returns false => no frame was sent.
+        if (lastSentColors.TryGetValue(segment, out var last) && SameColors(last.Colors, sampled)
+            && DateTime.Now - last.SentAt < ResendStaleColorsInterval)
+            return false;
+
+        if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {sampled.Length} via UDP...", LogLevel.Debug);
 
         var host = GetHostFromWledServerAddress(segment.WledServerAddress);
         if (host == null)
@@ -216,16 +239,50 @@ public class WledCommunicatorService(
         try
         {
             var correction = ColorCorrections.GetValueOrDefault(segment.WledServerAddress) ?? WledColorCorrection.DefaultFallback;
-            WledUdpColorSender.SendSegmentColors(host, segment.Start, SampleColorsToSegment(colors, segment), gammaLut: correction.GammaLut);
+            WledUdpColorSender.SendSegmentColors(host, segment.Start, sampled, gammaLut: correction.GammaLut);
+            lastSentColors[segment] = new(sampled, DateTime.Now);
             return true;
         }
         catch (Exception e)
         {
+            lastSentColors.Remove(segment); // dont trust stale colors; retry on a later tick
             // UDP is fire & forget; a failure here usually just means the server is unreachable right
             // now, and the update loop retries next tick anyway. Only log when frequent logging is on.
             if (frequentLogging) logger.WriteLine(e, LogLevel.Error);
             return false;
         }
+    }
+
+    /// <summary>
+    /// Releases a WLED server from realtime mode (timeout byte 255 keeps it in live mode forever
+    /// otherwise) and clears its dedup cache, so the next tick that drives the server repaints it.
+    /// Called when the server is deactivated or has nothing left to display.
+    /// </summary>
+    public void CancelRealtimeOnWledServer(string wledServerAddress)
+    {
+        foreach (var cached in lastSentColors.Keys.Where(x => x.WledServerAddress == wledServerAddress).ToArray())
+            lastSentColors.Remove(cached);
+
+        var host = GetHostFromWledServerAddress(wledServerAddress);
+        if (host == null) return;
+
+        try
+        {
+            WledUdpColorSender.CancelRealtime(host);
+        }
+        catch
+        {
+            // Ignore; the server is unreachable right now, the regular update flow retries later.
+        }
+    }
+
+    static bool SameColors(ColorRgb[] a, ColorRgb[] b)
+    {
+        if (a.Length != b.Length) return false;
+        for (int i = 0; i < a.Length; i++)
+            if (a[i].R != b[i].R || a[i].G != b[i].G || a[i].B != b[i].B)
+                return false;
+        return true;
     }
 
     // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control

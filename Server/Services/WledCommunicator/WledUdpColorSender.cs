@@ -22,14 +22,33 @@ public static class WledUdpColorSender
     // 1 = WARLS, 2 = DRGB, 3 = DRGBW, 4 = DNRGB, 5 = DNRGBW
     const byte DnRgbProtocol = 4;
 
-    // Seconds WLED keeps realtime mode alive after the last received packet before returning to
-    // its regular mode. The update loop runs every 50ms, so 2s leaves plenty of slack for a
-    // hiccup without the strip flickering back to WLEDs own state between frames.
-    const byte RealtimeTimeoutSecs = 2;
+    // Byte 1 = number of seconds WLED keeps realtime mode alive after the last received packet.
+    // 255 (= 255001 ms) makes WLED stay in live mode indefinitely (until a timeout byte of 0 is
+    // received or the device leaves realtime another way). That is what allows the orchestrator to
+    // prune duplicate frames: once a picture is on the strip it stays there without further traffic.
+    // Whenever the orchestrator stops driving a server it therefore sends an explicit cancel frame
+    // (see CancelRealtime), and SendSegmentColors callers are expected to re-send unchanged colors
+    // occasionally to recover from devices that left live mode on their own (e.g. after a reboot).
+    const byte RealtimeTimeoutSecs = 255;
 
     // WLED drops datagrams larger than UDP_IN_MAXSIZE (1472). Stay below that so frames are
     // neither dropped by WLED nor IP-fragmented on the wire.
     const int MaxPacketBytes = 1400;
+
+    /// <summary>
+    /// Asks the WLED server to leave realtime (live) mode. WLED exits live mode when it receives a
+    /// realtime-protocol packet whose timeout byte is 0, regardless of content; a minimal DNRGB
+    /// header suffices. Used when the orchestrator stops driving a server so the device can return
+    /// to its own effects instead of being stuck showing the last live frame forever.
+    /// </summary>
+    public static void CancelRealtime(string host, int udpPort = DefaultWledUdpPort)
+    {
+        if (string.IsNullOrWhiteSpace(host) || udpPort is < 1 or > 65535)
+            return;
+
+        byte[] frame = [DnRgbProtocol, 0]; // protocol + timeout 0 = cancel realtime
+        Send(frame, host, udpPort);
+    }
 
     /// <summary>
     /// Sends <paramref name="colors"/> to the WLED server at <paramref name="host"/>:<paramref name="udpPort"/>,
