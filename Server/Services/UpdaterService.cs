@@ -19,6 +19,15 @@ public class UpdaterService(
     // communicator when a segments colors are unchanged, and the HTTP brightness request below is
     // only sent when the value actually changes (see lastSentBrightness).
     const int ledUpdateIntervalMillis = 50;
+
+    // When a server has exactly one driven segment, colors whose HSV value is low (dim scenes) are
+    // lifted to the full 8-bit range and the uniform dim level is moved into the servers global
+    // WLED brightness instead. WLED applies that brightness linearly *after* the (client-side)
+    // gamma table, so dim scenes keep their hue/channel resolution instead of being crushed into
+    // the coarse near-black region of the gamma curve. Automatically disabled for servers with
+    // several segments, because WLED brightness is global per device and cannot represent several
+    // different dim levels at once.
+    const bool ConsolidateDimmingIntoBrightness = true;
     // Brightness value last sent to each server, used to avoid spamming identical HTTP requests every tick.
     readonly Dictionary<string, int> lastSentBrightness = [];
     // Servers the update loop currently keeps in WLED realtime mode; they must be explicitly
@@ -93,28 +102,77 @@ public class UpdaterService(
                     continue;
                 }
 
-                int avgBrightness = (int)themedSegments.Average(s => s.State.Brightness);
-                if (avgBrightness <= 0)
+                bool consolidateDimming = ConsolidateDimmingIntoBrightness && themedSegments.Count == 1;
+                if (consolidateDimming)
                 {
-                    // Brightness 0: every possible color renders identically (black), so sending
-                    // color frames is pointless regardless of what the themes compute.
-                    SetBrightnessIfChanged(serverAddress, 0);
-                    ReleaseServer(serverAddress);
-                    continue;
-                }
+                    var (segment, newLedState) = themedSegments[0];
+                    var (colors, brightness) = ConsolidateIntoBrightness(
+                        [.. newLedState.Colors.Select(x => x.HsvToRgb())], newLedState.Brightness);
 
-                foreach (var (segment, newLedState) in themedSegments)
-                    communicatorService.SetLedColorsOnWledSegment([.. newLedState.Colors.Select(x => x.HsvToRgb())], segment);
+                    if (brightness <= 0)
+                    {
+                        SetBrightnessIfChanged(serverAddress, 0);
+                        ReleaseServer(serverAddress);
+                        continue;
+                    }
+
+                    communicatorService.SetLedColorsOnWledSegment(colors, segment);
+                    SetBrightnessIfChanged(serverAddress, brightness);
+                    drivenServers.Add(serverAddress);
+                }
+                else
+                {
+                    int avgBrightness = (int)themedSegments.Average(s => s.State.Brightness);
+                    if (avgBrightness <= 0)
+                    {
+                        // Brightness 0: every possible color renders identically (black), so sending
+                        // color frames is pointless regardless of what the themes compute.
+                        SetBrightnessIfChanged(serverAddress, 0);
+                        ReleaseServer(serverAddress);
+                        continue;
+                    }
+
+                    foreach (var (segment, newLedState) in themedSegments)
+                        communicatorService.SetLedColorsOnWledSegment([.. newLedState.Colors.Select(x => x.HsvToRgb())], segment);
+
+                    SetBrightnessIfChanged(serverAddress, avgBrightness);
+                    drivenServers.Add(serverAddress);
+                }
 
                 // Segments whose group has no theme would otherwise keep showing their last frame;
                 // clear them (one black frame each, deduped afterwards) so a null theme reads as "off".
                 foreach (var segment in unthemedSegments)
                     communicatorService.ClearSegmentColors(segment);
-
-                SetBrightnessIfChanged(serverAddress, avgBrightness);
-                drivenServers.Add(serverAddress);
             }
         }
+    }
+
+    // Lifts dim colors up to the full 8-bit range and moves the removed level into the (global)
+    // WLED brightness. The themes HSV values stay the ground truth - only their *level* is split
+    // off, so dim scenes keep hue/channel resolution instead of being crushed into the coarse
+    // near-black region of the gamma table.
+    static (ColorRgb[] Colors, int Brightness) ConsolidateIntoBrightness(ColorRgb[] colors, int brightness)
+    {
+        if (colors.Length == 0 || brightness <= 0)
+            return (colors, brightness);
+
+        int maxChannel = 0;
+        foreach (var color in colors)
+            maxChannel = Math.Max(maxChannel, Math.Max(color.R, Math.Max(color.G, color.B)));
+
+        if (maxChannel <= 1 || maxChannel >= 255)
+            return (colors, brightness); // all black or already full range: nothing to consolidate
+
+        double scale = 255.0 / maxChannel;
+        var lifted = new ColorRgb[colors.Length];
+        for (int i = 0; i < colors.Length; i++)
+            lifted[i] = new ColorRgb(
+                (byte)Math.Min(255, (int)Math.Round(colors[i].R * scale)),
+                (byte)Math.Min(255, (int)Math.Round(colors[i].G * scale)),
+                (byte)Math.Min(255, (int)Math.Round(colors[i].B * scale)));
+
+        int dimmedBrightness = Math.Clamp((int)Math.Round(brightness * maxChannel / 255.0), 1, 255);
+        return (lifted, dimmedBrightness);
     }
 
     void SetBrightnessIfChanged(string serverAddress, int brightness)
