@@ -60,7 +60,7 @@ public class GroupController : ControllerBase
     public IResult PutTheme(
         [FromServices] DataStoreService dataStore,
         [Required] string groupId,
-        [FromBody, Required] LedTheme newTheme)
+        [FromBody] LedTheme? newTheme)
     {
         lock (dataStore.lockject)
         {
@@ -68,6 +68,8 @@ public class GroupController : ControllerBase
             if (group == null)
                 return Results.NotFound("The GroupId was not found in any groups!");
 
+            // newTheme == null clears the theme; a group without a theme is a valid state (e.g. a
+            // newly created group), and the theme editor already renders "None" for it.
             group.Theme = newTheme;
 
             dataStore.Save();

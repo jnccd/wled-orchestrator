@@ -62,17 +62,22 @@ export const deleteGroup = (args: { groupId: string }) =>
   apiClient.delete(`/state/groups/${args.groupId}`).then((res) => res.data);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const setGroupTheme = (args: { groupId: string; newTheme: any }) =>
-  apiClient
-    .put(`/state/groups/${args.groupId}/theme`, args.newTheme)
+export const setGroupTheme = (args: { groupId: string; newTheme: any }) => {
+  // Clearing the theme sends an explicit JSON null body (the server accepts null to remove the theme).
+  const clearsTheme = args.newTheme === null;
+  return apiClient
+    .put(
+      `/state/groups/${args.groupId}/theme`,
+      clearsTheme ? JSON.stringify(null) : args.newTheme,
+      clearsTheme
+        ? { headers: { "Content-Type": "application/json" } }
+        : undefined
+    )
     .then((res) => res.data);
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const addThemeModifier = (args: {
-  groupId: string;
-  newModifier: any;
-  index: number | null;
-}) =>
+export const addThemeModifier = (args: { groupId: string; newModifier: any; index: number | null }) =>
   apiClient
     .post(`/state/groups/${args.groupId}/theme/modifiers`, args.newModifier, {
       params: {

@@ -58,10 +58,21 @@ const ThemePicker = () => {
           {selectedGroup?.theme?.typeName ?? "None"}
         </MenuButton>
         <MenuList>
+          {/* "None" (= no theme) is a valid state, e.g. a freshly created group starts without one. */}
+          <MenuItem
+            onClick={() =>
+              changeThemeMutation.mutate({
+                groupId: selectedGroup?.id ?? "",
+                newTheme: null,
+              })
+            }
+          >
+            None
+          </MenuItem>
           {themeTypesQuery.data?.themes?.map((x) => (
             <MenuItem
               key={x.name}
-              onClick={(_) =>
+              onClick={() =>
                 changeThemeMutation.mutate({
                   groupId: selectedGroup?.id ?? "",
                   newTheme: {
