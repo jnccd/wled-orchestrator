@@ -31,8 +31,9 @@ public class WledCommunicatorService(
     // infinite timeout byte (255), so an unchanged picture does not need re-sending every tick.
     readonly Dictionary<LedSegment, CachedSegmentColors> lastSentColors = [];
     // A static picture is re-sent after this interval even when unchanged: a WLED that rebooted or
-    // left live mode on its own has no way to tell us, and the resend re-syncs it cheaply.
-    static readonly TimeSpan ResendStaleColorsInterval = TimeSpan.FromSeconds(10);
+    // left live mode on its own has no way to tell us, and the resend re-syncs it cheaply. 2s keeps
+    // interactive color edits responsive if a device drops out of live mode without us noticing.
+    static readonly TimeSpan ResendStaleColorsInterval = TimeSpan.FromSeconds(2);
 
     private bool frequentLogging = false;
 
@@ -287,6 +288,14 @@ public class WledCommunicatorService(
             return false;
         }
     }
+
+    /// <summary>
+    /// Gamma exponent applied to this servers colors (the devices own gamma or
+    /// <see cref="WledColorCorrection.GammaExponentOverride"/>). Used when dim colors are split into
+    /// the global brightness so that the total light output stays identical.
+    /// </summary>
+    public double GetEffectiveGammaExponent(string wledServerAddress) =>
+        (ColorCorrections.GetValueOrDefault(wledServerAddress) ?? WledColorCorrection.DefaultFallback).EffectiveGammaExponent;
 
     /// <summary>
     /// Releases a WLED server from realtime mode (timeout byte 255 keeps it in live mode forever

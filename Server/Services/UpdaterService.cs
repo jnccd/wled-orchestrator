@@ -22,11 +22,11 @@ public class UpdaterService(
 
     // When a server has exactly one driven segment, colors whose HSV value is low (dim scenes) are
     // lifted to the full 8-bit range and the uniform dim level is moved into the servers global
-    // WLED brightness instead. WLED applies that brightness linearly *after* the (client-side)
-    // gamma table, so dim scenes keep their hue/channel resolution instead of being crushed into
-    // the coarse near-black region of the gamma curve. Automatically disabled for servers with
-    // several segments, because WLED brightness is global per device and cannot represent several
-    // different dim levels at once.
+    // WLED brightness instead. The brightness is gamma-matched (brightness = level^gamma), so the
+    // total light stays identical to the old color-encoded dimming, while the colors themselves
+    // keep their full range instead of being crushed into the coarse near-black region of the gamma
+    // table. Automatically disabled for servers with several segments, because WLED brightness is
+    // global per device and cannot represent several different dim levels at once.
     const bool ConsolidateDimmingIntoBrightness = true;
     // Brightness value last sent to each server, used to avoid spamming identical HTTP requests every tick.
     readonly Dictionary<string, int> lastSentBrightness = [];
@@ -107,7 +107,9 @@ public class UpdaterService(
                 {
                     var (segment, newLedState) = themedSegments[0];
                     var (colors, brightness) = ConsolidateIntoBrightness(
-                        [.. newLedState.Colors.Select(x => x.HsvToRgb())], newLedState.Brightness);
+                        [.. newLedState.Colors.Select(x => x.HsvToRgb())],
+                        newLedState.Brightness,
+                        communicatorService.GetEffectiveGammaExponent(serverAddress));
 
                     if (brightness <= 0)
                     {
@@ -116,8 +118,11 @@ public class UpdaterService(
                         continue;
                     }
 
-                    communicatorService.SetLedColorsOnWledSegment(colors, segment);
+                    // The lifted colors are level-free (always up to full range), so the brightness
+                    // must reach the device first: otherwise a dimming transition would show the new
+                    // colors at the stale high brightness for one frame (bright flash, then black).
                     SetBrightnessIfChanged(serverAddress, brightness);
+                    communicatorService.SetLedColorsOnWledSegment(colors, segment);
                     drivenServers.Add(serverAddress);
                 }
                 else
@@ -151,7 +156,12 @@ public class UpdaterService(
     // WLED brightness. The themes HSV values stay the ground truth - only their *level* is split
     // off, so dim scenes keep hue/channel resolution instead of being crushed into the coarse
     // near-black region of the gamma table.
-    static (ColorRgb[] Colors, int Brightness) ConsolidateIntoBrightness(ColorRgb[] colors, int brightness)
+    //
+    // The brightness is gamma-matched to keep the total light output identical: lifting the colors
+    // by 1/level multiplies each channel by level^-gamma in the gamma domain, so the brightness is
+    // reduced by level^gamma (with level = maxChannel/255) to compensate.
+    static (ColorRgb[] Colors, int Brightness) ConsolidateIntoBrightness(
+        ColorRgb[] colors, int brightness, double gammaExponent)
     {
         if (colors.Length == 0 || brightness <= 0)
             return (colors, brightness);
@@ -171,7 +181,12 @@ public class UpdaterService(
                 (byte)Math.Min(255, (int)Math.Round(colors[i].G * scale)),
                 (byte)Math.Min(255, (int)Math.Round(colors[i].B * scale)));
 
-        int dimmedBrightness = Math.Clamp((int)Math.Round(brightness * maxChannel / 255.0), 1, 255);
+        if (gammaExponent <= 0.1)
+            return (lifted, brightness); // no color curve in play: keep the plain level
+
+        double level = maxChannel / 255.0;
+        double dimmed = brightness * Math.Pow(level, gammaExponent);
+        int dimmedBrightness = dimmed <= 0.5 ? 0 : Math.Clamp((int)Math.Round(dimmed), 1, 255);
         return (lifted, dimmedBrightness);
     }
 
