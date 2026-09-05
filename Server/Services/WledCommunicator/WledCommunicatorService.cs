@@ -218,11 +218,46 @@ public class WledCommunicatorService(
 
         // Sample the theme colors down to one color per physical LED (same mapping the old JSON
         // transport used). This is also the value the duplicate check below compares against.
-        var sampled = SampleColorsToSegment(colors, segment);
+        return SendSegmentColorsUdp(segment, SampleColorsToSegment(colors, segment));
+    }
 
-        // No cooldown, but prune duplicate frames: because WLEDs realtime timeout byte is 255
-        // (stay in live mode indefinitely), a segment whose colors did not change since the last
-        // successful send does not need another frame. Returns false => no frame was sent.
+    /// <summary>
+    /// Paints a whole segment black ("off"). Used for segments whose group has no theme, so they do
+    /// not keep showing their last colors. The dedup cache keeps this to a single frame per segment
+    /// until the colors would change again.
+    /// </summary>
+    public bool ClearSegmentColors(LedSegment segment)
+    {
+        if (segment.Length == 0)
+            return false;
+
+        return SendSegmentColorsUdp(segment, GetBlackColors(segment.Length));
+    }
+
+    // Reusable black pixel arrays, one per segment length, so clearing a segment does not allocate a
+    // new array every tick. Entries are never mutated by callers.
+    static readonly Dictionary<int, ColorRgb[]> blackColorsCache = [];
+    static ColorRgb[] GetBlackColors(int length)
+    {
+        lock (blackColorsCache)
+        {
+            if (!blackColorsCache.TryGetValue(length, out var black))
+            {
+                black = new ColorRgb[length];
+                for (int i = 0; i < length; i++)
+                    black[i] = new ColorRgb(0, 0, 0);
+                blackColorsCache[length] = black;
+            }
+            return black;
+        }
+    }
+
+    // Sends one segment frame over UDP unless the colors are unchanged since the last successful
+    // send. No cooldown, but duplicate frames are pruned: WLEDs realtime timeout byte is 255 (stay
+    // in live mode indefinitely), so an unchanged picture needs no further traffic. Returns false
+    // => no frame was sent.
+    bool SendSegmentColorsUdp(LedSegment segment, ColorRgb[] sampled)
+    {
         if (lastSentColors.TryGetValue(segment, out var last) && SameColors(last.Colors, sampled)
             && DateTime.Now - last.SentAt < ResendStaleColorsInterval)
             return false;

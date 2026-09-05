@@ -75,21 +75,25 @@ public class UpdaterService(
                     continue;
                 }
 
-                var drivenSegments = new List<(LedSegment Segment, LedGroupState State)>();
+                var themedSegments = new List<(LedSegment Segment, LedGroupState State)>();
+                var unthemedSegments = new List<LedSegment>();
                 foreach (var segment in ledServer)
                 {
                     var newLedState = ledThemeProvider.GetNewLedState(segment);
-                    if (newLedState != null) drivenSegments.Add((segment, newLedState));
+                    if (newLedState != null) themedSegments.Add((segment, newLedState));
+                    else unthemedSegments.Add(segment); // group has no theme
                 }
 
-                if (drivenSegments.Count == 0)
+                if (themedSegments.Count == 0)
                 {
-                    // Nothing to display on this server; release live mode but leave brightness alone.
+                    // No theme drives this server anymore (e.g. the last theme was set to null):
+                    // switch the whole server off instead of leaving it on its last colors.
+                    SetBrightnessIfChanged(serverAddress, 0);
                     ReleaseServer(serverAddress);
                     continue;
                 }
 
-                int avgBrightness = (int)drivenSegments.Average(s => s.State.Brightness);
+                int avgBrightness = (int)themedSegments.Average(s => s.State.Brightness);
                 if (avgBrightness <= 0)
                 {
                     // Brightness 0: every possible color renders identically (black), so sending
@@ -99,8 +103,13 @@ public class UpdaterService(
                     continue;
                 }
 
-                foreach (var (segment, newLedState) in drivenSegments)
+                foreach (var (segment, newLedState) in themedSegments)
                     communicatorService.SetLedColorsOnWledSegment([.. newLedState.Colors.Select(x => x.HsvToRgb())], segment);
+
+                // Segments whose group has no theme would otherwise keep showing their last frame;
+                // clear them (one black frame each, deduped afterwards) so a null theme reads as "off".
+                foreach (var segment in unthemedSegments)
+                    communicatorService.ClearSegmentColors(segment);
 
                 SetBrightnessIfChanged(serverAddress, avgBrightness);
                 drivenServers.Add(serverAddress);
@@ -110,7 +119,9 @@ public class UpdaterService(
 
     void SetBrightnessIfChanged(string serverAddress, int brightness)
     {
-        if (lastSentBrightness.GetValueOrDefault(serverAddress) == brightness) return;
+        // Post on the first decision for a server too (e.g. right after a restart, when the device
+        // may still be at an arbitrary brightness), not only when the value differs from before.
+        if (lastSentBrightness.TryGetValue(serverAddress, out var lastSent) && lastSent == brightness) return;
         communicatorService.SetBrightnessOnWledServer(brightness, serverAddress);
         lastSentBrightness[serverAddress] = brightness;
     }
