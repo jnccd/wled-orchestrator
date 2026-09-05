@@ -18,7 +18,7 @@ public class WledCommunicatorService(
     public WledServer[] WledServers { get; private set; } = [];
     private const double HttpReqCooldownSecs = 0.1;
     private readonly Dictionary<string, DateTime> LastBriHTTPReq = [];
-    private readonly Dictionary<LedSegment, DateTime> LastColHTTPReq = [];
+    private readonly Dictionary<LedSegment, DateTime> LastColReq = [];
     private bool frequentLogging = false;
 
     public void FindLEDs()
@@ -155,7 +155,6 @@ public class WledCommunicatorService(
         return true;
     }
 
-    // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
     public bool SetLedColorsGlobally(ColorRgb[] colors)
     {
         foreach (var wledServer in WledServers)
@@ -164,14 +163,59 @@ public class WledCommunicatorService(
                     return false;
         return true;
     }
+    // https://kno.wled.ge/interfaces/udp-realtime/
+    // Default transport of the update loop: sends the per-LED colors through WLEDs "UDP realtime"
+    // (DNRGB) channel. That channel shares the UDP port of WLEDs sync notifier (default 21324),
+    // making it far cheaper than the per-LED JSON POSTs the HTTP variant used.
+    // The old JSON transport stays available as SetLedColorsOnWledSegmentHttpJson (e.g. for servers
+    // that have UDP realtime disabled), and custom per-server UDP ports can be added later.
     public bool SetLedColorsOnWledSegment(ColorRgb[] colors, LedSegment segment)
     {
-        var secs = (DateTime.Now - LastColHTTPReq.GetValueOrDefault(segment)).TotalSeconds;
+        if (colors.Length == 0 || segment.Length == 0)
+            return false;
+
+        var secs = (DateTime.Now - LastColReq.GetValueOrDefault(segment)).TotalSeconds;
         if (secs < HttpReqCooldownSecs)
             return false;
-        LastColHTTPReq[segment] = DateTime.Now;
+        LastColReq[segment] = DateTime.Now;
 
-        if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length}...", LogLevel.Debug);
+        if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length} via UDP...", LogLevel.Debug);
+
+        var host = GetHostFromWledServerAddress(segment.WledServerAddress);
+        if (host == null)
+        {
+            logger.WriteLine($"Could not set led colors over UDP, invalid server address '{segment.WledServerAddress}'", LogLevel.Warn);
+            return false;
+        }
+
+        try
+        {
+            WledUdpColorSender.SendSegmentColors(host, segment.Start, SampleColorsToSegment(colors, segment));
+            return true;
+        }
+        catch (Exception e)
+        {
+            // UDP is fire & forget; a failure here usually just means the server is unreachable right
+            // now, and the update loop retries next tick anyway. Only log when frequent logging is on.
+            if (frequentLogging) logger.WriteLine(e, LogLevel.Error);
+            return false;
+        }
+    }
+
+    // https://kno.wled.ge/interfaces/json-api/#per-segment-individual-led-control
+    // Old transport of the update loop: per-LED colors via HTTP JSON POST. Kept as an explicit
+    // fallback for servers without UDP realtime enabled.
+    public bool SetLedColorsOnWledSegmentHttpJson(ColorRgb[] colors, LedSegment segment)
+    {
+        if (colors.Length == 0 || segment.Length == 0)
+            return false;
+
+        var secs = (DateTime.Now - LastColReq.GetValueOrDefault(segment)).TotalSeconds;
+        if (secs < HttpReqCooldownSecs)
+            return false;
+        LastColReq[segment] = DateTime.Now;
+
+        if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length} via HTTP...", LogLevel.Debug);
 
         var ledCols = new StringBuilder();
         ledCols.Append("{\"i\":[");
@@ -186,5 +230,21 @@ public class WledCommunicatorService(
 
         $"{{\"seg\":{ledCols}}}".HttpPostAsJsonTo($"{segment.WledServerAddress}/json/state");
         return true;
+    }
+
+    // Converts the theme color array (any resolution) into one color per physical LED of the segment,
+    // using the same sampling the old HTTP JSON transport used.
+    static ColorRgb[] SampleColorsToSegment(ColorRgb[] colors, LedSegment segment) =>
+        Enumerable.Range(0, segment.Length)
+            .Select(i => colors[(int)(i * (float)colors.Length / segment.Length)])
+            .ToArray();
+
+    // WledServerAddresses are stored as full urls ("http://192.168.x.y"), extract the host part for UDP.
+    static string? GetHostFromWledServerAddress(string wledServerAddress)
+    {
+        if (Uri.TryCreate(wledServerAddress, UriKind.Absolute, out var uri) && !string.IsNullOrWhiteSpace(uri.Host))
+            return uri.Host;
+        // Fall back to treating the address as a bare ip/hostname
+        return wledServerAddress.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
     }
 }
