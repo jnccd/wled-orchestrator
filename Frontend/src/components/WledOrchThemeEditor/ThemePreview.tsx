@@ -1,13 +1,14 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Flex, Image } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { Image } from "@chakra-ui/react";
-import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import {
   getWledOrchState,
   wledOrchStateQueryKey,
 } from "../../hooks/useWledOrchApi";
+import { useSelectedGroupStore } from "../../hooks/useLocalStore";
 import { useThemePreviewImageQuery } from "../../hooks/useThemePreviewImageQuery";
+import { readProperty } from "../../utils/untypedPropertyAccess";
 import ThemePaneHeader from "./ThemePaneHeader";
+import PreviewTimeAxis from "./PreviewTimeAxis";
 
 const ThemePreview = () => {
   // React Query setup
@@ -26,13 +27,25 @@ const ThemePreview = () => {
   );
 
   return (
-    <Box width={"300px"}>
+    <Box width={"348px"}>
       <ThemePaneHeader>Preview</ThemePaneHeader>
-      <Image
-        borderRadius={"8px"}
-        minHeight={300}
-        src={themePreviewImage ?? ""}
-      ></Image>
+      <Flex alignItems="stretch">
+        {/* The time axis of the preview is its y axis; the label strip stretches with the image. */}
+        <PreviewTimeAxis
+          previewType={readProperty(selectedGroup?.theme, "previewType")}
+        />
+        {themePreviewImage ? (
+          <Image
+            borderRadius={"8px"}
+            display={"block"}
+            width={"300px"}
+            height={"auto"}
+            src={themePreviewImage}
+          ></Image>
+        ) : (
+          <Box width={"300px"} minHeight={300} />
+        )}
+      </Flex>
     </Box>
   );
 };
