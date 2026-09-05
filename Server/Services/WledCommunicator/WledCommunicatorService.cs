@@ -66,7 +66,34 @@ public class WledCommunicatorService(
 
         logger.WriteLine("Found Wled Servers at: " + wledServers.Select(x => x.Address).Combine(", "));
         WledServers = [.. wledServers];
+        LoadColorCorrections();
         FillNewSegmentsIntoDatastore();
+    }
+
+    /// <summary>
+    /// Per-server color correction settings (gamma curve + whether the server corrects realtime data
+    /// itself), read once per discovery from each servers /json/cfg. WLED skips its own gamma
+    /// correction for UDP realtime frames by default, so these settings are used to pre-apply the same
+    /// correction the old JSON per-LED transport used to get (see <see cref="WledColorCorrection"/>).
+    /// </summary>
+    public Dictionary<string, WledColorCorrection> ColorCorrections { get; private set; } = [];
+
+    void LoadColorCorrections()
+    {
+        ColorCorrections = [];
+        foreach (var server in WledServers)
+        {
+            string address = server.Address;
+            try
+            {
+                var cfgJson = $"{address}/json/cfg".GetHttpResponseFrom().GetAwaiter().GetResult();
+                ColorCorrections[address] = WledColorCorrection.FromCfgJson(cfgJson) ?? WledColorCorrection.DefaultFallback;
+            }
+            catch
+            {
+                ColorCorrections[address] = WledColorCorrection.DefaultFallback;
+            }
+        }
     }
     static IPAddress? GetLocalIPAddress()
     {
@@ -174,10 +201,8 @@ public class WledCommunicatorService(
         if (colors.Length == 0 || segment.Length == 0)
             return false;
 
-        var secs = (DateTime.Now - LastColReq.GetValueOrDefault(segment)).TotalSeconds;
-        if (secs < HttpReqCooldownSecs)
-            return false;
-        LastColReq[segment] = DateTime.Now;
+        // No cooldown here: at 20fps every segment needs a fresh realtime frame each tick (frames
+        // also keep WLEDs realtime mode alive). The cooldown below only guards the HTTP fallback.
 
         if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length} via UDP...", LogLevel.Debug);
 
@@ -190,7 +215,8 @@ public class WledCommunicatorService(
 
         try
         {
-            WledUdpColorSender.SendSegmentColors(host, segment.Start, SampleColorsToSegment(colors, segment));
+            var correction = ColorCorrections.GetValueOrDefault(segment.WledServerAddress) ?? WledColorCorrection.DefaultFallback;
+            WledUdpColorSender.SendSegmentColors(host, segment.Start, SampleColorsToSegment(colors, segment), gammaLut: correction.GammaLut);
             return true;
         }
         catch (Exception e)

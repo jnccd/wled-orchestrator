@@ -23,7 +23,7 @@ public static class WledUdpColorSender
     const byte DnRgbProtocol = 4;
 
     // Seconds WLED keeps realtime mode alive after the last received packet before returning to
-    // its regular mode. The update loop runs every 500ms, so 2s leaves enough slack for a
+    // its regular mode. The update loop runs every 50ms, so 2s leaves plenty of slack for a
     // hiccup without the strip flickering back to WLEDs own state between frames.
     const byte RealtimeTimeoutSecs = 2;
 
@@ -36,7 +36,12 @@ public static class WledUdpColorSender
     /// starting at LED index <paramref name="startIndex"/>. Long color runs are chunked over multiple
     /// DNRGB frames so each datagram stays under the MTU.
     /// </summary>
-    public static void SendSegmentColors(string host, int startIndex, IReadOnlyList<ColorRgb> colors, int udpPort = DefaultWledUdpPort)
+    /// <param name="gammaLut">
+    /// Optional 256-entry gamma lookup table (see <see cref="WledColorCorrection"/>) applied per channel
+    /// before sending. WLED skips its own gamma correction for realtime data by default, so pre-applying
+    /// the same curve reproduces the look of WLEDs normal (JSON API) color path. Null sends raw colors.
+    /// </param>
+    public static void SendSegmentColors(string host, int startIndex, IReadOnlyList<ColorRgb> colors, int udpPort = DefaultWledUdpPort, byte[]? gammaLut = null)
     {
         if (string.IsNullOrWhiteSpace(host) || colors == null || colors.Count == 0 || udpPort is < 1 or > 65535)
             return;
@@ -59,9 +64,9 @@ public static class WledUdpColorSender
             {
                 var color = colors[offset + i];
                 int p = headerSize + i * 3;
-                frame[p] = color.R;
-                frame[p + 1] = color.G;
-                frame[p + 2] = color.B;
+                frame[p] = gammaLut == null ? color.R : gammaLut[color.R];
+                frame[p + 1] = gammaLut == null ? color.G : gammaLut[color.G];
+                frame[p + 2] = gammaLut == null ? color.B : gammaLut[color.B];
             }
 
             Send(frame, host, udpPort);

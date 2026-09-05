@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Server.Helper;
 using Server.Services.DataStore;
 using Server.Services.DataStore.Types;
@@ -14,7 +15,11 @@ public class UpdaterService(
 {
     Task? updateTask;
     CancellationTokenSource? cts;
-    const int ledUpdateIntervalMillis = 500;
+    // Per-LED colors travel over UDP now, so the loop can run at 20fps. The HTTP brightness request
+    // below is only sent when the value actually changes (see lastSentBrightness).
+    const int ledUpdateIntervalMillis = 50;
+    // Brightness value last sent to each server, used to avoid spamming identical HTTP requests every tick.
+    readonly Dictionary<string, int> lastSentBrightness = [];
 
     public void StartUpdateThread()
     {
@@ -27,9 +32,11 @@ public class UpdaterService(
         updateTask = Task.Run(() =>
         {
             Task.Run(communicatorService.FindLEDs);
+            var stopwatch = new Stopwatch();
 
             while (!cts.Token.IsCancellationRequested)
             {
+                stopwatch.Restart();
                 try
                 {
                     UpdateLedSegments();
@@ -39,7 +46,9 @@ public class UpdaterService(
                     logger.WriteLine(ex, LogLevel.Error);
                 }
 
-                Task.Delay(ledUpdateIntervalMillis).Wait();
+                int waitMillis = ledUpdateIntervalMillis - (int)stopwatch.ElapsedMilliseconds;
+                if (waitMillis > 0)
+                    Task.Delay(waitMillis).Wait();
             }
         }, cts.Token);
     }
@@ -50,15 +59,20 @@ public class UpdaterService(
         {
             foreach (var ledServer in dataStore.Data.Groups.SelectMany(x => x.LedSegments).GroupBy(x => x.WledServerAddress))
             {
+                string serverAddress = ledServer.Key;
                 if (!dataStore.Data.Activated)
                 {
-                    communicatorService.SetBrightnessOnWledServer(0, ledServer.Key);
+                    if (lastSentBrightness.GetValueOrDefault(serverAddress) != 0)
+                    {
+                        communicatorService.SetBrightnessOnWledServer(0, serverAddress);
+                        lastSentBrightness[serverAddress] = 0;
+                    }
                     continue;
                 }
 
                 var themeBrightnesses = new List<int>();
 
-                foreach (var (seg, i) in ledServer.WithIndex())
+                foreach (var seg in ledServer)
                 {
                     var newLedState = ledThemeProvider.GetNewLedState(seg);
                     if (newLedState == null) continue;
@@ -66,8 +80,13 @@ public class UpdaterService(
                     themeBrightnesses.Add(newLedState.Brightness);
                 }
 
-                if (themeBrightnesses == null || themeBrightnesses.Count == 0) continue;
-                communicatorService.SetBrightnessOnWledServer((int)themeBrightnesses.Average(), ledServer.Key);
+                if (themeBrightnesses.Count == 0) continue;
+                var avgBrightness = (int)themeBrightnesses.Average();
+                if (lastSentBrightness.GetValueOrDefault(serverAddress) != avgBrightness)
+                {
+                    communicatorService.SetBrightnessOnWledServer(avgBrightness, serverAddress);
+                    lastSentBrightness[serverAddress] = avgBrightness;
+                }
             }
         }
     }
