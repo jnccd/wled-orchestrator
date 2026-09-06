@@ -27,7 +27,7 @@ public class WledColorCorrection
     ///   - lowering it (e.g. 2.2) makes low/mid values brighter.
     /// A value of 1.0 means no correction (send raw values).
     /// </summary>
-    public const double GammaExponentOverride = 5.5;
+    public const double GammaExponentOverride = 5;
 
     /// <summary>
     /// Fallback for servers that do not answer /json/cfg (or return an unparsable payload):
