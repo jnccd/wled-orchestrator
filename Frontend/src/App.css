@@ -1,0 +1,8 @@
+/* The edit popovers (segment/group/modifier) render inside their trigger's stacking context
+   (the draggable buttons apply backdrop-filter, which creates a stacking context). Portaling them
+   to <body> escapes that trap; these rules additionally force the popper to always stay on top of
+   every other in-app element and render at full opacity. */
+.chakra-popover__popper {
+  z-index: 9999 !important;
+  opacity: 1 !important;
+}

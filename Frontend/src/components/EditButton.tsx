@@ -50,15 +50,21 @@ const EditButton = ({
               style={buttonStyle}
             />
           </PopoverTrigger>
-          <PopoverContent cursor={"default"} padding={1} style={popoverStyle}>
-            <FocusLock autoFocus={true} persistentFocus={true}>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <PopoverBody>
-                {children(isOpen, onOpen, onClose, firstFieldRef)}
-              </PopoverBody>
-            </FocusLock>
-          </PopoverContent>
+          {/* The popover content must live in a portal (not trapped inside its trigger's stacking
+              context, e.g. the segment button's backdrop-filter) so it can float above sibling UI
+              like the color picker and the theme-modifier cards. Z-index/opacity are forced globally
+              in App.css so every edit popover renders on top and opaque. */}
+          <Portal>
+            <PopoverContent cursor={"default"} padding={1} style={popoverStyle}>
+              <FocusLock autoFocus={true} persistentFocus={true}>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverBody>
+                  {children(isOpen, onOpen, onClose, firstFieldRef)}
+                </PopoverBody>
+              </FocusLock>
+            </PopoverContent>
+          </Portal>
         </>
       )}
     </Popover>

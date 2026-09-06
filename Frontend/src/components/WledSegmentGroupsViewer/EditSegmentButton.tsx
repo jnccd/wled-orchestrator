@@ -37,7 +37,7 @@ const EditSegmentButton = ({ segment }: Props) => {
   // Pre-fill with the current effective gamma (override if set, otherwise the device gamma) so the
   // user sees the value actually in use instead of a bare 0.
   const [gammaValue, setGammaValue] = useState<number>(
-    hasOverride ? (segment.gammaExponentOverride ?? 0) : deviceGamma
+    hasOverride ? (segment.gammaExponentOverride ?? 0) : deviceGamma,
   );
 
   // React Query setup
@@ -67,14 +67,12 @@ const EditSegmentButton = ({ segment }: Props) => {
     if (Number.isFinite(gammaValue)) {
       const clamped = Math.min(
         Math.max(gammaValue, 0),
-        maxGammaExponentOverride
+        maxGammaExponentOverride,
       );
       // If there was no explicit override and the user left the value at the device baseline, send 0
       // so the server keeps "use device default" instead of writing a redundant override.
       gamma =
-        !hasOverride && Math.abs(clamped - deviceGamma) < 0.0001
-          ? 0
-          : clamped;
+        !hasOverride && Math.abs(clamped - deviceGamma) < 0.0001 ? 0 : clamped;
     }
 
     renameSegmentMutation.mutate({ segmentId: segment.id, newName });
@@ -91,7 +89,12 @@ const EditSegmentButton = ({ segment }: Props) => {
       children={(_a, _b, onClose, firstFieldRef) => {
         return (
           <VStack alignItems={"left"}>
-            <FormLabel textAlign={"left"} htmlFor={inputId}>
+            <FormLabel
+              textAlign={"left"}
+              htmlFor={inputId}
+              marginTop={4}
+              marginBottom={1}
+            >
               Name:
             </FormLabel>
             <Input
@@ -102,8 +105,13 @@ const EditSegmentButton = ({ segment }: Props) => {
                 if (e.key === "Enter") submit(onClose);
               }}
             />
-            <FormLabel textAlign={"left"} htmlFor={gammaInputId}>
-              Gamma Exponent (0 = device default):
+            <FormLabel
+              textAlign={"left"}
+              htmlFor={gammaInputId}
+              marginTop={3}
+              marginBottom={0}
+            >
+              Gamma Exponent:
             </FormLabel>
             <NumberInput
               id={gammaInputId}
