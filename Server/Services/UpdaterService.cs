@@ -109,7 +109,7 @@ public class UpdaterService(
                     var (colors, brightness) = ConsolidateIntoBrightness(
                         [.. newLedState.Colors.Select(x => x.HsvToRgb())],
                         newLedState.Brightness,
-                        communicatorService.GetEffectiveGammaExponent(serverAddress));
+                        communicatorService.GetEffectiveGammaExponent(segment));
 
                     if (brightness <= 0)
                     {

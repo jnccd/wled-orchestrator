@@ -41,6 +41,9 @@ export interface paths {
   "/state/segments/{segmentId}/name": {
     put: operations["Segment_Rename"];
   };
+  "/state/segments/{segmentId}/gamma": {
+    put: operations["Segment_SetGammaExponentOverride"];
+  };
 }
 
 export interface components {
@@ -67,15 +70,22 @@ export interface components {
       start?: number;
       /** Format: int32 */
       length?: number;
+      /** Format: double */
+      gammaExponentOverride?: number | null;
+      /** Format: double */
+      deviceGammaExponent?: number | null;
       id?: string;
     };
     LedTheme: {
       /** Format: guid */
       id?: string;
       typeName?: string;
+      previewType?: components["schemas"]["LedThemePreviewType"];
       modifiers?: components["schemas"]["LedThemeModifier"][];
       $type: string;
     };
+    /** @enum {string} */
+    LedThemePreviewType: "Day" | "Min";
     LedThemeModifier: {
       /** Format: guid */
       id?: string;
@@ -94,18 +104,25 @@ export interface components {
       fadeTimeMinutes?: number;
       /** Format: duration */
       wakeUpDayTime?: string;
-    };
-    WeekdayModifier: components["schemas"]["LedThemeModifier"] & {
       activeDays?: components["schemas"]["EnumSetOfDayOfWeek"];
     };
     EnumSetOfDayOfWeek: components["schemas"]["DayOfWeek"][];
-    /** @enum {integer} */
-    DayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-    LedThemeDaylight: components["schemas"]["LedTheme"] & {
-      skyColor?: components["schemas"]["ColorHsv"];
-      sunColor?: components["schemas"]["ColorHsv"];
+    /** @enum {string} */
+    DayOfWeek:
+      | "Sunday"
+      | "Monday"
+      | "Tuesday"
+      | "Wednesday"
+      | "Thursday"
+      | "Friday"
+      | "Saturday";
+    LedThemeWave: components["schemas"]["LedTheme"] & {
+      color1?: components["schemas"]["ColorHsv"];
+      color2?: components["schemas"]["ColorHsv"];
       /** Format: double */
-      invertedSunSize?: number;
+      waveLength?: number;
+      /** Format: double */
+      waveSpeed?: number;
     };
     ColorHsv: {
       /** Format: double */
@@ -114,6 +131,20 @@ export interface components {
       s?: number;
       /** Format: double */
       v?: number;
+    };
+    LedThemeDiscreteWave: components["schemas"]["LedTheme"] & {
+      color1?: components["schemas"]["ColorHsv"];
+      color2?: components["schemas"]["ColorHsv"];
+      /** Format: double */
+      waveLength?: number;
+      /** Format: double */
+      waveSpeed?: number;
+    };
+    LedThemeDaylight: components["schemas"]["LedTheme"] & {
+      skyColor?: components["schemas"]["ColorHsv"];
+      sunColor?: components["schemas"]["ColorHsv"];
+      /** Format: double */
+      invertedSunSize?: number;
     };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["ColorHsv"];
@@ -344,6 +375,23 @@ export interface operations {
       };
       query: {
         newName?: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+    };
+  };
+  Segment_SetGammaExponentOverride: {
+    parameters: {
+      path: {
+        segmentId: string;
+      };
+      query: {
+        gammaExponentOverride?: number;
       };
     };
     responses: {

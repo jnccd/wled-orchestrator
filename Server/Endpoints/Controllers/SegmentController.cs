@@ -9,6 +9,9 @@ namespace Server.Endpoints.Controllers;
 [Route("/state/segments")]
 public class SegmentController : ControllerBase
 {
+    /// <summary>Upper bound for a per-segment gamma override; 0 (or null) means "use the devices own gamma".</summary>
+    const double MaxGammaExponentOverride = 10;
+
     [HttpPut("{segmentId}/move")]
     public IResult Move(
         [FromServices] DataStoreService dataStore,
@@ -54,6 +57,34 @@ public class SegmentController : ControllerBase
                 return Results.NotFound("The SegmentId was not found in any groups");
 
             segment.Name = newName;
+
+            dataStore.Save();
+        }
+
+        return Results.Accepted();
+    }
+
+    /// <summary>
+    /// Sets the per-segment gamma exponent override used when the orchestrator sends this segments
+    /// realtime colors over UDP. A value &gt; 0 overrides the devices own gamma for this segment;
+    /// 0 (or null) clears the override so the devices reported gamma is used again.
+    /// </summary>
+    [HttpPut("{segmentId}/gamma")]
+    public IResult SetGammaExponentOverride(
+        [FromServices] DataStoreService dataStore,
+        [Required] string segmentId,
+        double gammaExponentOverride)
+    {
+        if (gammaExponentOverride < 0 || gammaExponentOverride > MaxGammaExponentOverride)
+            return Results.BadRequest($"gammaExponentOverride must be between 0 and {MaxGammaExponentOverride}");
+
+        lock (dataStore.lockject)
+        {
+            var segment = LedSegment.FindInDatastore(segmentId, dataStore);
+            if (segment == null)
+                return Results.NotFound("The SegmentId was not found in any groups");
+
+            segment.GammaExponentOverride = gammaExponentOverride > 0 ? gammaExponentOverride : null;
 
             dataStore.Save();
         }

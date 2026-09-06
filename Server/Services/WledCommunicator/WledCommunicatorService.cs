@@ -151,6 +151,7 @@ public class WledCommunicatorService(
 
             foreach (var segment in segments)
             {
+                segment.DeviceGammaExponent = GetDeviceGammaExponent(segment.WledServerAddress);
                 var associatedGroup = dataStore.Data.Groups.FirstOrDefault(x => x.LedSegments.Contains(segment)) ?? defaultGroup;
                 if (!associatedGroup.LedSegments.Contains(segment))
                     associatedGroup.LedSegments.Add(segment);
@@ -165,12 +166,17 @@ public class WledCommunicatorService(
                     }
                     segmentInGroup.Start = segment.Start;
                     segmentInGroup.Length = segment.Length;
+                    segmentInGroup.DeviceGammaExponent = segment.DeviceGammaExponent;
                 }
             }
 
             dataStore.Save();
         }
     }
+
+    /// <summary>The gamma exponent a server reports for non-realtime colors, used as the UI baseline reference.</summary>
+    double GetDeviceGammaExponent(string wledServerAddress) =>
+        (ColorCorrections.GetValueOrDefault(wledServerAddress) ?? WledColorCorrection.DefaultFallback).GammaValue;
 
     LedSegment WledSegToNewLedSegment(string WledServerAddress, Seg wledSeg) =>
         new LedSegment(WledServerAddress, (int)(wledSeg.Id ?? 0), (int)(wledSeg.Start ?? 0), (int)(wledSeg.Len ?? 0));
@@ -289,7 +295,9 @@ public class WledCommunicatorService(
         try
         {
             var correction = ColorCorrections.GetValueOrDefault(segment.WledServerAddress) ?? WledColorCorrection.DefaultFallback;
-            WledUdpColorSender.SendSegmentColors(host, segment.Start, sampled, gammaLut: correction.GammaLut);
+            // Gamma is now steered per segment: an explicit override on the segment wins, otherwise the
+            // devices own reported gamma is used.
+            WledUdpColorSender.SendSegmentColors(host, segment.Start, sampled, gammaLut: correction.BuildGammaLut(segment.GammaExponentOverride));
             lastSentColors[segment] = new(sampled, now);
             if (!colorsSame)
                 lastColorChangeAt[segment] = now;
@@ -306,12 +314,12 @@ public class WledCommunicatorService(
     }
 
     /// <summary>
-    /// Gamma exponent applied to this servers colors (the devices own gamma or
-    /// <see cref="WledColorCorrection.GammaExponentOverride"/>). Used when dim colors are split into
-    /// the global brightness so that the total light output stays identical.
+    /// Gamma exponent applied to one segments colors (the segments own override if set, otherwise the
+    /// devices reported gamma). Used when dim colors are split into the global brightness so that the
+    /// total light output stays identical.
     /// </summary>
-    public double GetEffectiveGammaExponent(string wledServerAddress) =>
-        (ColorCorrections.GetValueOrDefault(wledServerAddress) ?? WledColorCorrection.DefaultFallback).EffectiveGammaExponent;
+    public double GetEffectiveGammaExponent(LedSegment segment) =>
+        (ColorCorrections.GetValueOrDefault(segment.WledServerAddress) ?? WledColorCorrection.DefaultFallback).EffectiveGammaExponent(segment.GammaExponentOverride);
 
     /// <summary>
     /// Releases a WLED server from realtime mode (timeout byte 255 keeps it in live mode forever

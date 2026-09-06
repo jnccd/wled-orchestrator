@@ -49,6 +49,18 @@ export const renameSegment = (args: { segmentId: string; newName: string }) =>
     })
     .then((res) => res.data);
 
+export const setSegmentGammaExponentOverride = (args: {
+  segmentId: string;
+  gammaExponentOverride: number;
+}) =>
+  apiClient
+    .put(`/state/segments/${args.segmentId}/gamma`, null, {
+      params: {
+        gammaExponentOverride: args.gammaExponentOverride,
+      },
+    })
+    .then((res) => res.data);
+
 export const renameGroup = (args: { groupId: string; newName: string }) =>
   apiClient
     .put(`/state/groups/${args.groupId}/name`, null, {
