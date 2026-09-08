@@ -113,8 +113,14 @@ public class UpdaterService(
 
                     if (brightness <= 0)
                     {
+                        // Keep the server in live mode at brightness 0 instead of releasing realtime.
+                        // Leaving live mode (CancelRealtime) makes WLED flash its own non-live content
+                        // (black, or the devices configured effect/color) for a tick before the next
+                        // tick re-enters — the flicker to black / a different color seen during dim
+                        // fades. Brightness 0 keeps the strip stably black and it reappears smoothly
+                        // when brightness rises again.
                         SetBrightnessIfChanged(serverAddress, 0);
-                        ReleaseServer(serverAddress);
+                        drivenServers.Add(serverAddress);
                         continue;
                     }
 
@@ -131,9 +137,11 @@ public class UpdaterService(
                     if (avgBrightness <= 0)
                     {
                         // Brightness 0: every possible color renders identically (black), so sending
-                        // color frames is pointless regardless of what the themes compute.
+                        // color frames is pointless regardless of what the themes compute. Keep the
+                        // server in live mode (black) rather than releasing it, to avoid the
+                        // leave/re-enter-live-mode flicker when brightness returns.
                         SetBrightnessIfChanged(serverAddress, 0);
-                        ReleaseServer(serverAddress);
+                        drivenServers.Add(serverAddress);
                         continue;
                     }
 
@@ -195,8 +203,11 @@ public class UpdaterService(
         // Post on the first decision for a server too (e.g. right after a restart, when the device
         // may still be at an arbitrary brightness), not only when the value differs from before.
         if (lastSentBrightness.TryGetValue(serverAddress, out var lastSent) && lastSent == brightness) return;
-        communicatorService.SetBrightnessOnWledServer(brightness, serverAddress);
-        lastSentBrightness[serverAddress] = brightness;
+        // Only treat the value as sent when the request actually went out. SetBrightnessOnWledServer
+        // is rate-limited (100ms cooldown); recording the intended value anyway desyncs the device
+        // brightness from what we believe is on the strip, which shows up as a flicker during fades.
+        if (communicatorService.SetBrightnessOnWledServer(brightness, serverAddress))
+            lastSentBrightness[serverAddress] = brightness;
     }
 
     void ReleaseServer(string serverAddress)
