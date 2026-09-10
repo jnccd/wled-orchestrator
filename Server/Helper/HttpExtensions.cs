@@ -62,4 +62,28 @@ public static partial class Extensions
 
         return client.PostAsync(address, contentData).Result;
     }
+
+    /// <summary>
+    /// Blocking POST with a millisecond timeout that reports success instead of throwing. Used where
+    /// the caller must be certain the device applied the change BEFORE the next network step of the
+    /// same tick (e.g. writing the global brightness before the realtime color frame that repaints
+    /// the strip, because WLED briefly leaves realtime mode when its brightness changes).
+    /// </summary>
+    public static bool TryBlockingHttpPostAsJsonTo(this string json, string address, int timeoutMs = 250)
+    {
+        using var client = new HttpClient();
+        client.Timeout = TimeSpan.FromMilliseconds(Math.Max(1, timeoutMs));
+
+        using var contentData = new StringContent(json, Encoding.UTF8, "application/json");
+
+        try
+        {
+            using var response = client.PostAsync(address, contentData).GetAwaiter().GetResult();
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

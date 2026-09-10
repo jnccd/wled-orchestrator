@@ -145,10 +145,14 @@ public class UpdaterService(
                         continue;
                     }
 
+                    // Brightness first, then the colors: a global brightness write can knock WLED out
+                    // of live mode for a moment, and the invalidation it triggers must be followed by
+                    // the color frames in this same tick to immediately repaint the strips.
+                    SetBrightnessIfChanged(serverAddress, avgBrightness);
+
                     foreach (var (segment, newLedState) in themedSegments)
                         communicatorService.SetLedColorsOnWledSegment([.. newLedState.Colors.Select(x => x.HsvToRgb())], segment);
 
-                    SetBrightnessIfChanged(serverAddress, avgBrightness);
                     drivenServers.Add(serverAddress);
                 }
 
@@ -206,8 +210,15 @@ public class UpdaterService(
         // Only treat the value as sent when the request actually went out. SetBrightnessOnWledServer
         // is rate-limited (100ms cooldown); recording the intended value anyway desyncs the device
         // brightness from what we believe is on the strip, which shows up as a flicker during fades.
-        if (communicatorService.SetBrightnessOnWledServer(brightness, serverAddress))
-            lastSentBrightness[serverAddress] = brightness;
+        if (!communicatorService.SetBrightnessOnWledServer(brightness, serverAddress)) return;
+        lastSentBrightness[serverAddress] = brightness;
+
+        // Changing the global brightness through WLEDs JSON API makes the device briefly drop out of
+        // realtime mode and render its own (default) segment colors. Force this servers color frames
+        // to be re-sent instead of letting the dedup prune them as unchanged, so the fallback is
+        // corrected by the frame sent right after this call (same tick) instead of lingering until the
+        // stale-resend interval, which is what makes the flicker so visible during a fade.
+        communicatorService.InvalidateSentColors(serverAddress);
     }
 
     void ReleaseServer(string serverAddress)

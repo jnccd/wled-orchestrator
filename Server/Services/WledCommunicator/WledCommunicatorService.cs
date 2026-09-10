@@ -26,6 +26,10 @@ public class WledCommunicatorService(
     private const double HttpReqCooldownSecs = 0.1;
     private readonly Dictionary<string, DateTime> LastBriHTTPReq = [];
     private readonly Dictionary<LedSegment, DateTime> LastColReq = [];
+    // Timestamp of the last failed brightness request per server; used as a back-off so a slow or
+    // offline device cannot stall the update loop on every tick (the request is blocking now).
+    private readonly Dictionary<string, DateTime> LastBriFailure = [];
+    private const double BrightnessFailureBackoffSecs = 5;
 
     // Cache of the last successfully sent colors per segment. Frames are UDP realtime with an
     // infinite timeout byte (255), so an unchanged picture does not need re-sending every tick.
@@ -199,15 +203,34 @@ public class WledCommunicatorService(
     }
     public bool SetBrightnessOnWledServer(int bri, string wledServerAddress)
     {
-        var secs = (DateTime.Now - LastBriHTTPReq.GetValueOrDefault(wledServerAddress)).TotalSeconds;
+        var now = DateTime.Now;
+
+        // Back off after a failed request so an offline/slow server cannot stall the update loop
+        // every tick now that the brightness request is blocking (see below).
+        if ((now - LastBriFailure.GetValueOrDefault(wledServerAddress)).TotalSeconds < BrightnessFailureBackoffSecs)
+            return false;
+
+        var secs = (now - LastBriHTTPReq.GetValueOrDefault(wledServerAddress)).TotalSeconds;
         if (secs < HttpReqCooldownSecs)
             return false;
-        LastBriHTTPReq[wledServerAddress] = DateTime.Now;
+        LastBriHTTPReq[wledServerAddress] = now;
 
         if (frequentLogging) logger.WriteLine($"Setting led brightness to {bri} on server {wledServerAddress}...", LogLevel.Debug);
 
-        $"{{\"bri\":{bri}}}".HttpPostAsJsonTo($"{wledServerAddress}/json/state");
-        return true;
+        // Blocking on purpose: WLED briefly drops out of realtime mode when its global brightness
+        // changes (it renders its own default segment colors until the next realtime frame). The
+        // caller re-sends the color frames right after this returns, so the brightness has to be
+        // applied BEFORE those frames go out. A fire-and-forget POST raced them and landed after the
+        // repaint, which left the strip showing the devices default colors for up to the dedup
+        // stale-resend interval - the flicker seen while the brightness ramps during a fade.
+        if ($"{{\"bri\":{bri}}}".TryBlockingHttpPostAsJsonTo($"{wledServerAddress}/json/state", timeoutMs: 500))
+        {
+            LastBriFailure.Remove(wledServerAddress);
+            return true;
+        }
+
+        LastBriFailure[wledServerAddress] = now;
+        return false;
     }
 
     public bool SetLedColorsGlobally(ColorRgb[] colors)
@@ -328,11 +351,7 @@ public class WledCommunicatorService(
     /// </summary>
     public void CancelRealtimeOnWledServer(string wledServerAddress)
     {
-        foreach (var cached in lastSentColors.Keys.Where(x => x.WledServerAddress == wledServerAddress).ToArray())
-        {
-            lastSentColors.Remove(cached);
-            lastColorChangeAt.Remove(cached);
-        }
+        InvalidateSentColors(wledServerAddress);
 
         var host = GetHostFromWledServerAddress(wledServerAddress);
         if (host == null) return;
@@ -344,6 +363,23 @@ public class WledCommunicatorService(
         catch
         {
             // Ignore; the server is unreachable right now, the regular update flow retries later.
+        }
+    }
+
+    /// <summary>
+    /// Drops the cached "already sent" colors of every segment on a server, so the next tick sends
+    /// them again even though they did not change. Needed after the orchestrator writes the servers
+    /// global brightness through WLEDs JSON API: WLED briefly drops out of realtime mode when its
+    /// brightness changes and renders its own (default) segment colors, and because the dedup would
+    /// otherwise prune the still-unchanged frame, the strip would keep showing those default colors
+    /// until the stale-resend interval elapsed.
+    /// </summary>
+    public void InvalidateSentColors(string wledServerAddress)
+    {
+        foreach (var cached in lastSentColors.Keys.Where(x => x.WledServerAddress == wledServerAddress).ToArray())
+        {
+            lastSentColors.Remove(cached);
+            lastColorChangeAt.Remove(cached);
         }
     }
 
