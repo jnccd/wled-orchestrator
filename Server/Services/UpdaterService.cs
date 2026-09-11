@@ -20,14 +20,17 @@ public class UpdaterService(
     // only sent when the value actually changes (see lastSentBrightness).
     const int ledUpdateIntervalMillis = 50;
 
-    // When a server has exactly one driven segment, colors whose HSV value is low (dim scenes) are
-    // lifted to the full 8-bit range and the uniform dim level is moved into the servers global
-    // WLED brightness instead. The brightness is gamma-matched (brightness = level^gamma), so the
-    // total light stays identical to the old color-encoded dimming, while the colors themselves
-    // keep their full range instead of being crushed into the coarse near-black region of the gamma
-    // table. Automatically disabled for servers with several segments, because WLED brightness is
-    // global per device and cannot represent several different dim levels at once.
-    const bool ConsolidateDimmingIntoBrightness = true;
+    // Dimming is carried entirely by the color values. The alternative - lifting dim colors to full
+    // range and moving the level into the servers global WLED brightness - is mathematically the
+    // same picture (bri/255 * lut(liftedColor) == lut(color)), but it requires writing "bri" over
+    // WLEDs JSON API while streaming realtime. WLED cannot apply a global brightness change without
+    // briefly dropping out of realtime mode and rendering its own default segment colors (~one device
+    // refresh, ~20ms) before the next realtime frame lands. Worse, between the two updates the strip
+    // is showing *full range* colors that only the global brightness keeps dark, so any hiccup in the
+    // brightness write (rate limited / failed / late) flashes the full theme colors. Keeping the
+    // global brightness constant and letting the colors carry the dimming removes both flickers, at
+    // no visible cost since the two forms produce the same output.
+    static readonly bool ConsolidateDimmingIntoBrightness = false;
     // Brightness value last sent to each server, used to avoid spamming identical HTTP requests every tick.
     readonly Dictionary<string, int> lastSentBrightness = [];
     // Servers the update loop currently keeps in WLED realtime mode; they must be explicitly
