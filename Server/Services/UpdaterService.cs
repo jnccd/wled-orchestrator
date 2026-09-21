@@ -216,11 +216,10 @@ public class UpdaterService(
         if (!communicatorService.SetBrightnessOnWledServer(brightness, serverAddress)) return;
         lastSentBrightness[serverAddress] = brightness;
 
-        // Changing the global brightness through WLEDs JSON API makes the device briefly drop out of
-        // realtime mode and render its own (default) segment colors. Force this servers color frames
-        // to be re-sent instead of letting the dedup prune them as unchanged, so the fallback is
-        // corrected by the frame sent right after this call (same tick) instead of lingering until the
-        // stale-resend interval, which is what makes the flicker so visible during a fade.
+        // Writing the global brightness through WLEDs JSON API makes the device briefly render its own
+        // (default) content, so force this servers color frames to be re-sent by the call that follows
+        // in this same tick instead of letting the unchanged-picture skip delay the repaint until the
+        // keep-alive interval elapsed.
         communicatorService.InvalidateSentColors(serverAddress);
     }
 

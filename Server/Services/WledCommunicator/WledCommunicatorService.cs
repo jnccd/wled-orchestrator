@@ -15,13 +15,6 @@ public class WledCommunicatorService(
 {
     public record WledServer(string Address, WledServerState State);
 
-    /// <summary>Last colors successfully sent for a segment, used to prune duplicate UDP frames.</summary>
-    class CachedSegmentColors(ColorRgb[] colors, DateTime sentAt)
-    {
-        public ColorRgb[] Colors { get; } = colors;
-        public DateTime SentAt { get; } = sentAt;
-    }
-
     public WledServer[] WledServers { get; private set; } = [];
     private const double HttpReqCooldownSecs = 0.1;
     private readonly Dictionary<string, DateTime> LastBriHTTPReq = [];
@@ -31,19 +24,23 @@ public class WledCommunicatorService(
     private readonly Dictionary<string, DateTime> LastBriFailure = [];
     private const double BrightnessFailureBackoffSecs = 5;
 
-    // Cache of the last successfully sent colors per segment. Frames are UDP realtime with an
-    // infinite timeout byte (255), so an unchanged picture does not need re-sending every tick.
+    /// <summary>Last colors successfully sent for one segment, used to skip unchanged frames.</summary>
+    class CachedSegmentColors(ColorRgb[] colors, DateTime sentAt)
+    {
+        public ColorRgb[] Colors { get; } = colors;
+        public DateTime SentAt { get; } = sentAt;
+    }
+
+    // Last sent colors per segment. A changed picture is always sent immediately; an unchanged one is
+    // skipped except for the keep-alive below.
     readonly Dictionary<LedSegment, CachedSegmentColors> lastSentColors = [];
-    // A static picture is re-sent after this interval even when unchanged: a WLED that rebooted or
-    // left live mode on its own has no way to tell us, and the resend re-syncs it cheaply. 2s keeps
-    // interactive color edits responsive if a device drops out of live mode without us noticing.
-    static readonly TimeSpan ResendStaleColorsInterval = TimeSpan.FromSeconds(2);
-    // Timestamp of the last *actual color change* per segment. Right after a change the frames are
-    // sent redundantly (see SendSegmentColorsUdp) for this window, so a device that briefly loses
-    // the picture during the change (clear on realtime re-entry, etc.) re-locks within milliseconds
-    // instead of waiting for the stale-resend interval.
-    static readonly TimeSpan RedundantResendAfterChangeInterval = TimeSpan.FromMilliseconds(600);
-    readonly Dictionary<LedSegment, DateTime> lastColorChangeAt = [];
+    // How long an unchanged picture may go un-re-sent. The WLED realtime protocol has no way to ask a
+    // device whether it is still in live mode, so this is the worst-case window in which a device that
+    // dropped out of it (WLAN hiccup, a reset on the device, its own realtime timeout) sits on its
+    // default segment colors before the orchestrator re-asserts the picture. It trades that window
+    // against radio airtime: 500ms is ~10x better than the 2s it used to be for a quarter of the
+    // airtime a per-tick stream costs. Colour changes are never delayed by this.
+    static readonly TimeSpan ResendUnchangedColorsInterval = TimeSpan.FromMilliseconds(500);
 
     private bool frequentLogging = false;
 
@@ -288,22 +285,18 @@ public class WledCommunicatorService(
         }
     }
 
-    // Sends one segment frame over UDP unless the colors are unchanged since the last successful
-    // send. No cooldown, but duplicate frames are pruned: WLEDs realtime timeout byte is 255 (stay
-    // in live mode indefinitely), so an unchanged picture needs no further traffic. Right after an
-    // actual color change the frame is re-sent for a short window even though the picture is
-    // unchanged, because WLED may clear/leave the live picture during the change and a fresh copy
-    // re-locks it immediately. Returns false => no frame was sent.
+    // Sends one segment frame over UDP. A picture that changed since the last send goes out
+    // immediately; an unchanged one is skipped unless the keep-alive interval elapsed (see
+    // ResendUnchangedColorsInterval), which is what re-asserts a device that dropped out of live mode
+    // without streaming duplicate frames on every tick.
     bool SendSegmentColorsUdp(LedSegment segment, ColorRgb[] sampled)
     {
         var now = DateTime.Now;
-        bool hasLast = lastSentColors.TryGetValue(segment, out var last);
-        bool colorsSame = last is not null && SameColors(last.Colors, sampled);
 
-        // Suppress duplicates while the picture is unchanged, but still re-send for a short window
-        // after an actual color change and whenever the stale-resend interval elapsed.
-        if (colorsSame && now - last!.SentAt < ResendStaleColorsInterval
-            && now - lastColorChangeAt.GetValueOrDefault(segment) >= RedundantResendAfterChangeInterval)
+        // Unchanged picture: skip until the keep-alive interval has elapsed.
+        if (lastSentColors.TryGetValue(segment, out var last)
+            && SameColors(last.Colors, sampled)
+            && now - last.SentAt < ResendUnchangedColorsInterval)
             return false;
 
         if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {sampled.Length} via UDP...", LogLevel.Debug);
@@ -318,12 +311,10 @@ public class WledCommunicatorService(
         try
         {
             var correction = ColorCorrections.GetValueOrDefault(segment.WledServerAddress) ?? WledColorCorrection.DefaultFallback;
-            // Gamma is now steered per segment: an explicit override on the segment wins, otherwise the
+            // Gamma is steered per segment: an explicit override on the segment wins, otherwise the
             // devices own reported gamma is used.
             WledUdpColorSender.SendSegmentColors(host, segment.Start, sampled, gammaLut: correction.BuildGammaLut(segment.GammaExponentOverride));
             lastSentColors[segment] = new(sampled, now);
-            if (!colorsSame)
-                lastColorChangeAt[segment] = now;
             return true;
         }
         catch (Exception e)
@@ -345,12 +336,15 @@ public class WledCommunicatorService(
         (ColorCorrections.GetValueOrDefault(segment.WledServerAddress) ?? WledColorCorrection.DefaultFallback).EffectiveGammaExponent(segment.GammaExponentOverride);
 
     /// <summary>
-    /// Releases a WLED server from realtime mode (timeout byte 255 keeps it in live mode forever
-    /// otherwise) and clears its dedup cache, so the next tick that drives the server repaints it.
-    /// Called when the server is deactivated or has nothing left to display.
+    /// Releases a WLED server from realtime mode (the timeout byte of 255 keeps it in live mode
+    /// indefinitely otherwise), so it can go back to its own effects. Called when the server is
+    /// deactivated or has nothing left to display.
     /// </summary>
     public void CancelRealtimeOnWledServer(string wledServerAddress)
     {
+        // The device is no longer showing our picture, so whatever we had cached as "already sent" is
+        // meaningless: drop it, otherwise driving the server again could skip the frame as unchanged
+        // and leave it on its default colors until the keep-alive interval elapsed.
         InvalidateSentColors(wledServerAddress);
 
         var host = GetHostFromWledServerAddress(wledServerAddress);
@@ -367,20 +361,15 @@ public class WledCommunicatorService(
     }
 
     /// <summary>
-    /// Drops the cached "already sent" colors of every segment on a server, so the next tick sends
-    /// them again even though they did not change. Needed after the orchestrator writes the servers
-    /// global brightness through WLEDs JSON API: WLED briefly drops out of realtime mode when its
-    /// brightness changes and renders its own (default) segment colors, and because the dedup would
-    /// otherwise prune the still-unchanged frame, the strip would keep showing those default colors
-    /// until the stale-resend interval elapsed.
+    /// Forgets the cached "already sent" colors of every segment on a server, so the next tick sends
+    /// them again even though they did not change. Needed whenever the device is known to have stopped
+    /// showing our realtime picture (it was released from live mode, or its global brightness was
+    /// written, which makes WLED briefly render its own content).
     /// </summary>
     public void InvalidateSentColors(string wledServerAddress)
     {
         foreach (var cached in lastSentColors.Keys.Where(x => x.WledServerAddress == wledServerAddress).ToArray())
-        {
             lastSentColors.Remove(cached);
-            lastColorChangeAt.Remove(cached);
-        }
     }
 
     static bool SameColors(ColorRgb[] a, ColorRgb[] b)

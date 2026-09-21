@@ -92,9 +92,17 @@ public static class WledUdpColorSender
         }
     }
 
+    // One shared client for every realtime datagram. The previous shape created (and disposed) a
+    // UdpClient per frame - a socket per tick per segment - which is pure churn; reusing one removes
+    // it without changing a single byte on the wire. Sends are serialized because the string-host
+    // overload can touch socket state (broadcast detection) and the update loop is not the only
+    // caller of this class.
+    static readonly UdpClient sharedUdpClient = new();
+    static readonly object sendLock = new();
+
     static void Send(byte[] datagram, string host, int port)
     {
-        using var udpClient = new UdpClient();
-        udpClient.Send(datagram, datagram.Length, host, port);
+        lock (sendLock)
+            sharedUdpClient.Send(datagram, datagram.Length, host, port);
     }
 }
