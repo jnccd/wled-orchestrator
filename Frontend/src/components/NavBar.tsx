@@ -4,8 +4,11 @@ import WledOrchActivationSwitch from "./WledOrchActivationSwitch";
 import { useMaxPageWidthStore } from "../hooks/useLocalStore";
 import { usePageWidthThreshold } from "../hooks/usePageWidthThreshold";
 
+/** Height of the fixed bar; also reserved below it so content starts underneath. */
+export const NAVBAR_HEIGHT = "100px";
+
 const NavBar = () => {
-  const height = "100px";
+  const height = NAVBAR_HEIGHT;
   const navbarId = "navbar-container";
   const maxPageWidthStore = useMaxPageWidthStore();
   const textPageWidthThreshold = usePageWidthThreshold(440);
