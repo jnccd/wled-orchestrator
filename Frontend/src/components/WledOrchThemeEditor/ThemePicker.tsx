@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useSelectedGroupStore } from "../../hooks/useLocalStore";
+import { readProperty } from "../../utils/untypedPropertyAccess";
 
 const ThemePicker = () => {
   // React Query setup
@@ -41,6 +42,13 @@ const ThemePicker = () => {
   )[0];
 
   if (!wledOrchStateQuery.isSuccess) return <></>;
+
+  const currentThemeType = selectedGroup?.theme
+    ? readProperty(selectedGroup.theme, "$type")
+    : undefined;
+  // The groups last settings per theme type (kept server side), so picking a type again restores
+  // them instead of resetting every parameter.
+  const themeStash = readProperty(selectedGroup ?? {}, "themeStash") ?? {};
 
   const fontSize = "1.2rem";
   return (
@@ -69,21 +77,29 @@ const ThemePicker = () => {
           >
             None
           </MenuItem>
-          {themeTypesQuery.data?.themes?.map((x) => (
-            <MenuItem
-              key={x.name}
-              onClick={() =>
-                changeThemeMutation.mutate({
-                  groupId: selectedGroup?.id ?? "",
-                  newTheme: {
-                    $type: x.typeDiscriminator,
-                  },
-                })
-              }
-            >
-              {x.name}
-            </MenuItem>
-          ))}
+          {themeTypesQuery.data?.themes?.map((x) => {
+            const stashedTheme = x.typeDiscriminator
+              ? themeStash[x.typeDiscriminator]
+              : undefined;
+            const isCurrent = x.typeDiscriminator === currentThemeType;
+            return (
+              <MenuItem
+                key={x.name}
+                isDisabled={isCurrent}
+                onClick={() =>
+                  changeThemeMutation.mutate({
+                    groupId: selectedGroup?.id ?? "",
+                    // Restore this groups stashed settings for that type, only fall back to a fresh
+                    // theme (server defaults) when it was never used.
+                    newTheme: stashedTheme ?? { $type: x.typeDiscriminator },
+                  })
+                }
+              >
+                {x.name}
+                {stashedTheme && !isCurrent ? " (saved)" : ""}
+              </MenuItem>
+            );
+          })}
         </MenuList>
       </Menu>
       <Text as="b" fontSize={fontSize}>

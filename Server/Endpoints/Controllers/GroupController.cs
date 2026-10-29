@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Helper;
 using Server.Services.DataStore;
@@ -67,6 +69,11 @@ public class GroupController : ControllerBase
             var group = dataStore.Data.Groups.FirstOrDefault(x => x.Id == Guid.Parse(groupId));
             if (group == null)
                 return Results.NotFound("The GroupId was not found in any groups!");
+
+            // Switching type (or clearing the theme) must not throw the old parameters away: keep the
+            // last theme of the type being left, so picking that type again restores it.
+            if (group.Theme != null && group.Theme.GetType() != newTheme?.GetType())
+                group.ThemeStash[GetThemeTypeKey(group.Theme)] = group.Theme;
 
             // newTheme == null clears the theme; a group without a theme is a valid state (e.g. a
             // newly created group), and the theme editor already renders "None" for it.
@@ -232,4 +239,11 @@ public class GroupController : ControllerBase
 
         return Results.Accepted();
     }
+
+    // JSON type discriminator of a theme (e.g. "ledThemeDaylight"): the key /theme-types reports to
+    // the frontend, and the key its settings are stashed under.
+    static string GetThemeTypeKey(LedTheme theme) =>
+        typeof(LedTheme).GetCustomAttributes<JsonDerivedTypeAttribute>()
+            .FirstOrDefault(attr => attr.DerivedType == theme.GetType())?.TypeDiscriminator as string
+        ?? theme.GetType().Name;
 }

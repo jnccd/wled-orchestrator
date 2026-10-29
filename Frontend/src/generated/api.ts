@@ -58,6 +58,9 @@ export interface components {
       name?: string;
       ledSegments?: components["schemas"]["LedSegment"][];
       theme?: components["schemas"]["LedTheme"] | null;
+      themeStash?: {
+        [key: string]: components["schemas"]["LedTheme"];
+      };
       displayColor?: components["schemas"]["ColorRgb"] | null;
       isEdited?: boolean;
     };
