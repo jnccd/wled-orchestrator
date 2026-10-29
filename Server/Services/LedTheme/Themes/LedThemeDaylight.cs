@@ -20,6 +20,10 @@ public class LedThemeDaylight : LedTheme
     [GenerateFrontendForm]
     public ColorHsv SkyColor { get; set; } = new ColorRgb(142, 215, 253).RgbToHSV();
 
+    // The sky takes on this colour near the sun while the sun is low (the orange of a sunrise/sunset).
+    [GenerateFrontendForm]
+    public ColorHsv SunsetSkyColor { get; set; } = new ColorRgb(255, 130, 50).RgbToHSV();
+
     [GenerateFrontendForm]
     public ColorHsv SunColor { get; set; } = new ColorRgb(252, 200, 20).RgbToHSV();
 
@@ -74,6 +78,9 @@ public class LedThemeDaylight : LedTheme
     // hour at mid latitudes, so the red phase only covers the sunrise/sunset itself instead of the
     // whole low sun part of the day.
     const double SunReddeningElevationDeg = 6;
+    // The sky warms up around the sun on a much wider lobe than the sun itself, so the sunrise/sunset
+    // side of the window turns orange while the rest of the sky keeps its colour.
+    const double SkyWarmthSizeDeg = 45;
     const double DegToRad = Math.PI / 180;
 
     public ColorHsv[] GetColors(TimeSpan utcTimeOfDay)
@@ -98,14 +105,21 @@ public class LedThemeDaylight : LedTheme
 
         var brightness = GetBrightness(sun) / 100;
         var sigma = Math.Max(SunSize, 0.5) / fieldOfView; // strip units
+        var skyWarmthSigma = SkyWarmthSizeDeg / fieldOfView;
 
         // Create Color Array
         ColorHsv[] colors = new ColorHsv[ColorArrayResolution];
         for (int i = 0; i < ColorArrayResolution; i++)
         {
             var x = i / (double)ColorArrayResolution - sunPosition;
+
+            // Same timings as the red sun, but spread wide: the sky glows orange around the suns
+            // bearing and fades back to SkyColor away from it.
+            var warmth = reddening * Math.Exp(-(x * x) / (skyWarmthSigma * skyWarmthSigma));
+            var sky = warmth > 0 ? SkyColor.Lerp(SunsetSkyColor, warmth) : SkyColor;
+
             var gaussianSun = Math.Exp(-(x * x) / (sigma * sigma)) * sunVisibility;
-            colors[i] = SkyColor.Lerp(sunColor, gaussianSun);
+            colors[i] = sky.Lerp(sunColor, gaussianSun);
 
             colors[i].V *= brightness;
         }
