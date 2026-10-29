@@ -14,7 +14,8 @@ public class LedThemeDaylight : LedTheme
     {
         // Local time carries the DST offset; the sun does not. Deriving the sky from the real UTC
         // instant keeps the arc the same before and after a clock change.
-        return new(GetColors(input.Time.ToUniversalTime().TimeOfDay));
+        var sun = SolarPositionCalculator.Calculate(Latitude, Longitude, (int)Math.Round(BaseDayOfYear), input.Time.ToUniversalTime().TimeOfDay);
+        return new(GetColors(sun, out var defaultColor), DefaultColor: defaultColor);
     }
 
     [GenerateFrontendForm]
@@ -87,9 +88,8 @@ public class LedThemeDaylight : LedTheme
     const double SunOffElevationDeg = -12;
     const double DegToRad = Math.PI / 180;
 
-    public ColorHsv[] GetColors(TimeSpan utcTimeOfDay)
+    public ColorHsv[] GetColors(SolarPosition sun, out ColorHsv defaultColor)
     {
-        var sun = SolarPositionCalculator.Calculate(Latitude, Longitude, (int)Math.Round(BaseDayOfYear), utcTimeOfDay);
         var fieldOfView = Math.Clamp(WindowFieldOfView, 1, 360);
 
         // Place the sun on the strip by its bearing relative to the window: the strip covers
@@ -110,6 +110,11 @@ public class LedThemeDaylight : LedTheme
         var brightness = GetBrightness(sun) / 100;
         var sigma = Math.Max(SunSize, 0.5) / fieldOfView; // strip units
         var skyWarmthSigma = Math.Max(SkyWarmthSize, 1) / fieldOfView;
+
+        // The theme as a single colour: the sky (no sun glow, it would only be a bright dot on one
+        // LED) with the same dusk warmth the sky gets. Used by segments that have only one LED.
+        defaultColor = SkyColor.Lerp(SunsetSkyColor, reddening);
+        defaultColor.V *= brightness;
 
         // Create Color Array
         ColorHsv[] colors = new ColorHsv[ColorArrayResolution];

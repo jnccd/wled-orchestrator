@@ -3,7 +3,7 @@ using Server.Services.LedTheme.Themes;
 
 namespace Server.Services.LedTheme;
 
-public record LedThemeInput(DateTime Time);
+public record LedThemeInput(DateTime Time, int? SegmentLength = null);
 
 public enum LedThemePreviewType
 {
@@ -30,6 +30,15 @@ public class LedTheme
     public LedGroupState? GetNewModifiedState(LedThemeInput input)
     {
         var state = GetNewState(input);
+        if (state == null)
+            return null;
+
+        // A segment with a single LED cannot show the themes gradient, so it gets the themes
+        // representative colour instead. Done before the modifiers so they still apply to it (the
+        // wake up dimming needs to be able to switch that one LED off, for example).
+        if (input.SegmentLength == 1 && state.DefaultColor != null)
+            state.Colors = [state.DefaultColor];
+
         foreach (var modifier in Modifiers)
             state = modifier.ModifyState(state, input);
         return state;
