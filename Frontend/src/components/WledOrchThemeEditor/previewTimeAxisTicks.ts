@@ -9,7 +9,7 @@ export interface TimeAxisTick {
  * The preview image renders one row per time step: the top row is the start of the preview window
  * and the bottom row is its end (the server maps LedThemePreviewType to that window, see
  * LedTheme.GetPreviewState). Which window applies depends on the theme's LedThemePreviewType:
- *   Day: 24 hours
+ *   Day: 24 hours, in UTC (the daylight theme follows the real UTC sun, see LedThemeDaylight)
  *   Min: 60 seconds
  *
  * Ticks are placed with uniform vertical spacing across the axis. The tick step thins out when the
@@ -49,6 +49,10 @@ const toPreviewTypeKey = (previewType: unknown): string => {
   if (typeof previewType === "string") return previewType; // future types serialized as strings
   return "";
 };
+
+/** True when the theme previews a whole day, whose axis the server renders in UTC. */
+export const isUtcDayPreview = (previewType: unknown): boolean =>
+  toPreviewTypeKey(previewType) === "Day";
 
 export const getTimeAxisTicks = (
   previewType: unknown,

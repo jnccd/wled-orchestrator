@@ -144,7 +144,23 @@ export interface components {
       skyColor?: components["schemas"]["ColorHsv"];
       sunColor?: components["schemas"]["ColorHsv"];
       /** Format: double */
-      invertedSunSize?: number;
+      latitude?: number;
+      /** Format: double */
+      longitude?: number;
+      /** Format: double */
+      windowAzimuth?: number;
+      /** Format: double */
+      windowFieldOfView?: number;
+      /** Format: double */
+      baseDayOfYear?: number;
+      /** Format: double */
+      sunSize?: number;
+      /** Format: double */
+      nightBrightness?: number;
+      /** Format: double */
+      horizonBrightness?: number;
+      /** Format: double */
+      dayBrightness?: number;
     };
     LedThemeSingleColor: components["schemas"]["LedTheme"] & {
       color?: components["schemas"]["ColorHsv"];

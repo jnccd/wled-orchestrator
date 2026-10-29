@@ -39,9 +39,13 @@ public class LedTheme
     {
         var hour = 24 / (float)maxIterator * curIterator;
         var sec = 60 / (float)maxIterator * curIterator;
+        // The day preview runs in UTC: the daylight theme derives the sky from the real UTC instant,
+        // so a local-time preview would shift the sun arc with the time zone and with DST.
+        var utcDay = DateTime.UtcNow.Date;
+        var utcHour = new TimeSpan((int)hour, (int)(hour % 1 * 60), 0);
         return PreviewType switch
         {
-            LedThemePreviewType.Day => this.GetNewModifiedState(new(new(DateOnly.FromDateTime(DateTime.Now), new((int)hour, (int)(hour % 1 * 60), 0)))),
+            LedThemePreviewType.Day => this.GetNewModifiedState(new LedThemeInput(utcDay.Add(utcHour))),
             LedThemePreviewType.Min => this.GetNewModifiedState(new(new(DateOnly.FromDateTime(DateTime.Now), new(0, 0, (int)sec, (int)(sec % 1 * 1000))))),
             _ => null,
         };

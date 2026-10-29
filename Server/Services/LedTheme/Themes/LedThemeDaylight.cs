@@ -2,12 +2,19 @@ using Server.Endpoints;
 using Server.Helper;
 namespace Server.Services.LedTheme.Themes;
 
+/// <summary>
+/// A virtual window on a spring sky. The sun is placed on the strip by its real compass bearing as
+/// seen through the window, and the sky brightness follows the suns height above the horizon. Arc and
+/// brightness are both computed for a fixed spring day, so the window stays bright on early winter
+/// evenings, and both are driven by UTC so daylight savings cannot shift the sun.
+/// </summary>
 public class LedThemeDaylight : LedTheme
 {
     public override LedGroupState? GetNewState(LedThemeInput input)
     {
-        var dayTimePercent = input.Time.TimeOfDay.TotalDays;
-        return new(GetColors(dayTimePercent));
+        // Local time carries the DST offset; the sun does not. Deriving the sky from the real UTC
+        // instant keeps the arc the same before and after a clock change.
+        return new(GetColors(input.Time.ToUniversalTime().TimeOfDay));
     }
 
     [GenerateFrontendForm]
@@ -15,37 +22,118 @@ public class LedThemeDaylight : LedTheme
 
     [GenerateFrontendForm]
     public ColorHsv SunColor { get; set; } = new ColorRgb(252, 200, 20).RgbToHSV();
+
+    // Where the window is and which way it faces. Azimuth is in compass degrees: 0 = north,
+    // 90 = east, 180 = south, 270 = west (so 315 is a north-west window).
+    [GenerateFrontendForm(InputType: "number-input", MinValue: -90, MaxValue: 90)]
+    public double Latitude { get; set; } = 48;
+
+    [GenerateFrontendForm(InputType: "number-input", MinValue: -180, MaxValue: 180)]
+    public double Longitude { get; set; } = 11.5;
+
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 0, MaxValue: 360)]
+    public double WindowAzimuth { get; set; } = 180;
+
+    // How much sky the window shows: the strip spans this many degrees centered on WindowAzimuth.
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 10, MaxValue: 360)]
+    public double WindowFieldOfView { get; set; } = 180;
+
+    // The sun arc (and with it the brightness curve) is computed for this day of the year instead of
+    // today, so a spring day keeps the window bright in early winter evenings.
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 1, MaxValue: 365)]
+    public double BaseDayOfYear { get; set; } = 120;
+
+    // Angular sigma of the suns glow in degrees of sky. A wider window fits more sky around it, so
+    // the same size covers fewer leds.
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 1, MaxValue: 90)]
+    public double SunSize { get; set; } = 25;
+
+    // Sky brightness in percent: before/after the twilight, when the sun touches the horizon and at
+    // the highest point of the day.
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 0, MaxValue: 100)]
+    public double NightBrightness { get; set; } = 1;
+
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 0, MaxValue: 100)]
+    public double HorizonBrightness { get; set; } = 40;
+
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 0, MaxValue: 100)]
+    public double DayBrightness { get; set; } = 100;
+
     readonly int ColorArrayResolution = 300;
-    static readonly double sunRise = 0.3;
-    static readonly double sunTime = 0.5;
 
-    static readonly double halfSunTime = sunTime / 2;
-    static readonly double sunTop = sunRise + halfSunTime;
-    static readonly double sunSet = sunRise + sunTime;
+    // Civil twilight ends about 6 degrees below the horizon; that is where the sky reaches the night
+    // brightness, so the sun glow has faded out by then. The band below only matters when the night
+    // brightness is set high, and keeps the sun from showing up in the middle of the night.
+    const double TwilightElevationDeg = -6;
+    const double SunOffElevationDeg = -12;
+    const double DegToRad = Math.PI / 180;
 
-    static readonly double dayLightFunMult = -Math.Log2(0.4) / (halfSunTime * halfSunTime);
-    readonly Func<double, double> DayLightFunction = (x) => Math.Pow(2, -((x - sunTop) * (x - sunTop)) * dayLightFunMult);
-
-    [GenerateFrontendForm(InputType: "number-input")]
-    public double InvertedSunSize { get; set; } = 150;
-
-    public ColorHsv[] GetColors(double curDayTimePercent)
+    public ColorHsv[] GetColors(TimeSpan utcTimeOfDay)
     {
-        // Progress of the sun across the strip: 0 = left edge at sunrise, 1 = right edge at sunset.
-        // sunTime is the duration of that trip, so the elapsed time since sunrise has to be divided by it.
-        var sunRiseDayTime = (curDayTimePercent - sunRise) / sunTime;
+        var sun = SolarPositionCalculator.Calculate(Latitude, Longitude, (int)Math.Round(BaseDayOfYear), utcTimeOfDay);
+        var fieldOfView = Math.Clamp(WindowFieldOfView, 1, 360);
+
+        // Place the sun on the strip by its bearing relative to the window: the strip covers
+        // +/- fieldOfView/2 degrees around WindowAzimuth.
+        var bearingFromWindow = WrapAzimuth(sun.AzimuthDeg - WindowAzimuth);
+        var sunPosition = 0.5 + bearingFromWindow / fieldOfView;
+
+        // No hard cut offs: at the windows edges the glow slides in and out over the strip bounds
+        // because the gaussian extends past the suns centre, and a setting sun fades away with the
+        // sky brightness (it is already dim at the horizon level) rather than blinking off.
+        var sunVisibility = SmoothStep(SunOffElevationDeg, TwilightElevationDeg, sun.ElevationDeg);
+
+        var brightness = GetBrightness(sun) / 100;
+        var sigma = Math.Max(SunSize, 0.5) / fieldOfView; // strip units
 
         // Create Color Array
         ColorHsv[] colors = new ColorHsv[ColorArrayResolution];
         for (int i = 0; i < ColorArrayResolution; i++)
         {
-            var x = i / (double)ColorArrayResolution - sunRiseDayTime;
-            var gaussianSun = Math.Exp(-(x * x) * InvertedSunSize);
+            var x = i / (double)ColorArrayResolution - sunPosition;
+            var gaussianSun = Math.Exp(-(x * x) / (sigma * sigma)) * sunVisibility;
             colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
 
-            colors[i].V *= DayLightFunction(curDayTimePercent);
+            colors[i].V *= brightness;
         }
 
         return colors;
+    }
+
+    double GetBrightness(SolarPosition sun)
+    {
+        var night = Math.Clamp(NightBrightness, 0, 100);
+        var horizon = Math.Clamp(HorizonBrightness, 0, 100);
+        var day = Math.Clamp(DayBrightness, 0, 100);
+
+        if (sun.ElevationDeg <= TwilightElevationDeg)
+            return night;
+
+        if (sun.ElevationDeg < 0)
+            return Lerp(night, horizon, SmoothStep(TwilightElevationDeg, 0, sun.ElevationDeg));
+
+        // Above the horizon the sky brightness follows the suns height: none at the horizon, full at
+        // the highest point of the day.
+        if (sun.MaxElevationDeg <= 1)
+            return horizon;
+
+        var relativeHeight = Math.Sin(sun.ElevationDeg * DegToRad) / Math.Sin(sun.MaxElevationDeg * DegToRad);
+        return Lerp(horizon, day, SmoothStep(0, 1, relativeHeight));
+    }
+
+    static double Lerp(double a, double b, double x) => a * (1 - x) + b * x;
+
+    static double SmoothStep(double edge0, double edge1, double x)
+    {
+        var t = Math.Clamp((x - edge0) / (edge1 - edge0), 0, 1);
+        return t * t * (3 - 2 * t);
+    }
+
+    static double WrapAzimuth(double degrees)
+    {
+        var wrapped = degrees % 360;
+        if (wrapped > 180) wrapped -= 360;
+        if (wrapped < -180) wrapped += 360;
+        return wrapped;
     }
 }
