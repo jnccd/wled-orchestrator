@@ -9,7 +9,6 @@ import { useThemePreviewImageQuery } from "../../hooks/useThemePreviewImageQuery
 import { readProperty } from "../../utils/untypedPropertyAccess";
 import ThemePaneHeader from "./ThemePaneHeader";
 import PreviewTimeAxis from "./PreviewTimeAxis";
-import { isUtcDayPreview } from "./previewTimeAxisTicks";
 
 const ThemePreview = () => {
   // React Query setup
@@ -31,9 +30,7 @@ const ThemePreview = () => {
 
   return (
     <Box width={"348px"}>
-      <ThemePaneHeader>
-        Preview{isUtcDayPreview(previewType) ? " (UTC)" : ""}
-      </ThemePaneHeader>
+      <ThemePaneHeader>Preview</ThemePaneHeader>
       <Flex alignItems="stretch">
         {/* The time axis of the preview is its y axis; the label strip stretches with the image. */}
         <PreviewTimeAxis previewType={previewType} />
