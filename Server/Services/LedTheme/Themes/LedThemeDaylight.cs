@@ -31,12 +31,14 @@ public class LedThemeDaylight : LedTheme
 
     public ColorHsv[] GetColors(double curDayTimePercent)
     {
+        // Progress of the sun across the strip: 0 = left edge at sunrise, 1 = right edge at sunset.
+        // sunTime is the duration of that trip, so the elapsed time since sunrise has to be divided by it.
+        var sunRiseDayTime = (curDayTimePercent - sunRise) / sunTime;
+
         // Create Color Array
         ColorHsv[] colors = new ColorHsv[ColorArrayResolution];
         for (int i = 0; i < ColorArrayResolution; i++)
         {
-            var sunRiseDayTime = curDayTimePercent / sunTime - sunRise;
-
             var x = i / (double)ColorArrayResolution - sunRiseDayTime;
             var gaussianSun = Math.Exp(-(x * x) * InvertedSunSize);
             colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
