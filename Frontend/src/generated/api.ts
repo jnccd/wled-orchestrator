@@ -143,6 +143,7 @@ export interface components {
     LedThemeDaylight: components["schemas"]["LedTheme"] & {
       skyColor?: components["schemas"]["ColorHsv"];
       sunColor?: components["schemas"]["ColorHsv"];
+      sunsetColor?: components["schemas"]["ColorHsv"];
       /** Format: double */
       latitude?: number;
       /** Format: double */

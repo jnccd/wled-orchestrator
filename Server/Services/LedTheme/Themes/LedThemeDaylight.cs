@@ -23,6 +23,10 @@ public class LedThemeDaylight : LedTheme
     [GenerateFrontendForm]
     public ColorHsv SunColor { get; set; } = new ColorRgb(252, 200, 20).RgbToHSV();
 
+    // The sun turns this colour while it sits near the horizon (the red of a real sunrise/sunset).
+    [GenerateFrontendForm]
+    public ColorHsv SunsetColor { get; set; } = new ColorRgb(255, 80, 20).RgbToHSV();
+
     // Where the window is and which way it faces. Azimuth is in compass degrees: 0 = north,
     // 90 = east, 180 = south, 270 = west (so 315 is a north-west window).
     [GenerateFrontendForm(InputType: "number-input", MinValue: -90, MaxValue: 90)]
@@ -66,6 +70,10 @@ public class LedThemeDaylight : LedTheme
     // brightness is set high, and keeps the sun from showing up in the middle of the night.
     const double TwilightElevationDeg = -6;
     const double SunOffElevationDeg = -12;
+    // How high the sun has to climb before it is plain SunColor again. Six degrees is about half an
+    // hour at mid latitudes, so the red phase only covers the sunrise/sunset itself instead of the
+    // whole low sun part of the day.
+    const double SunReddeningElevationDeg = 6;
     const double DegToRad = Math.PI / 180;
 
     public ColorHsv[] GetColors(TimeSpan utcTimeOfDay)
@@ -83,6 +91,11 @@ public class LedThemeDaylight : LedTheme
         // sky brightness (it is already dim at the horizon level) rather than blinking off.
         var sunVisibility = SmoothStep(SunOffElevationDeg, TwilightElevationDeg, sun.ElevationDeg);
 
+        // A low sun is red: fade from SunsetColor at the horizon to SunColor once it has climbed a
+        // few degrees, so the redness only covers the sunrise/sunset itself.
+        var reddening = SmoothStep(SunReddeningElevationDeg, 0, sun.ElevationDeg);
+        var sunColor = SunColor.Lerp(SunsetColor, reddening);
+
         var brightness = GetBrightness(sun) / 100;
         var sigma = Math.Max(SunSize, 0.5) / fieldOfView; // strip units
 
@@ -92,7 +105,7 @@ public class LedThemeDaylight : LedTheme
         {
             var x = i / (double)ColorArrayResolution - sunPosition;
             var gaussianSun = Math.Exp(-(x * x) / (sigma * sigma)) * sunVisibility;
-            colors[i] = SkyColor.Lerp(SunColor, gaussianSun);
+            colors[i] = SkyColor.Lerp(sunColor, gaussianSun);
 
             colors[i].V *= brightness;
         }
