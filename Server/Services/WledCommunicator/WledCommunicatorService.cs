@@ -396,11 +396,12 @@ public class WledCommunicatorService(
 
         if (frequentLogging) logger.WriteLine($"Setting led colors of segment {segment} with resolution of {colors.Length} via HTTP...", LogLevel.Debug);
 
+        var sampled = SampleColorsToSegment(colors, segment);
         var ledCols = new StringBuilder();
         ledCols.Append("{\"i\":[");
         for (int i = 0; i < segment.Length; i++)
         {
-            var col = colors[(int)(i * (float)colors.Length / segment.Length)];
+            var col = sampled[i];
             if (i > 0)
                 ledCols.Append(',');
             ledCols.Append($"{segment.Start + i},'{col.ToHex()}'");
@@ -411,11 +412,13 @@ public class WledCommunicatorService(
         return true;
     }
 
-    // Converts the theme color array (any resolution) into one color per physical LED of the segment,
-    // using the same sampling the old HTTP JSON transport used.
+    // Converts the theme color array (any resolution) into one color per physical LED of the segment.
+    // Each LED takes the color at the center of the slice of the theme array it covers, so a segment
+    // shorter than the theme spans the whole theme instead of its left end: a single LED segment
+    // shows the middle color, two LEDs take the middle of both halves, and so on.
     static ColorRgb[] SampleColorsToSegment(ColorRgb[] colors, LedSegment segment) =>
         Enumerable.Range(0, segment.Length)
-            .Select(i => colors[(int)(i * (float)colors.Length / segment.Length)])
+            .Select(i => colors[(int)((i + 0.5) * colors.Length / segment.Length)])
             .ToArray();
 
     // WledServerAddresses are stored as full urls ("http://192.168.x.y"), extract the host part for UDP.
