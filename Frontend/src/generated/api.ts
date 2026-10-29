@@ -159,6 +159,8 @@ export interface components {
       /** Format: double */
       baseDayOfYear?: number;
       /** Format: double */
+      extraDaylightMinutes?: number;
+      /** Format: double */
       sunSize?: number;
       /** Format: double */
       skyWarmthSize?: number;

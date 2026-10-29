@@ -24,7 +24,13 @@ public static class SolarPositionCalculator
     /// window needs. The date is fixed per call (the theme uses one spring day), so only the hour
     /// angle moves with <paramref name="utcTimeOfDay"/>.
     /// </summary>
-    public static SolarPosition Calculate(double latitudeDeg, double longitudeDeg, int dayOfYear, TimeSpan utcTimeOfDay)
+    /// <param name="daylightExtensionHours">
+    /// Stretches the day about solar noon without changing its shape: sunrise and sunset keep their
+    /// bearings and the noon height stays the same, but the day lasts this many hours longer (half of
+    /// it on each side). Sunrise/sunset are only valid when the base day has a real day/night cycle,
+    /// i.e. not during polar day or night.
+    /// </param>
+    public static SolarPosition Calculate(double latitudeDeg, double longitudeDeg, int dayOfYear, TimeSpan utcTimeOfDay, double daylightExtensionHours = 0)
     {
         var gamma = 2 * Math.PI / 365 * (Math.Clamp(dayOfYear, 1, 365) - 1);
 
@@ -42,6 +48,17 @@ public static class SolarPositionCalculator
         var hourAngle = (solarHours - 12) * 15 * DegToRad;
 
         var latitude = Math.Clamp(latitudeDeg, -90, 90) * DegToRad;
+
+        // Optional: slow the sun down by scaling its hour angle. The elevation curve keeps its shape
+        // (same noon height, same sunrise/sunset bearings) but is spread over a longer day, so the
+        // sky stays bright past what the base date would allow.
+        if (daylightExtensionHours > 0)
+        {
+            var halfDayAngle = Math.Acos(Math.Clamp(-Math.Tan(latitude) * Math.Tan(declination), -1, 1));
+            var dayHours = 2 * halfDayAngle * RadToDeg / 15;
+            if (dayHours is > 0.1 and < 23.9)
+                hourAngle *= dayHours / (dayHours + daylightExtensionHours);
+        }
 
         var sinElevation = Math.Sin(latitude) * Math.Sin(declination)
                            + Math.Cos(latitude) * Math.Cos(declination) * Math.Cos(hourAngle);

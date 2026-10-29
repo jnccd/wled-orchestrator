@@ -14,7 +14,10 @@ public class LedThemeDaylight : LedTheme
     {
         // Local time carries the DST offset; the sun does not. Deriving the sky from the real UTC
         // instant keeps the arc the same before and after a clock change.
-        var sun = SolarPositionCalculator.Calculate(Latitude, Longitude, (int)Math.Round(BaseDayOfYear), input.Time.ToUniversalTime().TimeOfDay);
+        var sun = SolarPositionCalculator.Calculate(
+            Latitude, Longitude, (int)Math.Round(BaseDayOfYear),
+            input.Time.ToUniversalTime().TimeOfDay,
+            Math.Clamp(ExtraDaylightMinutes, 0, 240) / 60);
         return new(GetColors(sun, out var defaultColor), DefaultColor: defaultColor);
     }
 
@@ -51,6 +54,12 @@ public class LedThemeDaylight : LedTheme
     // today, so a spring day keeps the window bright in early winter evenings.
     [GenerateFrontendForm(InputType: "number-input", MinValue: 1, MaxValue: 365)]
     public double BaseDayOfYear { get; set; } = 120;
+
+    // Stretches the day beyond what the base date can give: the sun rises this many minutes earlier
+    // and sets this many minutes later, keeping the same sunrise/sunset bearings and noon height, so
+    // the window stays bright longer without changing the shape of the arc. 0 = the real day.
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 0, MaxValue: 240)]
+    public double ExtraDaylightMinutes { get; set; } = 0;
 
     // Angular sigma of the suns glow in degrees of sky. A wider window fits more sky around it, so
     // the same size covers fewer leds.
