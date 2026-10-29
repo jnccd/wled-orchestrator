@@ -158,6 +158,10 @@ export interface components {
       /** Format: double */
       sunSize?: number;
       /** Format: double */
+      skyWarmthSize?: number;
+      /** Format: double */
+      reddeningHeight?: number;
+      /** Format: double */
       nightBrightness?: number;
       /** Format: double */
       horizonBrightness?: number;

@@ -56,6 +56,17 @@ public class LedThemeDaylight : LedTheme
     [GenerateFrontendForm(InputType: "number-input", MinValue: 1, MaxValue: 90)]
     public double SunSize { get; set; } = 25;
 
+    // Angular sigma of the warm sky lobe in degrees. Much wider than the sun, so the sunset side of
+    // the window goes orange while the rest keeps its colour; set it wide (e.g. 180) to warm the
+    // whole window at dawn/dusk.
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 10, MaxValue: 360)]
+    public double SkyWarmthSize { get; set; } = 45;
+
+    // How many degrees the sun has to climb above the horizon before the red sun and the warm sky are
+    // back to normal, i.e. how long the sunrise/sunset colour phase lasts.
+    [GenerateFrontendForm(InputType: "number-input", MinValue: 1, MaxValue: 45)]
+    public double ReddeningHeight { get; set; } = 6;
+
     // Sky brightness in percent: before/after the twilight, when the sun touches the horizon and at
     // the highest point of the day.
     [GenerateFrontendForm(InputType: "number-input", MinValue: 0, MaxValue: 100)]
@@ -74,13 +85,6 @@ public class LedThemeDaylight : LedTheme
     // brightness is set high, and keeps the sun from showing up in the middle of the night.
     const double TwilightElevationDeg = -6;
     const double SunOffElevationDeg = -12;
-    // How high the sun has to climb before it is plain SunColor again. Six degrees is about half an
-    // hour at mid latitudes, so the red phase only covers the sunrise/sunset itself instead of the
-    // whole low sun part of the day.
-    const double SunReddeningElevationDeg = 6;
-    // The sky warms up around the sun on a much wider lobe than the sun itself, so the sunrise/sunset
-    // side of the window turns orange while the rest of the sky keeps its colour.
-    const double SkyWarmthSizeDeg = 45;
     const double DegToRad = Math.PI / 180;
 
     public ColorHsv[] GetColors(TimeSpan utcTimeOfDay)
@@ -100,12 +104,12 @@ public class LedThemeDaylight : LedTheme
 
         // A low sun is red: fade from SunsetColor at the horizon to SunColor once it has climbed a
         // few degrees, so the redness only covers the sunrise/sunset itself.
-        var reddening = SmoothStep(SunReddeningElevationDeg, 0, sun.ElevationDeg);
+        var reddening = SmoothStep(Math.Max(ReddeningHeight, 0.1), 0, sun.ElevationDeg);
         var sunColor = SunColor.Lerp(SunsetColor, reddening);
 
         var brightness = GetBrightness(sun) / 100;
         var sigma = Math.Max(SunSize, 0.5) / fieldOfView; // strip units
-        var skyWarmthSigma = SkyWarmthSizeDeg / fieldOfView;
+        var skyWarmthSigma = Math.Max(SkyWarmthSize, 1) / fieldOfView;
 
         // Create Color Array
         ColorHsv[] colors = new ColorHsv[ColorArrayResolution];
